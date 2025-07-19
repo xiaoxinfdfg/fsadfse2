@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程目标达成度分析系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #eee;
+            cursor: pointer;
+            margin-right: 5px;
+            border-radius: 5px 5px 0 0;
+        }
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .filter-results {
+            margin-top: 20px;
+        }
+        .student-row:hover {
+            background-color: #e6f7ff;
+        }
+        .highlight-low {
+            background-color: #ffcccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>课程目标达成度分析系统</h1>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('basic-info')">基本信息</div>
+            <div class="tab" onclick="switchTab('data-input')">数据输入</div>
+            <div class="tab" onclick="switchTab('analysis-results')">分析结果</div>
+            <div class="tab" onclick="switchTab('chart-analysis')">图表分析</div>
+            <div class="tab" onclick="switchTab('filter-results')">筛选结果</div>
+        </div>
+        
+        <!-- 基本信息编辑 -->
+        <div id="basic-info" class="tab-content active">
+            <h2>基本信息编辑</h2>
+            <div class="section">
+                <div class="form-group">
+                    <label for="table-name">表格名称</label>
+                    <input type="text" id="table-name" value="《大学物理BI》课程目标达成度分析表">
+                </div>
+                <div class="form-group">
+                    <label for="course-type">课程性质</label>
+                    <input type="text" id="course-type" value="专业基础">
+                </div>
+                <div class="form-group">
+                    <label for="course-credit">课程学分</label>
+                    <input type="number" id="course-credit" step="0.1" value="2.5">
+                </div>
+                <div class="form-group">
+                    <label for="teacher-name">教师姓名</label>
+                    <input type="text" id="teacher-name" value="马厂">
+                </div>
+                <div class="form-group">
+                    <label for="class-name">班级</label>
+                    <input type="text" id="class-name" value="信息与计算科学2024(1)(2)(3)班">
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>权重设置</h3>
+                <div class="form-group">
+                    <label for="gamma1">γ₁ (课程目标1权重)</label>
+                    <input type="number" id="gamma1" step="0.1" min="0" max="1" value="0.4">
+                </div>
+                <div class="form-group">
+                    <label for="gamma2">γ₂ (课程目标2权重)</label>
+                    <input type="number" id="gamma2" step="0.1" min="0" max="1" value="0.3">
+                </div>
+                <div class="form-group">
+                    <label for="gamma3">γ₃ (课程目标3权重)</label>
+                    <input type="number" id="gamma3" step="0.1" min="0" max="1" value="0.3">
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>成绩系数设置</h3>
+                <div class="form-group">
+                    <label for="usual-coefficient">平时成绩系数</label>
+                    <input type="number" id="usual-coefficient" step="0.1" min="0" max="1" value="0.4">
+                </div>
+                <div class="form-group">
+                    <label for="final-coefficient">期末成绩系数</label>
+                    <input type="number" id="final-coefficient" step="0.1" min="0" max="1" value="0.6">
+                </div>
+            </div>
+            
+            <button onclick="saveBasicInfo()">保存基本信息</button>
+        </div>
+        
+        <!-- 数据输入 -->
+        <div id="data-input" class="tab-content">
+            <h2>数据输入</h2>
+            <div class="section">
+                <button onclick="addStudent()">添加学生</button>
+                <button onclick="removeSelectedStudents()">删除选中学生</button>
+                <button onclick="importFromExcel()">从Excel导入</button>
+                <button onclick="exportToExcel()">导出到Excel</button>
+                <input type="file" id="file-input" style="display: none;" accept=".xlsx,.xls">
+            </div>
+            
+            <div class="section">
+                <table id="input-table">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="select-all" onclick="toggleSelectAll()"></th>
+                            <th>序号</th>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>平时成绩项目1</th>
+                            <th>平时成绩项目2</th>
+                            <th>平时成绩项目3</th>
+                            <th>平时成绩项目4</th>
+                            <th>期末成绩课程目标1</th>
+                            <th>期末成绩课程目标2</th>
+                            <th>期末成绩课程目标3</th>
+                        </tr>
+                    </thead>
+                    <tbody id="input-data">
+                        <!-- 数据将通过JavaScript动态添加 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 分析结果 -->
+        <div id="analysis-results" class="tab-content">
+            <h2>分析结果</h2>
+            <div class="section">
+                <table id="result-table">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>平时成绩</th>
+                            <th>期末成绩</th>
+                            <th>R1</th>
+                            <th>R2</th>
+                            <th>R3</th>
+                            <th>课程达成度R</th>
+                        </tr>
+                    </thead>
+                    <tbody id="result-data">
+                        <!-- 结果将通过JavaScript动态添加 -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="section">
+                <h3>达成度平均值</h3>
+                <table>
+                    <tr>
+                        <th>目标1均值 (R1)</th>
+                        <th>目标2均值 (R2)</th>
+                        <th>目标3均值 (R3)</th>
+                        <th>总达成度均值</th>
+                    </tr>
+                    <tr>
+                        <td id="avg-r1">0.00</td>
+                        <td id="avg-r2">0.00</td>
+                        <td id="avg-r3">0.00</td>
+                        <td id="avg-total">0.00</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 图表分析 -->
+        <div id="chart-analysis" class="tab-content">
+            <h2>图表分析</h2>
+            <div class="section">
+                <div class="chart-container">
+                    <canvas id="achievement-chart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 筛选结果 -->
+        <div id="filter-results" class="tab-content">
+            <h2>筛选结果</h2>
+            <div class="section">
+                <button onclick="filterLowR1()">筛选R1<0.6的学生</button>
+                <button onclick="filterLowR2()">筛选R2<0.6的学生</button>
+                <button onclick="filterLowR3()">筛选R3<0.6的学生</button>
+                <button onclick="clearFilter()">清除筛选</button>
+            </div>
+            
+            <div class="section filter-results">
+                <table id="filter-table">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>R1</th>
+                            <th>R2</th>
+                            <th>R3</th>
+                            <th>课程达成度R</th>
+                        </tr>
+                    </thead>
+                    <tbody id="filter-data">
+                        <!-- 筛选结果将通过JavaScript动态添加 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let students = [];
+        let chart = null;
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 添加一个示例学生
+            addStudent();
+            
+            // 初始化图表
+            initChart();
+            
+            // 计算初始结果
+            calculateResults();
+        });
+        
+        // 切换标签页
+        function switchTab(tabId) {
+            // 隐藏所有标签内容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 取消所有标签的活动状态
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的标签内容
+            document.getElementById(tabId).classList.add('active');
+            
+            // 设置选中标签的活动状态
+            event.currentTarget.classList.add('active');
+            
+            // 如果是图表标签，重新绘制图表
+            if (tabId === 'chart-analysis') {
+                updateChart();
+            }
+        }
+        
+        // 保存基本信息
+        function saveBasicInfo() {
+            alert('基本信息已保存！');
+        }
+        
+        // 添加学生
+        function addStudent() {
+            const tbody = document.getElementById('input-data');
+            const newId = students.length + 1;
+            
+            const tr = document.createElement('tr');
+            tr.className = 'student-row';
+            tr.innerHTML = `
+                <td><input type="checkbox" class="student-checkbox"></td>
+                <td>${newId}</td>
+                <td><input type="text" class="student-id" placeholder="学号"></td>
+                <td><input type="text" class="student-name" placeholder="姓名"></td>
+                <td><input type="number" class="usual-score1" placeholder="成绩1" min="0" max="100" onchange="calculateResults()"></td>
+                <td><input type="number" class="usual-score2" placeholder="成绩2" min="0" max="100" onchange="calculateResults()"></td>
+                <td><input type="number" class="usual-score3" placeholder="成绩3" min="0" max="100" onchange="calculateResults()"></td>
+                <td><input type="number" class="usual-score4" placeholder="成绩4" min="0" max="100" onchange="calculateResults()"></td>
+                <td><input type="number" class="final-score1" placeholder="目标1" min="0" max="100" onchange="calculateResults()"></td>
+                <td><input type="number" class="final-score2" placeholder="目标2" min="0" max="100" onchange="calculateResults()"></td>
+                <td><input type="number" class="final-score3" placeholder="目标3" min="0" max="100" onchange="calculateResults()"></td>
+            `;
+            
+            tbody.appendChild(tr);
+            
+            // 添加到学生数组
+            students.push({
+                id: newId,
+                studentId: '',
+                name: '',
+                usualScores: [null, null, null, null],
+                finalScores: [null, null, null]
+            });
+        }
+        
+        // 删除选中的学生
+        function removeSelectedStudents() {
+            const checkboxes = document.querySelectorAll('.student-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('请先选择要删除的学生！');
+                return;
+            }
+            
+            if (confirm(`确定要删除选中的 ${checkboxes.length} 条学生记录吗？`)) {
+                checkboxes.forEach(checkbox => {
+                    const tr = checkbox.closest('tr');
+                    const index = Array.from(tr.parentNode.children).indexOf(tr) - 1; // 减去表头
+                    
+                    // 从数组中删除
+                    students.splice(index, 1);
+                    
+                    // 从DOM中删除
+                    tr.remove();
+                });
+                
+                // 重新计算序号
+                updateStudentIds();
+                
+                // 重新计算结果
+                calculateResults();
+            }
+        }
+        
+        // 更新学生序号
+        function updateStudentIds() {
+            const rows = document.querySelectorAll('#input-data tr');
+            rows.forEach((row, index) => {
+                const idCell = row.querySelector('td:nth-child(2)');
+                idCell.textContent = index + 1;
+                
+                // 更新数组中的ID
+                if (students[index]) {
+                    students[index].id = index + 1;
+                }
+            });
+        }
+        
+        // 全选/取消全选
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('select-all').checked;
+            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                checkbox.checked = selectAll;
+            });
+        }
+        
+        // 从Excel导入数据
+        function importFromExcel() {
+            document.getElementById('file-input').click();
+        }
+        
+        // 处理文件导入
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                // 获取第一个工作表
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                
+                // 转换为JSON
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                
+                // 清空现有数据
+                document.getElementById('input-data').innerHTML = '';
+                students = [];
+                
+                // 跳过表头，从第二行开始处理数据
+                for (let i = 1; i < jsonData.length; i++) {
+                    const row = jsonData[i];
+                    if (row.length === 0) continue; // 跳过空行
+                    
+                    addStudent();
+                    
+                    const lastIndex = students.length - 1;
+                    const currentStudent = students[lastIndex];
+                    const currentRow = document.querySelector(`#input-data tr:nth-child(${lastIndex + 1})`);
+                    
+                    // 填充数据
+                    if (row[1]) {
+                        currentStudent.studentId = row[1].toString();
+                        currentRow.querySelector('.student-id').value = row[1].toString();
+                    }
+                    
+                    if (row[2]) {
+                        currentStudent.name = row[2].toString();
+                        currentRow.querySelector('.student-name').value = row[2].toString();
+                    }
+                    
+                    // 平时成绩项目
+                    for (let j = 3; j <= 6; j++) {
+                        if (row[j] !== undefined && row[j] !== null && row[j] !== '') {
+                            const score = parseFloat(row[j]);
+                            if (!isNaN(score)) {
+                                currentStudent.usualScores[j-3] = score;
+                                currentRow.querySelector(`.usual-score${j-2}`).value = score;
+                            }
+                        }
+                    }
+                    
+                    // 期末成绩课程目标
+                    for (let j = 7; j <= 9; j++) {
+                        if (row[j] !== undefined && row[j] !== null && row[j] !== '') {
+                            const score = parseFloat(row[j]);
+                            if (!isNaN(score)) {
+                                currentStudent.finalScores[j-7] = score;
+                                currentRow.querySelector(`.final-score${j-6}`).value = score;
+                            }
+                        }
+                    }
+                }
+                
+                // 重新计算结果
+                calculateResults();
+            };
+            reader.readAsArrayBuffer(file);
+            
+            // 重置文件输入，以便可以重复选择同一个文件
+            e.target.value = '';
+        });
+        
+        // 导出到Excel
+        function exportToExcel() {
+            // 收集数据
+            const data = [];
+            
+            // 表头
+            data.push([
+                '序号', '学号', '姓名', 
+                '平时成绩项目1', '平时成绩项目2', '平时成绩项目3', '平时成绩项目4',
+                '期末成绩课程目标1', '期末成绩课程目标2', '期末成绩课程目标3'
+            ]);
+            
+            // 学生数据
+            const rows = document.querySelectorAll('#input-data tr');
+            rows.forEach(row => {
+                const rowData = [
+                    row.querySelector('td:nth-child(2)').textContent,
+                    row.querySelector('.student-id').value,
+                    row.querySelector('.student-name').value,
+                    row.querySelector('.usual-score1').value || '',
+                    row.querySelector('.usual-score2').value || '',
+                    row.querySelector('.usual-score3').value || '',
+                    row.querySelector('.usual-score4').value || '',
+                    row.querySelector('.final-score1').value || '',
+                    row.querySelector('.final-score2').value || '',
+                    row.querySelector('.final-score3').value || ''
+                ];
+                data.push(rowData);
+            });
+            
+            // 创建工作表
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            
+            // 创建工作簿
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "学生成绩数据");
+            
+            // 导出Excel文件
+            const tableName = document.getElementById('table-name').value || '课程目标达成度数据';
+            XLSX.writeFile(wb, `${tableName}.xlsx`);
+        }
+        
+        // 计算结果
+        function calculateResults() {
+            // 获取权重和系数
+            const gamma1 = parseFloat(document.getElementById('gamma1').value) || 0;
+            const gamma2 = parseFloat(document.getElementById('gamma2').value) || 0;
+            const gamma3 = parseFloat(document.getElementById('gamma3').value) || 0;
+            const usualCoefficient = parseFloat(document.getElementById('usual-coefficient').value) || 0;
+            const finalCoefficient = parseFloat(document.getElementById('final-coefficient').value) || 0;
+            
+            // 验证权重总和是否为1
+            const totalGamma = gamma1 + gamma2 + gamma3;
+            if (Math.abs(totalGamma - 1) > 0.001) {
+                alert(`警告：课程目标权重总和应为1，当前为${totalGamma}`);
+            }
+            
+            // 验证成绩系数总和是否为1
+            const totalCoefficient = usualCoefficient + finalCoefficient;
+            if (Math.abs(totalCoefficient - 1) > 0.001) {
+                alert(`警告：成绩系数总和应为1，当前为${totalCoefficient}`);
+            }
+            
+            // 清空结果表格
+            const resultTbody = document.getElementById('result-data');
+            resultTbody.innerHTML = '';
+            
+            // 统计数据
+            let totalR1 = 0, totalR2 = 0, totalR3 = 0, totalAchievement = 0;
+            let validCount = 0;
+            
+            // 处理每一行数据
+            const rows = document.querySelectorAll('#input-data tr');
+            rows.forEach((row, index) => {
+                // 获取学生数据
+                const studentId = row.querySelector('.student-id').value;
+                const name = row.querySelector('.student-name').value;
+                
+                // 计算平时成绩（取非空成绩的平均值）
+                const usualScores = [];
+                for (let i = 1; i <= 4; i++) {
+                    const score = parseFloat(row.querySelector(`.usual-score${i}`).value);
+                    if (!isNaN(score)) {
+                        usualScores.push(score);
+                    }
+                }
+                
+                const usualAvg = usualScores.length > 0 ? usualScores.reduce((a, b) => a + b, 0) / usualScores.length : 0;
+                
+                // 计算期末成绩（三个目标成绩之和）
+                const finalScore1 = parseFloat(row.querySelector('.final-score1').value) || 0;
+                const finalScore2 = parseFloat(row.querySelector('.final-score2').value) || 0;
+                const finalScore3 = parseFloat(row.querySelector('.final-score3').value) || 0;
+                const finalTotal = finalScore1 + finalScore2 + finalScore3;
+                
+                // 计算各项R值
+                const r1 = (usualAvg * usualCoefficient * gamma1 + finalScore1 * finalCoefficient) / (gamma1 * 100);
+                const r2 = (usualAvg * usualCoefficient * gamma2 + finalScore2 * finalCoefficient) / (gamma2 * 100);
+                const r3 = (usualAvg * usualCoefficient * gamma3 + finalScore3 * finalCoefficient) / (gamma3 * 100);
+                
+                // 计算总达成度
+                const achievement = gamma1 * r1 + gamma2 * r2 + gamma3 * r3;
+                
+                // 添加到统计
+                if (usualScores.length > 0 || finalTotal > 0) {
+                    totalR1 += r1;
+                    totalR2 += r2;
+                    totalR3 += r3;
+                    totalAchievement += achievement;
+                    validCount++;
+                }
+                
+                // 添加到结果表格
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${studentId}</td>
+                    <td>${name}</td>
+                    <td>${usualAvg.toFixed(2)}</td>
+                    <td>${finalTotal.toFixed(2)}</td>
+                    <td class="${r1 < 0.6 ? 'highlight-low' : ''}">${r1.toFixed(4)}</td>
+                    <td class="${r2 < 0.6 ? 'highlight-low' : ''}">${r2.toFixed(4)}</td>
+                    <td class="${r3 < 0.6 ? 'highlight-low' : ''}">${r3.toFixed(4)}</td>
+                    <td>${achievement.toFixed(4)}</td>
+                `;
+                resultTbody.appendChild(tr);
+                
+                // 更新学生数组
+                if (students[index]) {
+                    students[index] = {
+                        id: index + 1,
+                        studentId,
+                        name,
+                        usualScores,
+                        finalScores: [finalScore1, finalScore2, finalScore3],
+                        usualAvg,
+                        finalTotal,
+                        r1,
+                        r2,
+                        r3,
+                        achievement
+                    };
+                }
+            });
+            
+            // 计算平均值
+            if (validCount > 0) {
+                document.getElementById('avg-r1').textContent = (totalR1 / validCount).toFixed(4);
+                document.getElementById('avg-r2').textContent = (totalR2 / validCount).toFixed(4);
+                document.getElementById('avg-r3').textContent = (totalR3 / validCount).toFixed(4);
+                document.getElementById('avg-total').textContent = (totalAchievement / validCount).toFixed(4);
+            } else {
+                document.getElementById('avg-r1').textContent = '0.0000';
+                document.getElementById('avg-r2').textContent = '0.0000';
+                document.getElementById('avg-r3').textContent = '0.0000';
+                document.getElementById('avg-total').textContent = '0.0000';
+            }
+            
+            // 更新图表
+            updateChart();
+        }
+        
+        // 初始化图表
+        function initChart() {
+            const ctx = document.getElementById('achievement-chart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'R1',
+                            data: [],
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'R2',
+                            data: [],
+                            borderColor: 'rgb(54, 162, 235)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'R3',
+                            data: [],
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1,
+                            title: {
+                                display: true,
+                                text: '达成度'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '学生序号'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 更新图表数据
+        function updateChart() {
+            if (!chart) return;
+            
+            const labels = [];
+            const r1Data = [];
+            const r2Data = [];
+            const r3Data = [];
+            
+            students.forEach(student => {
+                labels.push(student.id);
+                r1Data.push(student.r1 || 0);
+                r2Data.push(student.r2 || 0);
+                r3Data.push(student.r3 || 0);
+            });
+            
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = r1Data;
+            chart.data.datasets[1].data = r2Data;
+            chart.data.datasets[2].data = r3Data;
+            
+            chart.update();
+        }
+        
+        // 筛选R1<0.6的学生
+        function filterLowR1() {
+            filterStudents('r1');
+        }
+        
+        // 筛选R2<0.6的学生
+        function filterLowR2() {
+            filterStudents('r2');
+        }
+        
+        // 筛选R3<0.6的学生
+        function filterLowR3() {
+            filterStudents('r3');
+        }
+        
+        // 筛选学生
+        function filterStudents(criteria) {
+            const filtered = students.filter(student => {
+                if (!student[criteria]) return false;
+                return student[criteria] < 0.6;
+            });
+            
+            displayFilteredResults(filtered, criteria);
+        }
+        
+        // 显示筛选结果
+        function displayFilteredResults(filteredStudents, criteria) {
+            const tbody = document.getElementById('filter-data');
+            tbody.innerHTML = '';
+            
+            if (filteredStudents.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td colspan="7">没有找到${criteria.toUpperCase()}<0.6的学生</td>`;
+                tbody.appendChild(tr);
+                return;
+            }
+            
+            // 按序号排序
+            filteredStudents.sort((a, b) => a.id - b.id);
+            
+            filteredStudents.forEach(student => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${student.studentId}</td>
+                    <td>${student.name}</td>
+                    <td class="${student.r1 < 0.6 ? 'highlight-low' : ''}">${student.r1 ? student.r1.toFixed(4) : '-'}</td>
+                    <td class="${student.r2 < 0.6 ? 'highlight-low' : ''}">${student.r2 ? student.r2.toFixed(4) : '-'}</td>
+                    <td class="${student.r3 < 0.6 ? 'highlight-low' : ''}">${student.r3 ? student.r3.toFixed(4) : '-'}</td>
+                    <td>${student.achievement ? student.achievement.toFixed(4) : '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // 清除筛选
+        function clearFilter() {
+            document.getElementById('filter-data').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
