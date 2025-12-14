@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>光敏电阻实验</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #e0f7fa 0%, #bbdefb 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        h1 {
+            color: #1565c0;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #1976d2;
+            border-bottom: 2px solid #bbdefb;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            font-weight: 500;
+        }
+        h3 {
+            color: #2196f3;
+            margin-top: 25px;
+            font-weight: 500;
+        }
+        .basic-info {
+            background: rgba(179, 229, 252, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(33, 150, 243, 0.1);
+        }
+        .basic-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .basic-info td {
+            padding: 12px;
+            border: none;
+        }
+        .basic-info td:first-child {
+            font-weight: 600;
+            color: #0d47a1;
+            width: 20%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 14px;
+            text-align: center;
+            border: none;
+        }
+        th {
+            background: linear-gradient(to bottom, #2196f3, #1976d2);
+            color: white;
+            font-weight: 500;
+        }
+        tr:nth-child(even) {
+            background-color: rgba(187, 222, 251, 0.2);
+        }
+        tr:hover {
+            background-color: rgba(179, 229, 252, 0.4);
+        }
+        .fill-blank {
+            border: none;
+            border-bottom: 2px solid #2196f3;
+            background: rgba(33, 150, 243, 0.1);
+            padding: 4px 8px;
+            text-align: center;
+            min-width: 80px;
+            font-family: inherit;
+            color: #0d47a1;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .fill-blank:focus {
+            outline: none;
+            background: rgba(33, 150, 243, 0.2);
+            border-bottom: 2px solid #1565c0;
+        }
+        .formula {
+            background: rgba(255, 245, 157, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #ffd54f;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .experiment-steps {
+            background: rgba(200, 230, 201, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+        }
+        .experiment-steps ol {
+            margin-left: 20px;
+        }
+        .experiment-steps li {
+            margin: 12px 0;
+            line-height: 1.7;
+        }
+        .chart-instruction {
+            background: rgba(255, 204, 188, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #ff8a65;
+        }
+        .score-section {
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid #4caf50;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .score-btn {
+            background: linear-gradient(to bottom, #4caf50, #388e3c);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .score-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .chart-btn {
+            background: linear-gradient(to bottom, #2196f3, #1976d2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .chart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .score-display {
+            font-size: 24px;
+            color: #2e7d32;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .correct {
+            color: #2e7d32 !important;
+            border-bottom: 2px solid #4caf50 !important;
+        }
+        .incorrect {
+            color: #c62828 !important;
+            border-bottom: 2px solid #f44336 !important;
+        }
+        .info-input {
+            border: none;
+            border-bottom: 2px solid #2196f3;
+            background: rgba(33, 150, 243, 0.1);
+            padding: 4px 8px;
+            text-align: left;
+            min-width: 150px;
+            font-family: inherit;
+            color: #0d47a1;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .info-input:focus {
+            outline: none;
+            background: rgba(33, 150, 243, 0.2);
+            border-bottom: 2px solid #1565c0;
+        }
+        .chart-container {
+            width: 80%;
+            margin: 30px auto;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .summary-box {
+            min-height: 200px;
+            border: 1px solid rgba(33, 150, 243, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            width: 100%;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .comment-section {
+            background: rgba(255, 243, 224, 0.7);
+            border: 2px solid #ff9800;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .comment-title {
+            color: #e65100;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .comment-content {
+            color: #bf360c;
+            font-size: 16px;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        .auto-grade-btn {
+            background: linear-gradient(to bottom, #ff9800, #f57c00);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .auto-grade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .comment-footer {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed #ff9800;
+            text-align: right;
+            font-size: 14px;
+            color: #e65100;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>光敏电阻实验</h1>
+        
+        <div class="basic-info">
+            <table>
+                <tr>
+                    <td>实验名称</td>
+                    <td><input type="text" class="info-input" placeholder="请输入实验名称" value="光敏电阻实验"></td>
+                    <td>实验时间</td>
+                    <td><input type="text" class="info-input" placeholder="请输入实验时间"></td>
+                </tr>
+                <tr>
+                    <td>专业</td>
+                    <td><input type="text" class="info-input" placeholder="请输入专业"></td>
+                    <td>实验地点</td>
+                    <td><input type="text" class="info-input" placeholder="请输入实验地点"></td>
+                </tr>
+                <tr>
+                    <td>班级</td>
+                    <td><input type="text" class="info-input" placeholder="请输入班级"></td>
+                    <td>指导教师</td>
+                    <td><input type="text" class="info-input" placeholder="请输入指导教师" value="马厂"></td>
+                </tr>
+                <tr>
+                    <td>学号</td>
+                    <td><input type="text" class="info-input" placeholder="请输入学号"></td>
+                    <td>同组人</td>
+                    <td><input type="text" class="info-input" placeholder="请输入同组人"></td>
+                </tr>
+                <tr>
+                    <td>姓名</td>
+                    <td><input type="text" class="info-input" placeholder="请输入姓名"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+
+        <h2>一、实验目的</h2>
+        <ol>
+            <li>在一定光照下，测量光敏电阻的<input type="text" class="fill-blank" data-answer="电压" placeholder="请填写">与电流的关系；</li>
+            <li>在一定电压下，测量光敏电阻的<input type="text" class="fill-blank" data-answer="照度" placeholder="请填写">与电流的关系。</li>
+        </ol>
+
+        <h2>二、实验仪器</h2>
+        <p>YJ-GR-2 <input type="text" class="fill-blank" data-answer="光敏电阻照度特性" placeholder="请填写">实验仪、<input type="text" class="fill-blank" data-answer="光电" placeholder="请填写">实验装置。</p>
+
+        <h2>三、实验原理</h2>
+        
+        <h3>1.光敏电阻的工作原理</h3>
+        <p>在光照作用下能使物体的电导率改变的现象称为<input type="text" class="fill-blank" data-answer="内光电效应" placeholder="请填写">。本实验所用的光敏电阻就是基于内光电效应的光电元件。当内光电效应发生时，固体材料吸收的能量使部分价带电子迁移到<input type="text" class="fill-blank" data-answer="导带" placeholder="请填写">，同时在价带中留下<input type="text" class="fill-blank" data-answer="空穴" placeholder="请填写">。这样由于材料中载流子个数，使材料的电导率的改变量为：</p>
+        <div class="formula">
+            △σ=△p*e*μp+△n*e*μn
+        </div>
+        <p>式中e为电荷电量；△p为<input type="text" class="fill-blank" data-answer="空穴浓度" placeholder="请填写">的改变量；△n为<input type="text" class="fill-blank" data-answer="电子浓度" placeholder="请填写">的改变量；μp为<input type="text" class="fill-blank" data-answer="空穴的迁移率" placeholder="请填写">；μn为<input type="text" class="fill-blank" data-answer="电子的迁移率" placeholder="请填写">。当光敏电阻两端加上电压U后，光电流为：</p>
+        <div class="formula">
+            Iph=△σ*U*A/d
+        </div>
+        <p>其中A为与电流垂直的<input type="text" class="fill-blank" data-answer="截面积" placeholder="请填写">，d为<input type="text" class="fill-blank" data-answer="电极间的距离" placeholder="请填写">。</p>
+
+        <p>用于制造光敏电阻的材料主要有金属的<input type="text" class="fill-blank" data-answer="硫化物" placeholder="请填写">、<input type="text" class="fill-blank" data-answer="硒化物" placeholder="请填写">、和<input type="text" class="fill-blank" data-answer="锑化物" placeholder="请填写">等半导体材料。目前生产的光敏电阻主要是硫化镉。光敏电阻具有灵敏度高、光谱特性好、使用寿命长、稳定性能高、体积小以及制造工艺简单等特点，被广泛地用于自动化技术中。</p>
+
+        <p>本实验光敏电阻得到的光照Φ由一组中性减光片来控制，其透光率有0、25%、50%、75%、100%五档。</p>
+
+        <h3>2.光敏电阻的基本特性</h3>
+        <p>光敏电阻的基本特性包括伏-安特性、光照特性、光电灵敏度、光谱特性、频率特性和温度特性等。本实验主要研究光敏电阻的<input type="text" class="fill-blank" data-answer="伏安特性" placeholder="请填写">和<input type="text" class="fill-blank" data-answer="光照特性" placeholder="请填写">。</p>
+
+        <h2>四、实验步骤</h2>
+        <div class="experiment-steps">
+            <ol>
+                <li>调整<input type="text" class="fill-blank" data-answer="光敏电阻" placeholder="请填写">和<input type="text" class="fill-blank" data-answer="汞灯" placeholder="请填写">位于合适位置，转至0的位置，如图1、图2所示，"汞灯电源"通过电缆与"插座"相连，"光敏电阻输入"通过电缆与"插座"相连。</li>
+                <li>在一定照度下，测量光敏电阻的电压与光电流的关系：将滤光片转至空位，调节中性减光片和光敏电阻测试架的位置使照度表的显示为50LUX左右，调节电压调节旋钮取U值分别为2.00V、3.00V、4.00V、5.00V、6.00V......12.00V，测量光电流的Iph值。</li>
+                <li>调节中性减光片和光敏电阻测试架的位置使照度表的显示为100LUX、150LUX、200LUX、250LUX、300LUX左右，重复以上实验，测绘出U-Iph曲线。</li>
+                <li>在一定工作电压下，测量光敏电阻的照度与光电流的关系。将光敏电阻的工作电压设定为U=2.00V，调节中性减光片和光敏电阻测试架的位置使照度表的显示为100LUX、150LUX、200LUX、250LUX、300LUX左右，测量光电流Iph值。光敏电阻的工作电压分别设定为4V、6V、8V、10V、12V时，重复以上实验，测绘Φ-Iph曲线。</li>
+            </ol>
+        </div>
+
+        <h2>五、实验数据记录</h2>
+        
+        <h3>1.在一定光照下，测量光敏电阻的电压与电流的关系</h3>
+        <table>
+            <tr>
+                <th>光照度（LUX）</th>
+                <th>2V</th>
+                <th>3V</th>
+                <th>4V</th>
+                <th>5V</th>
+                <th>6V</th>
+                <th>7V</th>
+                <th>8V</th>
+                <th>9V</th>
+                <th>10V</th>
+                <th>11V</th>
+                <th>12V</th>
+            </tr>
+            <tr>
+                <td>50</td>
+                <td><input type="text" class="data-input" data-row="50" data-col="2" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="50" data-col="3" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="50" data-col="4" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="50" data-col="5" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="50" data-col="6" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="50" data-col="7" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="50" data-col="8" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="50" data-col="9" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="50" data-col="10" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="50" data-col="11" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="50" data-col="12" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+            <tr>
+                <td>100</td>
+                <td><input type="text" class="data-input" data-row="100" data-col="2" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="100" data-col="3" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="100" data-col="4" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="100" data-col="5" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="100" data-col="6" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="100" data-col="7" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="100" data-col="8" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="100" data-col="9" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="100" data-col="10" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="100" data-col="11" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="100" data-col="12" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+            <tr>
+                <td>150</td>
+                <td><input type="text" class="data-input" data-row="150" data-col="2" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="150" data-col="3" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="150" data-col="4" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="150" data-col="5" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="150" data-col="6" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="150" data-col="7" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="150" data-col="8" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="150" data-col="9" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="150" data-col="10" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="150" data-col="11" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="150" data-col="12" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+            <tr>
+                <td>200</td>
+                <td><input type="text" class="data-input" data-row="200" data-col="2" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="200" data-col="3" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="200" data-col="4" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="200" data-col="5" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="200" data-col="6" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="200" data-col="7" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="200" data-col="8" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="200" data-col="9" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="200" data-col="10" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="200" data-col="11" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="200" data-col="12" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+            <tr>
+                <td>250</td>
+                <td><input type="text" class="data-input" data-row="250" data-col="2" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="250" data-col="3" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="250" data-col="4" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="250" data-col="5" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="250" data-col="6" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="250" data-col="7" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="250" data-col="8" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="250" data-col="9" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="250" data-col="10" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="250" data-col="11" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="250" data-col="12" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+            <tr>
+                <td>300</td>
+                <td><input type="text" class="data-input" data-row="300" data-col="2" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="300" data-col="3" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="300" data-col="4" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="300" data-col="5" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="300" data-col="6" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="300" data-col="7" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="300" data-col="8" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="300" data-col="9" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="300" data-col="10" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="300" data-col="11" style="width: 60px;"></td>
+                <td><input type="text" class="data-input" data-row="300" data-col="12" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+        </table>
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="chart-btn" onclick="drawChart1()">绘制图1：U-Iph曲线</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart1"></canvas>
+        </div>
+
+        <h3>2.在一定电压下，测量光敏电阻的照度与电流的关系</h3>
+        <table>
+            <tr>
+                <th>电压（V）</th>
+                <th>100LUX</th>
+                <th>150LUX</th>
+                <th>200LUX</th>
+                <th>250LUX</th>
+                <th>300LUX</th>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><input type="text" class="data-input2" data-row="2" data-col="100" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="2" data-col="150" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="2" data-col="200" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="2" data-col="250" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="2" data-col="300" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+            <tr>
+                <td>4</td>
+                <td><input type="text" class="data-input2" data-row="4" data-col="100" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="4" data-col="150" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="4" data-col="200" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="4" data-col="250" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="4" data-col="300" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+            <tr>
+                <td>6</td>
+                <td><input type="text" class="data-input2" data-row="6" data-col="100" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="6" data-col="150" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="6" data-col="200" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="6" data-col="250" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="6" data-col="300" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+            <tr>
+                <td>8</td>
+                <td><input type="text" class="data-input2" data-row="8" data-col="100" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="8" data-col="150" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="8" data-col="200" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="8" data-col="250" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="8" data-col="300" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+            <tr>
+                <td>10</td>
+                <td><input type="text" class="data-input2" data-row="10" data-col="100" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="10" data-col="150" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="10" data-col="200" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="10" data-col="250" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="10" data-col="300" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+            <tr>
+                <td>12</td>
+                <td><input type="text" class="data-input2" data-row="12" data-col="100" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="12" data-col="150" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="12" data-col="200" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="12" data-col="250" style="width: 60px;"></td>
+                <td><input type="text" class="data-input2" data-row="12" data-col="300" style="width: 60px;"></td>
+            </tr>
+            <!-- 参考值行已删除 -->
+        </table>
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="chart-btn" onclick="drawChart2()">绘制图2：Φ-Iph曲线</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="chart2"></canvas>
+        </div>
+
+        <h2>七、实验小结</h2>
+        <textarea class="summary-box" placeholder="请在此处填写实验小结..."></textarea>
+
+        <div class="score-section">
+            <h3>预习分数计算</h3>
+            <p>请填写所有填空题后，点击计算分数</p>
+            <button class="score-btn" onclick="calculateScore()">计算预习分数</button>
+            <div class="score-display" id="scoreDisplay"></div>
+        </div>
+
+        <!-- 实验评语框 -->
+        <div class="comment-section" id="commentSection">
+            <div class="comment-title">实验评语</div>
+            <div class="comment-content" id="commentContent">
+                <p style="text-align: center; color: #999;">点击"自动评分并生成评语"按钮生成实验评语和报告得分</p>
+            </div>
+            <div class="comment-footer" id="commentFooter" style="display: none;">
+                <div>指导教师：<span id="teacherName">马厂</span></div>
+                <div>评语日期：<span id="currentDate"></span></div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="auto-grade-btn" onclick="autoGrade()">自动评分并生成评语</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 答案对照表
+        const answers = {
+            "电压": ["电压"],
+            "照度": ["照度"],
+            "光敏电阻照度特性": ["光敏电阻照度特性", "光敏电阻特性", "照度特性"],
+            "光电": ["光电"],
+            "内光电效应": ["内光电效应", "光电效应"],
+            "导带": ["导带"],
+            "空穴": ["空穴"],
+            "空穴浓度": ["空穴浓度"],
+            "电子浓度": ["电子浓度"],
+            "空穴的迁移率": ["空穴的迁移率", "迁移率"],
+            "电子的迁移率": ["电子的迁移率", "迁移率"],
+            "截面积": ["截面积"],
+            "电极间的距离": ["电极间的距离", "距离"],
+            "硫化物": ["硫化物"],
+            "硒化物": ["硒化物"],
+            "锑化物": ["锑化物"],
+            "伏安特性": ["伏安特性", "伏-安特性"],
+            "光照特性": ["光照特性"],
+            "光敏电阻": ["光敏电阻"],
+            "汞灯": ["汞灯"]
+        };
+
+        // 新的参考数据（隐藏，仅用于偏差计算）
+        const referenceData1 = {
+            "50": [0.05, 0.08, 0.11, 0.14, 0.17, 0.20, 0.24, 0.27, 0.31, 0.35, 0.38],
+            "100": [0.11, 0.17, 0.24, 0.30, 0.37, 0.44, 0.51, 0.58, 0.66, 0.74, 0.82],
+            "150": [0.15, 0.23, 0.31, 0.39, 0.47, 0.56, 0.65, 0.74, 0.84, 0.93, 1.03],
+            "200": [0.17, 0.26, 0.36, 0.46, 0.56, 0.66, 0.77, 0.87, 0.98, 1.09, 1.21],
+            "250": [0.21, 0.32, 0.44, 0.56, 0.68, 0.81, 0.93, 1.06, 1.20, 1.33, 1.47],
+            "300": [0.23, 0.36, 0.48, 0.61, 0.74, 0.88, 1.02, 1.17, 1.31, 1.47, 1.63]
+        };
+
+        const referenceData2 = {
+            "2": [0.11, 0.15, 0.17, 0.21, 0.23],
+            "4": [0.24, 0.31, 0.36, 0.44, 0.48],
+            "6": [0.37, 0.47, 0.56, 0.68, 0.74],
+            "8": [0.51, 0.65, 0.77, 0.93, 1.02],
+            "10": [0.66, 0.84, 0.98, 1.2, 1.31],
+            "12": [0.82, 1.03, 1.21, 1.47, 1.63]
+        };
+
+        function calculateScore() {
+            const inputs = document.querySelectorAll('.fill-blank');
+            let correct = 0;
+            let total = inputs.length;
+
+            inputs.forEach(input => {
+                const userAnswer = input.value.trim();
+                const correctAnswers = answers[input.dataset.answer];
+                
+                if (correctAnswers && correctAnswers.some(ans => userAnswer.includes(ans))) {
+                    correct++;
+                    input.classList.remove('incorrect');
+                    input.classList.add('correct');
+                } else {
+                    input.classList.remove('correct');
+                    input.classList.add('incorrect');
+                }
+            });
+
+            const score = Math.round((correct / total) * 100);
+            document.getElementById('scoreDisplay').innerHTML = `预习分数：${score}分（答对${correct}/${total}题）`;
+            return score;
+        }
+
+        function calculateDataDeviationScore() {
+            const data1Inputs = document.querySelectorAll('.data-input');
+            const data2Inputs = document.querySelectorAll('.data-input2');
+            let totalScore = 0;
+            let validDataCount = 0;
+
+            // 检查表1数据偏差
+            data1Inputs.forEach(input => {
+                if (input.value.trim() !== '') {
+                    const row = input.dataset.row;
+                    const colIndex = parseInt(input.dataset.col) - 2;
+                    const userValue = parseFloat(input.value);
+                    const refValue = referenceData1[row][colIndex];
+                    
+                    if (!isNaN(userValue) && !isNaN(refValue)) {
+                        const deviation = Math.abs(userValue - refValue) / refValue * 100;
+                        let score = 0;
+                        if (deviation <= 10) score = 100;
+                        else if (deviation <= 20) score = 80;
+                        else if (deviation <= 30) score = 60;
+                        else score = 40;
+                        
+                        totalScore += score;
+                        validDataCount++;
+                    }
+                }
+            });
+
+            // 检查表2数据偏差
+            data2Inputs.forEach(input => {
+                if (input.value.trim() !== '') {
+                    const row = input.dataset.row;
+                    const colIndex = [100, 150, 200, 250, 300].indexOf(parseInt(input.dataset.col));
+                    const userValue = parseFloat(input.value);
+                    const refValue = referenceData2[row][colIndex];
+                    
+                    if (!isNaN(userValue) && !isNaN(refValue)) {
+                        const deviation = Math.abs(userValue - refValue) / refValue * 100;
+                        let score = 0;
+                        if (deviation <= 10) score = 100;
+                        else if (deviation <= 20) score = 80;
+                        else if (deviation <= 30) score = 60;
+                        else score = 40;
+                        
+                        totalScore += score;
+                        validDataCount++;
+                    }
+                }
+            });
+
+            return validDataCount > 0 ? Math.round(totalScore / validDataCount) : 0;
+        }
+
+        function autoGrade() {
+            const preScore = calculateScore();
+            const deviationScore = calculateDataDeviationScore();
+            const summary = document.querySelector('.summary-box').value.trim();
+            const data1Filled = Array.from(document.querySelectorAll('.data-input')).some(input => input.value.trim() !== '');
+            const data2Filled = Array.from(document.querySelectorAll('.data-input2')).some(input => input.value.trim() !== '');
+            const chart1Drawn = chart1Instance !== null;
+            const chart2Drawn = chart2Instance !== null;
+
+            // 计算综合分数
+            let totalScore = 0;
+            let scoreBreakdown = [];
+
+            // 预习分数（30%）
+            const preScoreWeighted = Math.round(preScore * 0.3);
+            totalScore += preScoreWeighted;
+            scoreBreakdown.push(`预习：${preScore}×30%=${preScoreWeighted}`);
+
+            // 数据偏差分数（40%）
+            const deviationScoreWeighted = Math.round(deviationScore * 0.4);
+            totalScore += deviationScoreWeighted;
+            scoreBreakdown.push(`数据偏差：${deviationScore}×40%=${deviationScoreWeighted}`);
+
+            // 实验小结分数（20%）
+            let summaryScore = 0;
+            if (summary.length > 100) summaryScore = 100;
+            else if (summary.length > 50) summaryScore = 80;
+            else if (summary.length > 20) summaryScore = 60;
+            else if (summary.length > 0) summaryScore = 40;
+            
+            const summaryScoreWeighted = Math.round(summaryScore * 0.2);
+            totalScore += summaryScoreWeighted;
+            scoreBreakdown.push(`实验小结：${summaryScore}×20%=${summaryScoreWeighted}`);
+
+            // 图表分数（10%）
+            let chartScore = 0;
+            if (chart1Drawn && chart2Drawn) chartScore = 100;
+            else if (chart1Drawn || chart2Drawn) chartScore = 50;
+            
+            const chartScoreWeighted = Math.round(chartScore * 0.1);
+            totalScore += chartScoreWeighted;
+            scoreBreakdown.push(`图表：${chartScore}×10%=${chartScoreWeighted}`);
+
+            let comment = "";
+            let grade = "不及格";
+            let gradeColor = "#c62828";
+
+            if (totalScore >= 90) {
+                grade = "优秀";
+                gradeColor = "#2e7d32";
+                comment = `🎉 恭喜你！实验报告表现非常出色！综合得分${totalScore}分，各项表现均衡优秀。预习扎实，数据记录准确，实验分析深入，图表规范。展现了卓越的实验素养和科学态度！`;
+            } else if (totalScore >= 80) {
+                grade = "良好";
+                gradeColor = "#388e3c";
+                comment = `👍 表现很好！综合得分${totalScore}分，实验报告质量较高。预习掌握较好，数据记录较为准确，实验分析较为充分。建议在数据精确度和分析深度方面可以再提升！`;
+            } else if (totalScore >= 70) {
+                grade = "中等";
+                gradeColor = "#f57c00";
+                comment = `✊ 基本达到要求！综合得分${totalScore}分，实验报告质量一般。预习掌握一般，部分数据偏差较大，实验分析简单。需要加强理论学习，提高数据记录准确性！`;
+            } else if (totalScore >= 60) {
+                grade = "及格";
+                gradeColor = "#ff9800";
+                comment = `⚠️ 勉强及格！综合得分${totalScore}分，实验报告存在不足。预习掌握不够扎实，数据偏差明显，实验分析过于简单。需要更加认真对待实验，完善各个环节！`;
+            } else {
+                grade = "不及格";
+                gradeColor = "#d32f2f";
+                comment = `❌ 未达到基本要求！综合得分${totalScore}分，实验报告质量较差。请重新认真学习实验原理，补充完整实验记录，重视实验过程和分析！`;
+            }
+
+            // 具体建议
+            let suggestions = [];
+            if (preScore < 80) suggestions.push("预习部分需要加强");
+            if (deviationScore < 80) suggestions.push("数据记录准确性需要提高");
+            if (summaryScore < 60) suggestions.push("实验小结需要更加详实");
+            if (chartScore < 50) suggestions.push("图表绘制需要完成");
+
+            if (suggestions.length > 0) {
+                comment += ` 具体改进建议：${suggestions.join('；')}。`;
+            }
+
+            // 显示详细分数分解
+            comment += ` 详细评分：${scoreBreakdown.join('，')}，总分：${totalScore}分。`;
+
+            // 获取指导教师姓名和当前日期
+            const teacherName = document.querySelector('.info-input[placeholder="请输入指导教师"]').value || '马厂';
+            const currentDate = new Date().toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // 添加指导教师和日期信息
+            comment += `<div class="comment-footer">
+                <div>指导教师：${teacherName}</div>
+                <div>评语日期：${currentDate}</div>
+            </div>`;
+
+            document.getElementById('commentContent').innerHTML = comment;
+            document.getElementById('commentContent').style.color = gradeColor;
+            document.getElementById('commentSection').style.display = 'block';
+            document.getElementById('scoreDisplay').innerHTML = `综合评级：${grade}（总分${totalScore}分）`;
+        }
+
+        let chart1Instance = null;
+        let chart2Instance = null;
+
+        function drawChart1() {
+            const ctx = document.getElementById('chart1').getContext('2d');
+            const luxLevels = [50, 100, 150, 200, 250, 300];
+            const voltages = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+            
+            const datasets = luxLevels.map(lux => {
+                const data = voltages.map(v => {
+                    const input = document.querySelector(`.data-input[data-row="${lux}"][data-col="${v}"]`);
+                    return input && input.value ? parseFloat(input.value) : 0;
+                });
+                
+                return {
+                    label: `${lux} LUX`,
+                    data: data,
+                    borderColor: `hsl(${lux * 1.2}, 70%, 50%)`,
+                    backgroundColor: `hsla(${lux * 1.2}, 70%, 50%, 0.1)`,
+                    tension: 0.1
+                };
+            });
+
+            if (chart1Instance) {
+                chart1Instance.destroy();
+            }
+
+            chart1Instance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: voltages.map(v => `${v}V`),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '图1：不同照度下的U-Iph曲线'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '电压 (V)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '光电流 (Iph)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function drawChart2() {
+            const ctx = document.getElementById('chart2').getContext('2d');
+            const voltages = [2, 4, 6, 8, 10, 12];
+            const luxLevels = [100, 150, 200, 250, 300];
+            
+            const datasets = voltages.map(voltage => {
+                const data = luxLevels.map(lux => {
+                    const input = document.querySelector(`.data-input2[data-row="${voltage}"][data-col="${lux}"]`);
+                    return input && input.value ? parseFloat(input.value) : 0;
+                });
+                
+                return {
+                    label: `${voltage}V`,
+                    data: data,
+                    borderColor: `hsl(${voltage * 30}, 70%, 50%)`,
+                    backgroundColor: `hsla(${voltage * 30}, 70%, 50%, 0.1)`,
+                    tension: 0.1
+                };
+            });
+
+            if (chart2Instance) {
+                chart2Instance.destroy();
+            }
+
+            chart2Instance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: luxLevels.map(lux => `${lux}LUX`),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '图2：不同电压下的Φ-Iph曲线'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '照度 (LUX)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '光电流 (Iph)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
