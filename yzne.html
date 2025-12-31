@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>验证牛顿第二定律实验</title>
+<style>
+/* ---------- 全局字体放大 ---------- */
+body { background: #f5f5f5; padding: 20px; line-height: 1.6; font-size: 16px; }
+.container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 30px; box-shadow: 0 0 12px rgba(0,0,0,.1); border-radius: 8px; }
+h1 { text-align: center; margin-bottom: 25px; font-size: 28px; }
+h2 { margin: 30px 0 12px; border-bottom: 2px solid #4CAF50; padding-bottom: 6px; font-size: 20px; }
+h3 { margin: 18px 0 10px; font-size: 18px; }
+
+/* ---------- 表格美化 ---------- */
+table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 15px; table-layout: fixed; }
+th, td { border: 1px solid #ccc; padding: 6px 4px; text-align: center; line-height: 1.35; }
+th { background: #f2f2f2; font-weight: 600; }
+.eqn { font-family: "Times New Roman", serif; font-style: italic; font-size: 16px; }
+
+/* ---------- 填空框美化 ---------- */
+input[type=text] {
+    width: 100%;
+    padding: 4px 2px;
+    border: none;
+    border-bottom: 2px solid #bbb;
+    background: transparent;
+    text-align: center;
+    font-family: "Times New Roman", serif;
+    font-style: italic;
+    font-size: 15px;
+    border-radius: 4px;
+    transition: border-color .3s;
+}
+input[type=text]:focus {
+    border-bottom-color: #4CAF50;
+    outline: none;
+}
+
+/* ---------- 按钮 ---------- */
+.btn { background: #4CAF50; color: #fff; padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; margin: 6px; font-size: 15px; transition: background .3s; }
+.btn:hover { background: #45a049; }
+
+/* ---------- 区域 ---------- */
+.score-section { background: #f9f9f9; padding: 15px; border-radius: 6px; }
+textarea { width: 100%; height: 130px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; resize: vertical; font-size: 15px; }
+.result { margin-top: 15px; padding: 12px; background: #f0f8ff; border-left: 5px solid #4CAF50; font-size: 15px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="container">
+<h1>验证牛顿第二定律实验</h1>
+
+<!-- 基本信息 -->
+<div class="section">
+<h2>一、基本信息</h2>
+<table>
+<tr><td width="15%">专业</td><td width="35%"><input id="major"></td><td width="15%">班级</td><td width="35%"><input id="class"></td></tr>
+<tr><td>学号</td><td><input id="studentId"></td><td>姓名</td><td><input id="name"></td></tr>
+<tr><td>指导教师</td><td><input id="instructor" value="马厂"></td><td>同组人</td><td><input id="partner"></td></tr>
+<tr><td>实验时间</td><td><input id="experimentTime"></td><td>实验地点</td><td><input id="experimentLocation"></td></tr>
+</table>
+</div>
+
+<!-- 实验目的 -->
+<div class="section">
+<h2>二、实验目的</h2>
+<p>1．熟悉 <input id="purpose1" class="blank"> 和数字毫秒计的使用方法；</p>
+<p>2．学会测量滑块速度和加速度的方法；</p>
+<p>3．研究力、质量和加速度之间的关系，通过测滑块 <input id="purpose2" class="blank"> 验证牛顿第二定律；</p>
+</div>
+
+<!-- 实验仪器 -->
+<div class="section">
+<h2>三、实验仪器</h2>
+<p>本实验仪器包括气垫导轨、滑块、 <input id="instrument1" class="blank"> 、砝码、天平。</p>
+<p>本实验中，用数字毫秒计测量时间。利用它的测加速度程序，可同时测量出滑块通过两个光电门的时间及滑块通过两光电门之间的时间间隔。</p>
+</div>
+
+<!-- 实验原理 -->
+<div class="section">
+<h2>四、实验原理</h2>
+<h3>1．速度的测量</h3>
+<p>悬浮在水平气垫导轨上的滑块，当它所受合外力为零时，滑块将在导轨上静止或 <input id="theory1" class="blank"> 。</p>
+<p>在滑块上装两个挡光杆，当滑块通过某一光电门时，第一个挡光杆挡住照在光电管上的光，数字毫秒计 <input id="theory2" class="blank"> ；当另一挡光杆再次挡光时，数字毫秒计 <input id="theory3" class="blank"> 。</p>
+<p>若两挡光杆轴线之间距离为 <span class="eqn">ΔL</span> ，则可计算滑块通过光电门的平均速度 <span class="eqn">v̄ = ΔL / Δt</span> 。</p>
+<p>由于 <span class="eqn">ΔL</span> 较小（约 1 cm），在 <span class="eqn">ΔL</span> 范围内滑块速度变化很小，故可把 <span class="eqn">v̄</span> 视为滑块经过光电门的 <input id="theory4" class="blank"> 。</p>
+
+<h3>2．加速度的测量</h3>
+<p>在气垫导轨上设置两个光电门，其间距为 <span class="eqn">S</span> 。使受到 <input id="theory5" class="blank"> 作用的滑块（作匀加速直线运动）依次通过这两个光电门。</p>
+<p>滑块滑过第一光电门的初速度为 <span class="eqn">v₁ = ΔL / Δt₁</span>，滑过第二光电门的末速度为 <span class="eqn">v₂ = ΔL / Δt₂</span>，则滑块加速度为</p>
+<div class="equation" style="text-align:center;font-family:'Times New Roman',serif;font-style:italic;font-size:18px">a = (v₂² – v₁²) / (2S)</div>
+
+<h3>3．验证牛顿第二定律</h3>
+<p>按牛顿第二定律，对于质量为 <span class="eqn">M</span> 的物体，其所受合外力 <span class="eqn">F合</span> 与加速度 <span class="eqn">a</span> 关系为</p>
+<div class="equation" style="text-align:center;font-family:'Times New Roman',serif;font-style:italic;font-size:18px">F合 = M a</div>
+<p>验证可分两步：</p>
+<p>① 物体质量 <span class="eqn">M</span> 一定时，验证其所受合外力 <span class="eqn">F合</span> 与加速度 <span class="eqn">a</span> 成 <input id="theory6" class="blank"> ；</p>
+<p>② 合外力 <span class="eqn">F合</span> 一定时，验证物体加速度 <span class="eqn">a</span> 与其质量 <span class="eqn">M</span> 成 <input id="theory7" class="blank"> 。</p>
+<p>若滑块质量为 <span class="eqn">m₁</span>，砝码盘及砝码总质量为 <span class="eqn">m₂</span>，则系统总质量 <span class="eqn">M = m₁ + m₂</span>，所受合外力大小 <span class="eqn">F合 = m₂ g</span>。</p>
+</div>
+
+<!-- 实验内容 -->
+<div class="section">
+<h2>五、实验内容</h2>
+<h3>1．调节光电计时系统</h3>
+<p>将气垫导轨上两个光电门引线接入数字毫秒计后面板对应插口，打开 <input id="procedure1" class="blank"> 电源开关，接通气源。</p>
+<p>轻推滑块，使其 <input id="procedure2" class="blank"> 两光电门，检查毫秒计是否正常记录时间。</p>
+
+<h3>2．调节气垫导轨水平</h3>
+<p>（1）静态调平（粗调）：调节导轨底脚螺丝，使滑块可在导轨上 <input id="procedure3" class="blank"> 地自然运动（即能静止），认为导轨已 <input id="procedure4" class="blank"> 。</p>
+<p>（2）动态调平（细调）：轻推滑块，使其依次通过两光电门，要求两挡光杆通过时间 <span class="eqn">Δt₁</span> 与 <span class="eqn">Δt₂</span> 相差小于 1%，否则继续调节 <input id="procedure5" class="blank"> 。</p>
+
+<h3>3．验证牛顿第二定律</h3>
+<p>（1）系统总质量 <span class="eqn">M</span> 不变，验证外力与加速度成正比</p>
+<p>① 在导轨上固定两光电门，将 <input id="procedure6" class="blank"> 一端系于滑块，另一端经 <input id="procedure7" class="blank"> 与砝码盘相连。</p>
+<p>滑块上先放 50 g 铁片，砝码盘自重 5 g。滑块置于远离滑轮端，由静止释放，在砝码盘 <input id="procedure8" class="blank"> 作用下作匀加速运动。</p>
+<p>注意：滑块释放 <input id="procedure9" class="blank"> 必须一致；近滑轮光电门位置须合适，防止滑块未通过而砝码盘已落到 <input id="procedure10" class="blank"> 上。</p>
+<p>② 将铁片移入砝码盘，再测一次加速度。</p>
+<p>③ 记录两种情况外力 <span class="eqn">F₁</span>、<span class="eqn">F₂</span>，比较 <span class="eqn">F₁/a₁</span> 与 <span class="eqn">F₂/a₂</span> 是否相等，数据记入表 1。</p>
+
+<p>（2）外力 <span class="eqn">F</span> 不变，验证系统质量与加速度成反比</p>
+<p>① 砝码盘放两枚 5 g 砝码，测滑块加速度 <span class="eqn">a₃</span>。</p>
+<p>② 保持砝码不变（外力一定），将 50 g 铁片放回滑块，测此时加速度 <span class="eqn">a₄</span>。</p>
+<p>③ 记录两组系统总质量 <span class="eqn">M₁</span>、<span class="eqn">M₂</span>，比较 <span class="eqn">M₁a₃</span> 与 <span class="eqn">M₂a₄</span> 是否相等，数据记入表 2。</p>
+</div>
+
+<!-- 实验数据记录 -->
+<div class="section">
+<h2>六、实验数据记录</h2>
+<p><em>ΔL = 1.00 cm；S = 50.0 cm</em></p>
+
+<!-- 表1 -->
+<h3>表1　验证质量不变时外力与加速度成正比（M≈0.155 kg）</h3>
+<table class="data-table">
+<thead>
+<tr>
+    <th rowspan="2">序号</th>
+    <th rowspan="2">外力<br><span class="eqn">F</span>/N</th>
+    <th colspan="3"><span class="eqn">t₁</span> / ms</th>
+    <th rowspan="2"><span class="eqn">t̄₁</span><br>/ ms</th>
+    <th rowspan="2"><span class="eqn">v̄₁</span> = ΔL/<span class="eqn">t̄₁</span><br>/ m·s⁻¹</th>
+    <th colspan="3"><span class="eqn">t₂</span> / ms</th>
+    <th rowspan="2"><span class="eqn">t̄₂</span><br>/ ms</th>
+    <th rowspan="2"><span class="eqn">v̄₂</span> = ΔL/<span class="eqn">t̄₂</span><br>/ m·s⁻¹</th>
+    <th rowspan="2"><span class="eqn">a</span> = (<span class="eqn">v̄₂²</span>–<span class="eqn">v̄₁²</span>)/(2S)<br>/ m·s⁻²</th>
+    <th rowspan="2"><span class="eqn">F/a</span><br>/ kg</th>
+</tr>
+<tr><th>1</th><th>2</th><th>3</th><th>1</th><th>2</th><th>3</th></tr>
+</thead>
+<tbody>
+<tr>
+    <td>1</td>
+    <td>0.049</td>
+    <td><input class="t1-11"></td><td><input class="t1-12"></td><td><input class="t1-13"></td>
+    <td><input class="t1-1avg" readonly></td>
+    <td><input class="v1-1" readonly></td>
+    <td><input class="t2-11"></td><td><input class="t2-12"></td><td><input class="t2-13"></td>
+    <td><input class="t2-1avg" readonly></td>
+    <td><input class="v2-1" readonly></td>
+    <td><input class="a1" readonly></td>
+    <td><input class="f_a1" readonly></td>
+</tr>
+<tr>
+    <td>2</td>
+    <td>0.098</td>
+    <td><input class="t1-21"></td><td><input class="t1-22"></td><td><input class="t1-23"></td>
+    <td><input class="t1-2avg" readonly></td>
+    <td><input class="v1-2" readonly></td>
+    <td><input class="t2-21"></td><td><input class="t2-22"></td><td><input class="t2-23"></td>
+    <td><input class="t2-2avg" readonly></td>
+    <td><input class="v2-2" readonly></td>
+    <td><input class="a2" readonly></td>
+    <td><input class="f_a2" readonly></td>
+</tr>
+</tbody>
+</table>
+
+<!-- 表2 -->
+<h3>表2　验证外力不变时质量与加速度成反比（F≈0.098 N）</h3>
+<table class="data-table">
+<thead>
+<tr>
+    <th rowspan="2">序号</th>
+    <th rowspan="2">总质量<br><span class="eqn">M</span>/kg</th>
+    <th colspan="3"><span class="eqn">t₁</span> / ms</th>
+    <th rowspan="2"><span class="eqn">t̄₁</span><br>/ ms</th>
+    <th rowspan="2"><span class="eqn">v̄₁</span> = ΔL/<span class="eqn">t̄₁</span><br>/ m·s⁻¹</th>
+    <th colspan="3"><span class="eqn">t₂</span> / ms</th>
+    <th rowspan="2"><span class="eqn">t̄₂</span><br>/ ms</th>
+    <th rowspan="2"><span class="eqn">v̄₂</span> = ΔL/<span class="eqn">t̄₂</span><br>/ m·s⁻¹</th>
+    <th rowspan="2"><span class="eqn">a</span> = (<span class="eqn">v̄₂²</span>–<span class="eqn">v̄₁²</span>)/(2S)<br>/ m·s⁻²</th>
+    <th rowspan="2"><span class="eqn">Ma</span><br>/ N</th>
+</tr>
+<tr><th>1</th><th>2</th><th>3</th><th>1</th><th>2</th><th>3</th></tr>
+</thead>
+<tbody>
+<tr>
+    <td>3</td>
+    <td>0.105</td>
+    <td><input class="t1-31"></td><td><input class="t1-32"></td><td><input class="t1-33"></td>
+    <td><input class="t1-3avg" readonly></td>
+    <td><input class="v1-3" readonly></td>
+    <td><input class="t2-31"></td><td><input class="t2-32"></td><td><input class="t2-33"></td>
+    <td><input class="t2-3avg" readonly></td>
+    <td><input class="v2-3" readonly></td>
+    <td><input class="a3" readonly></td>
+    <td><input class="ma3" readonly></td>
+</tr>
+<tr>
+    <td>4</td>
+    <td>0.155</td>
+    <td><input class="t1-41"></td><td><input class="t1-42"></td><td><input class="t1-43"></td>
+    <td><input class="t1-4avg" readonly></td>
+    <td><input class="v1-4" readonly></td>
+    <td><input class="t2-41"></td><td><input class="t2-42"></td><td><input class="t2-43"></td>
+    <td><input class="t2-4avg" readonly></td>
+    <td><input class="v2-4" readonly></td>
+    <td><input class="a4" readonly></td>
+    <td><input class="ma4" readonly></td>
+</tr>
+</tbody>
+</table>
+
+<button class="btn" id="calculateDataBtn">计算 v̄ 与 a</button>
+<button class="btn" id="fillReferenceBtn">填入参考数据</button>
+</div>
+
+<!-- 数据处理 -->
+<div class="section">
+<h2>七、数据处理</h2>
+<div class="result">
+<p>1. 验证表1 中 <span class="eqn">F/a</span> 是否相等，误差有多大：</p>
+<p><span class="eqn">F₁/a₁</span> = <span id="ratio1">-</span>　　<span class="eqn">F₂/a₂</span> = <span id="ratio2">-</span>　　相对误差 = <span id="error1">-</span>%</p>
+<p>2. 验证表2 中 <span class="eqn">Ma</span> 是否相等，误差有多大：</p>
+<p><span class="eqn">M₃a₃</span> = <span id="product1">-</span>　　<span class="eqn">M₄a₄</span> = <span id="product2">-</span>　　相对误差 = <span id="error2">-</span>%</p>
+</div>
+</div>
+
+<!-- 实验小结 -->
+<div class="section">
+<h2>八、实验小结</h2>
+<textarea id="summary" placeholder="请填写实验小结，包括实验结论、误差分析、心得体会等"></textarea>
+</div>
+
+<!-- 评分 -->
+<div class="section score-section">
+<h2>九、实验预习与报告评分</h2>
+<p>预习填空得分：<input id="preparationScore" readonly> / 100</p>
+<button class="btn" id="calculateScoreBtn">计算预习分数</button>
+<button class="btn" id="autoScoreBtn">自动评分并生成评语</button>
+<div id="commentBox" class="result" style="display:none;white-space:pre-wrap;margin-top:10px;"></div>
+</div>
+</div>
+
+<script>
+/* ---------- 答案库 ---------- */
+const answers = {
+    purpose1:"气垫导轨", purpose2:"加速度", instrument1:"数字毫秒计",
+    theory1:"作匀速直线运动", theory2:"开始计时", theory3:"停止计时", theory4:"瞬时速度",
+    theory5:"水平恒力", theory6:"正比", theory7:"反比",
+    procedure1:"数字毫秒计", procedure2:"依次通过", procedure3:"无定向", procedure4:"初步调平",
+    procedure5:"底脚螺丝", procedure6:"细线", procedure7:"气垫滑轮", procedure8:"自身重力",
+    procedure9:"初始位置", procedure10:"地面"
+};
+
+/* ---------- 参考数据（时间，其余自动算） ---------- */
+const refT = {
+    t1_11:25.4, t1_12:25.2, t1_13:25.3,  t2_11:15.2, t2_12:15.3, t2_13:15.1,
+    t1_21:18.1, t1_22:18.0, t1_23:18.2,  t2_21:11.3, t2_22:11.2, t2_23:11.4,
+    t1_31:20.5, t1_32:20.4, t1_33:20.6,  t2_31:12.8, t2_32:12.7, t2_33:12.9,
+    t1_41:25.4, t1_42:25.3, t1_43:25.5,  t2_41:15.2, t2_42:15.1, t2_43:15.3
+};
+
+/* ---------- 工具函数 ---------- */
+const avg3 = (a,b,c) => { const x=parseFloat(a),y=parseFloat(b),z=parseFloat(c); return (isNaN(x)||isNaN(y)||isNaN(z))?0:(x+y+z)/3; };
+const calcV = tBar => { const t=parseFloat(tBar); return t===0?0:(0.01/(t*1e-3)).toFixed(2); };
+const calcA = (v1,v2) => { const a=parseFloat(v1),b=parseFloat(v2); return ((b*b-a*a)/(2*0.5)).toFixed(2); };
+
+/* ---------- 计算 v̄ 与 a ---------- */
+document.getElementById('calculateDataBtn').addEventListener('click', () => {
+    // 表1-1
+    const t1_1avg = avg3(document.querySelector('.t1-11').value,document.querySelector('.t1-12').value,document.querySelector('.t1-13').value).toFixed(1);
+    const t2_1avg = avg3(document.querySelector('.t2-11').value,document.querySelector('.t2-12').value,document.querySelector('.t2-13').value).toFixed(1);
+    document.querySelector('.t1-1avg').value = t1_1avg; document.querySelector('.t2-1avg').value = t2_1avg;
+    const v1_1 = calcV(t1_1avg), v2_1 = calcV(t2_1avg);
+    document.querySelector('.v1-1').value = v1_1; document.querySelector('.v2-1').value = v2_1;
+    const a1 = calcA(v1_1,v2_1); document.querySelector('.a1').value = a1;
+    document.querySelector('.f_a1').value = (0.049/a1).toFixed(3);
+
+    // 表1-2
+    const t1_2avg = avg3(document.querySelector('.t1-21').value,document.querySelector('.t1-22').value,document.querySelector('.t1-23').value).toFixed(1);
+    const t2_2avg = avg3(document.querySelector('.t2-21').value,document.querySelector('.t2-22').value,document.querySelector('.t2-23').value).toFixed(1);
+    document.querySelector('.t1-2avg').value = t1_2avg; document.querySelector('.t2-2avg').value = t2_2avg;
+    const v1_2 = calcV(t1_2avg), v2_2 = calcV(t2_2avg);
+    document.querySelector('.v1-2').value = v1_2; document.querySelector('.v2-2').value = v2_2;
+    const a2 = calcA(v1_2,v2_2); document.querySelector('.a2').value = a2;
+    document.querySelector('.f_a2').value = (0.098/a2).toFixed(3);
+
+    // 表2-3
+    const t1_3avg = avg3(document.querySelector('.t1-31').value,document.querySelector('.t1-32').value,document.querySelector('.t1-33').value).toFixed(1);
+    const t2_3avg = avg3(document.querySelector('.t2-31').value,document.querySelector('.t2-32').value,document.querySelector('.t2-33').value).toFixed(1);
+    document.querySelector('.t1-3avg').value = t1_3avg; document.querySelector('.t2-3avg').value = t2_3avg;
+    const v1_3 = calcV(t1_3avg), v2_3 = calcV(t2_3avg);
+    document.querySelector('.v1-3').value = v1_3; document.querySelector('.v2-3').value = v2_3;
+    const a3 = calcA(v1_3,v2_3); document.querySelector('.a3').value = a3;
+    document.querySelector('.ma3').value = (0.105*a3).toFixed(3);
+
+    // 表2-4
+    const t1_4avg = avg3(document.querySelector('.t1-41').value,document.querySelector('.t1-42').value,document.querySelector('.t1-43').value).toFixed(1);
+    const t2_4avg = avg3(document.querySelector('.t2-41').value,document.querySelector('.t2-42').value,document.querySelector('.t2-43').value).toFixed(1);
+    document.querySelector('.t1-4avg').value = t1_4avg; document.querySelector('.t2-4avg').value = t2_4avg;
+    const v1_4 = calcV(t1_4avg), v2_4 = calcV(t2_4avg);
+    document.querySelector('.v1-4').value = v1_4; document.querySelector('.v2-4').value = v2_4;
+    const a4 = calcA(v1_4,v2_4); document.querySelector('.a4').value = a4;
+    document.querySelector('.ma4').value = (0.155*a4).toFixed(3);
+
+    updateError();
+});
+
+/* ---------- 一键填入参考数据 ---------- */
+document.getElementById('fillReferenceBtn').addEventListener('click', () => {
+    Object.keys(refT).forEach(k => {
+        const el = document.querySelector('.' + k.replaceAll('_', '-'));
+        if (el) el.value = refT[k];
+    });
+    document.getElementById('calculateDataBtn').click();
+    alert('参考数据已填入（若直接使用按 0 分计）');
+});
+
+/* ---------- 误差更新 ---------- */
+function updateError() {
+    const fa1 = parseFloat(document.querySelector('.f_a1').value) || 0;
+    const fa2 = parseFloat(document.querySelector('.f_a2').value) || 0;
+    if (fa1 && fa2) {
+        const err = Math.abs(fa2 - fa1) / fa1 * 100;
+        document.getElementById('error1').textContent = err.toFixed(1);
+        document.getElementById('ratio1').textContent = fa1.toFixed(3);
+        document.getElementById('ratio2').textContent = fa2.toFixed(3);
+    }
+    const ma3 = parseFloat(document.querySelector('.ma3').value) || 0;
+    const ma4 = parseFloat(document.querySelector('.ma4').value) || 0;
+    if (ma3 && ma4) {
+        const err = Math.abs(ma4 - ma3) / ma3 * 100;
+        document.getElementById('error2').textContent = err.toFixed(1);
+        document.getElementById('product1').textContent = ma3.toFixed(3);
+        document.getElementById('product2').textContent = ma4.toFixed(3);
+    }
+}
+
+/* ---------- 预习得分 ---------- */
+document.getElementById('calculateScoreBtn').addEventListener('click', () => {
+    let sc = 0;
+    Object.entries(answers).forEach(([id, ans]) => {
+        if (document.getElementById(id)?.value.trim() === ans) sc += 5;
+    });
+    document.getElementById('preparationScore').value = sc;
+});
+
+/* ---------- 自动评分 & 详细评语 ---------- */
+const cfg = {
+    weight: { prep: 40, data: 20, sum: 20, err: 20 },
+    key: ['牛顿第二定律','正比','反比','F=ma','加速度','质量','外力'],
+    minLen: 50,
+    level: [
+        {min:90,lab:'优秀',col:'#28a745',des:'实验完成质量高，数据可靠，思考深入。'},
+        {min:75,lab:'良好',col:'#007bff',des:'实验完整，数据合理，略有小瑕疵。'},
+        {min:60,lab:'及格',col:'#ffc107',des:'实验基本达到要求，但存在明显不足。'},
+        {min:0, lab:'待改进',col:'#dc3545',des:'实验未完成或错误较多，请重做并参考建议。'}
+    ]
+};
+document.getElementById('autoScoreBtn').addEventListener('click', () => {
+    let s = 0, d = {};
+    // 1. 预习
+    let p = 0; Object.entries(answers).forEach(([id, ans]) => { if (document.getElementById(id)?.value.trim() === ans) p++; });
+    d.prep = Math.round(p / Object.keys(answers).length * cfg.weight.prep); s += d.prep;
+    // 2. 数据
+    const a1 = parseFloat(document.querySelector('.a1').value);
+    const a2 = parseFloat(document.querySelector('.a2').value);
+    const a3 = parseFloat(document.querySelector('.a3').value);
+    const a4 = parseFloat(document.querySelector('.a4').value);
+    d.data = (a1 && a2 && a3 && a4) ? cfg.weight.data : 0; s += d.data;
+    // 3. 小结
+    const txt = document.getElementById('summary').value.trim();
+    const hit = cfg.key.filter(k => txt.includes(k)).length;
+    d.sum = (hit && txt.length >= cfg.minLen) ? cfg.weight.sum : (hit && txt.length >= 30 ? Math.round(cfg.weight.sum * 0.6) : 0); s += d.sum;
+    // 4. 误差
+    d.err = ((parseFloat(document.getElementById('error1').textContent) || 0) > 0 && (parseFloat(document.getElementById('error2').textContent) || 0) > 0) ? cfg.weight.err : 0; s += d.err;
+
+    const lv = cfg.level.find(l => s >= l.min);
+    // 详细评语
+    let sug = [];
+    if (d.data < cfg.weight.data * 0.7) sug.push('• 数据合理性不足：请检查 t₁、t₂ 是否遗漏或明显偏离参考值，确认光电门位置、滑块释放是否一致。');
+    if (d.sum < cfg.weight.sum * 0.7) {
+        const hitList = cfg.key.filter(k => txt.includes(k));
+        sug.push(`• 实验小结不够完善：当前关键词命中 [${hitList.join(', ')}] 共 ${hitList.length} 个，建议再补充“正比/反比”“F=ma”“误差来源”等表述，并确保字数≥${cfg.minLen}。`);
+    }
+    if (d.err === 0) sug.push('• 误差分析区未完整填写：请点击“计算 v̄ 与 a”按钮，确保两组相对误差均出现数值。');
+    if (sug.length === 0) sug.push('• 报告完整，继续保持！');
+
+    const com = `【自动评语】
+得分：${s} / 100，等级：${lv.lab}
+${lv.des}
+
+明细：预习 ${d.prep} | 数据 ${d.data} | 小结 ${d.sum} | 误差 ${d.err}
+
+改进建议：
+${sug.join('\n')}
+
+教师：马厂　日期：${new Date().toLocaleDateString('zh-CN')}`;
+    const box = document.getElementById('commentBox');
+    box.style.display = 'block'; box.style.color = lv.col; box.style.fontWeight = 'bold'; box.textContent = com;
+});
+</script>
+</body>
+</html>
