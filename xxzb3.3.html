@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>弦线上驻波实验</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #bdc3c7;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            font-weight: 500;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-weight: 500;
+        }
+        .basic-info {
+            background: rgba(236, 240, 241, 0.5);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(189, 195, 199, 0.2);
+        }
+        .basic-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .basic-info td {
+            padding: 12px;
+            border: none;
+        }
+        .basic-info td:first-child {
+            font-weight: 600;
+            color: #2c3e50;
+            width: 15%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ecf0f1;
+        }
+        th {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            font-weight: 500;
+        }
+        tr:nth-child(even) {
+            background-color: rgba(236, 240, 241, 0.3);
+        }
+        tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        .fill-blank {
+            border: none;
+            border-bottom: 2px solid #3498db;
+            background: rgba(52, 152, 219, 0.1);
+            padding: 4px 8px;
+            text-align: center;
+            min-width: 80px;
+            font-family: inherit;
+            color: #2c3e50;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .fill-blank:focus {
+            outline: none;
+            background: rgba(52, 152, 219, 0.2);
+            border-bottom: 2px solid #2980b9;
+        }
+        .data-input {
+            width: 70px;
+            text-align: center;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 6px;
+            transition: all 0.3s ease;
+        }
+        .data-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        .formula {
+            background: rgba(255, 245, 157, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            border-left: 4px solid #f1c40f;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .experiment-content {
+            background: rgba(200, 230, 201, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+        }
+        .experiment-content ol {
+            margin-left: 20px;
+        }
+        .experiment-content li {
+            margin: 12px 0;
+            line-height: 1.7;
+        }
+        .calculation-section {
+            background: rgba(179, 229, 252, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border: 1px solid rgba(33, 150, 243, 0.1);
+        }
+        .score-section {
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid #4caf50;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .score-btn {
+            background: linear-gradient(to bottom, #4caf50, #388e3c);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .score-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .chart-btn {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .chart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .score-display {
+            font-size: 24px;
+            color: #2e7d32;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .correct {
+            color: #2e7d32 !important;
+            border-bottom: 2px solid #4caf50 !important;
+            background-color: rgba(76, 175, 80, 0.1) !important;
+        }
+        .incorrect {
+            color: #c62828 !important;
+            border-bottom: 2px solid #f44336 !important;
+            background-color: rgba(244, 67, 54, 0.1) !important;
+        }
+        .empty {
+            color: #757575 !important;
+            border-bottom: 2px dashed #bdbdbd !important;
+            background-color: rgba(189, 189, 189, 0.1) !important;
+        }
+        .info-input {
+            border: none;
+            border-bottom: 2px solid #3498db;
+            background: rgba(52, 152, 219, 0.1);
+            padding: 6px 8px;
+            text-align: left;
+            min-width: 150px;
+            font-family: inherit;
+            color: #2c3e50;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .info-input:focus {
+            outline: none;
+            background: rgba(52, 152, 219, 0.2);
+            border-bottom: 2px solid #2980b9;
+        }
+        .chart-container {
+            width: 80%;
+            margin: 30px auto;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .summary-box {
+            min-height: 150px;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            width: 100%;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .comment-section {
+            background: rgba(255, 243, 224, 0.7);
+            border: 2px solid #ff9800;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .comment-title {
+            color: #e65100;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .comment-content {
+            color: #bf360c;
+            font-size: 16px;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        .auto-grade-btn {
+            background: linear-gradient(to bottom, #ff9800, #f57c00);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .auto-grade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .comment-footer {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed #ff9800;
+            text-align: right;
+            font-size: 14px;
+            color: #e65100;
+            font-weight: 500;
+        }
+        .section-title {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 20px 0 10px 0;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .calculation-result {
+            font-weight: bold;
+            color: #2c3e50;
+            padding: 8px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        .warning-box {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid #ff9800;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            color: #e65100;
+        }
+        .reference-btn {
+            background: linear-gradient(to bottom, #9c27b0, #7b1fa2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .reference-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .question-item {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .apparatus-img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .math-formula {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .symbol {
+            font-style: italic;
+            font-weight: bold;
+        }
+        .experiment-step {
+            background: rgba(255, 255, 255, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #3498db;
+        }
+        .thought-answer {
+            display: none;
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 3px solid #4caf50;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #2e7d32;
+            /* 防止文本选择和复制 */
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .thought-answer-btn {
+            background: linear-gradient(to bottom, #2196f3, #1976d2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .thought-answer-btn:hover {
+            transform: translateY(-1px);
+        }
+        /* 新增样式：思考题回答框 */
+        .thought-input {
+            width: 100%;
+            min-height: 80px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        .thought-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        /* 新增样式：填空题答案状态图标 */
+        .answer-status {
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+        }
+        .answer-status.correct-icon {
+            color: #4caf50;
+        }
+        .answer-status.incorrect-icon {
+            color: #f44336;
+        }
+        .answer-status.empty-icon {
+            color: #9e9e9e;
+        }
+        /* 填空题容器 */
+        .fill-blank-container {
+            position: relative;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>弦线上驻波实验</h1>
+        
+        <div class="basic-info">
+            <table>
+                <tr>
+                    <td>实验名称</td>
+                    <td><input type="text" class="info-input" placeholder="请输入实验名称" value="弦线上驻波实验"></td>
+                    <td>实验时间</td>
+                    <td><input type="text" class="info-input" placeholder="请输入实验时间"></td>
+                </tr>
+                <tr>
+                    <td>专业</td>
+                    <td><input type="text" class="info-input" placeholder="请输入专业"></td>
+                    <td>实验地点</td>
+                    <td><input type="text" class="info-input" placeholder="请输入实验地点"></td>
+                </tr>
+                <tr>
+                    <td>班级</td>
+                    <td><input type="text" class="info-input" placeholder="请输入班级"></td>
+                    <td>指导教师</td>
+                    <td><input type="text" class="info-input" placeholder="请输入指导教师" value="马厂"></td>
+                </tr>
+                <tr>
+                    <td>学号</td>
+                    <td><input type="text" class="info-input" placeholder="请输入学号"></td>
+                    <td>同组人</td>
+                    <td><input type="text" class="info-input" placeholder="请输入同组人"></td>
+                </tr>
+                <tr>
+                    <td>姓名</td>
+                    <td><input type="text" class="info-input" placeholder="请输入姓名"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+
+        <h2>一、实验目的</h2>
+        <div class="question-item">
+            1．观察在弦上形成的<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="驻波" placeholder="请填写"><span class="answer-status"></span></span>，并用实验确定弦线振动时驻波波长与张力的关系；
+        </div>
+        <div class="question-item">
+            2．在弦线张力不变时，用实验确定弦线振动时驻波波长与振动<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="频率" placeholder="请填写"><span class="answer-status"></span></span>的关系；
+        </div>
+        <div class="question-item">
+            3．学习对数作图或最小二乘法进行<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="数据处理" placeholder="请填写"><span class="answer-status"></span></span>。
+        </div>
+
+        <h2>二、实验仪器</h2>
+        <div class="question-item">
+            实验装置主要包括：1、<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="机械振动源" placeholder="请填写"><span class="answer-status"></span></span>；2、振动簧片；3、<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="弦线" placeholder="请填写"><span class="answer-status"></span></span>；4、可动刀口；5、可动刀口支架；
+        </div>
+        <div class="question-item">
+            6、标尺；7、固定滑轮；8、砝码与砝码盘；9、<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="信号源" placeholder="请填写"><span class="answer-status"></span></span>；10、实验平台；11、实验桌。
+        </div>
+
+        <h2>三、实验原理</h2>
+        <div class="question-item">
+            1．在一根拉紧的弦线上，其中张力为<span class="symbol">T</span>，线密度为<span class="symbol">μ</span>，则沿弦线传播的横波应满足运动方程：
+            <div class="formula">∂²y/∂t² = (T/μ) · ∂²y/∂x²</div>
+        </div>
+        <div class="question-item">
+            2．与典型波动方程∂²y/∂t² = V² · ∂²y/∂x²相比较，可得波的传播速度：
+            <div class="formula">V = √(T/μ)</div>
+        </div>
+        <div class="question-item">
+            3．若波源的振动频率为<span class="symbol">f</span>，横波波长为<span class="symbol">λ</span>，由于波速<span class="symbol">V = fλ</span>，故波长与张力及线密度之间的关系为：
+            <div class="formula">λ = (1/f) · √(T/μ)</div>
+        </div>
+        <div class="question-item">
+            4．为了验证该公式，两边取对数得：
+            <div class="formula">lgλ = ½ lgT - ½ lgμ - lgf</div>
+            固定<span class="symbol">f</span>和<span class="symbol">μ</span>，改变<span class="symbol">T</span>，作lg<span class="symbol">λ</span>-lg<span class="symbol">T</span>图，若得斜率为<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="0.5" placeholder="请填写"><span class="answer-status"></span></span>的直线，则验证了<span class="symbol">λ ∝ T^{½}</span>关系。
+        </div>
+        <div class="question-item">
+            5．同理，固定<span class="symbol">μ</span>和<span class="symbol">T</span>，改变<span class="symbol">f</span>，作lg<span class="symbol">λ</span>-lg<span class="symbol">f</span>图，若得斜率为<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="-1" placeholder="请填写"><span class="answer-status"></span></span>的直线，则验证了<span class="symbol">λ ∝ f^{-1}</span>关系。
+        </div>
+        <div class="question-item">
+            6．弦线上的波长可利用<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="驻波" placeholder="请填写"><span class="answer-status"></span></span>原理测量。相邻两波节间的距离为<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="半个波长" placeholder="请填写"><span class="answer-status"></span></span>。
+        </div>
+        <div class="question-item">
+            7．当弦线长度<span class="symbol">L</span>等于半波长的整数倍时，即可得到振幅较大而稳定的驻波，其关系式为：
+            <div class="formula">L = n · (λ/2)</div>
+            其中<span class="symbol">n</span>为<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="正整数" placeholder="请填写"><span class="answer-status"></span></span>。
+        </div>
+        <div class="question-item">
+            8．若弦线下端悬挂砝码（含砝码盘）的质量为<span class="symbol">m</span>，则张力<span class="symbol">T = <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="mg" placeholder="请填写"><span class="answer-status"></span></span></span>，其中<span class="symbol">g</span>为重力加速度。
+        </div>
+
+        <h2>四、实验内容</h2>
+        <div class="experiment-content">
+            <h3>A、验证横波的波长与弦线中的张力的关系</h3>
+            <div class="experiment-step">
+                1．固定波源振动频率为<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="90" placeholder="请填写"><span class="answer-status"></span></span>Hz（或其他固定值）；
+            </div>
+            <div class="experiment-step">
+                2．在砝码盘上添加不同质量的砝码，改变弦线<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="张力" placeholder="请填写"><span class="answer-status"></span></span><span class="symbol">T</span>；
+            </div>
+            <div class="experiment-step">
+                3．每改变一次张力，调节可动刀口位置，使弦线出现<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="振幅较大而稳定" placeholder="请填写"><span class="answer-status"></span></span>的驻波；
+            </div>
+            <div class="experiment-step">
+                4．测量弦线长度<span class="symbol">L</span>，记录砝码质量、半波波数<span class="symbol">n</span>；
+            </div>
+            <div class="experiment-step">
+                5．根据公式<span class="symbol">λ = <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="2L/n" placeholder="请填写"><span class="answer-status"></span></span></span>计算波长<span class="symbol">λ</span>；
+            </div>
+            <div class="experiment-step">
+                6．计算张力<span class="symbol">T = mg</span>，作lg<span class="symbol">λ</span>-lg<span class="symbol">T</span>图，求斜率验证<span class="symbol">λ ∝ T^{½}</span>。
+            </div>
+            
+            <h3>B、验证横波的波长与波源振动频率的关系</h3>
+            <div class="experiment-step">
+                1．固定弦线张力<span class="symbol">T</span>（固定砝码质量）；
+            </div>
+            <div class="experiment-step">
+                2．改变波源振动<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="频率" placeholder="请填写"><span class="answer-status"></span></span><span class="symbol">f</span>；
+            </div>
+            <div class="experiment-step">
+                3．用驻波法测量各相应的波长<span class="symbol">λ</span>；
+            </div>
+            <div class="experiment-step">
+                4．作lg<span class="symbol">λ</span>-lg<span class="symbol">f</span>图，求斜率验证<span class="symbol">λ ∝ f^{-1}</span>。
+            </div>
+            
+            <h3>C、选做内容：验证横波的波长与弦线密度的关系</h3>
+            <div class="experiment-step">
+                1．固定<span class="symbol">T</span>和<span class="symbol">f</span>；
+            </div>
+            <div class="experiment-step">
+                2．改变弦线的<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="粗细" placeholder="请填写"><span class="answer-status"></span></span>来改变线密度<span class="symbol">μ</span>；
+            </div>
+            <div class="experiment-step">
+                3．测量相应的波长<span class="symbol">λ</span>；
+            </div>
+            <div class="experiment-step">
+                4．作lg<span class="symbol">λ</span>-lg<span class="symbol">μ</span>图，验证<span class="symbol">λ ∝ μ^{-½}</span>关系。
+            </div>
+        </div>
+
+        <div class="warning-box">
+            ⚠️ 警告：以下表格数据需根据实际实验测量填写！若直接搬用参考数据，数据部分将计0分！
+            <div style="margin-top: 10px;">
+                <button class="reference-btn" onclick="fillReferenceData()">填入参考数据（仅供对照）</button>
+            </div>
+        </div>
+
+        <h2>五、实验数据记录</h2>
+        
+        <div class="section-title">表1 验证横波的波长λ与弦线中的张力T的关系（固定频率f=90.00Hz）</div>
+        <table>
+            <tr>
+                <th>砝码质量m (g)</th>
+                <th>总质量m+m₀ (g)</th>
+                <th>弦线长度L (cm)</th>
+                <th>半波波数n</th>
+                <th>波长λ (cm)</th>
+                <th>张力T (N)</th>
+            </tr>
+            <tr>
+                <td><input type="text" class="data-input" id="m1" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="tm1" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="L1" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="n1" placeholder="测量值" value="4"></td>
+                <td id="lambda1">-</td>
+                <td id="T1">-</td>
+            </tr>
+            <tr>
+                <td><input type="text" class="data-input" id="m2" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="tm2" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="L2" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="n2" placeholder="测量值" value="4"></td>
+                <td id="lambda2">-</td>
+                <td id="T2">-</td>
+            </tr>
+            <tr>
+                <td><input type="text" class="data-input" id="m3" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="tm3" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="L3" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="n3" placeholder="测量值" value="4"></td>
+                <td id="lambda3">-</td>
+                <td id="T3">-</td>
+            </tr>
+            <tr>
+                <td><input type="text" class="data-input" id="m4" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="tm4" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="L4" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="n4" placeholder="测量值" value="4"></td>
+                <td id="lambda4">-</td>
+                <td id="T4">-</td>
+            </tr>
+            <tr>
+                <td><input type="text" class="data-input" id="m5" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="tm5" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="L5" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="n5" placeholder="测量值" value="4"></td>
+                <td id="lambda5">-</td>
+                <td id="T5">-</td>
+            </tr>
+        </table>
+        
+        <div style="margin: 15px 0;">
+            <button class="chart-btn" onclick="calculateTable1()">计算表1数据</button>
+        </div>
+        
+        <div class="section-title">表2 验证横波的波长λ与波源振动频率f的关系（固定张力T=1.762N）</div>
+        <table>
+            <tr>
+                <th>频率f (Hz)</th>
+                <th>弦线长度L (cm)</th>
+                <th>半波波数n</th>
+                <th>波长λ (cm)</th>
+                <th>lgλ</th>
+                <th>lgf</th>
+            </tr>
+            <tr>
+                <td><input type="text" class="data-input" id="f1" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="Lf1" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="nf1" placeholder="测量值"></td>
+                <td id="lambda_f1">-</td>
+                <td id="lg_lambda1">-</td>
+                <td id="lg_f1">-</td>
+            </tr>
+            <tr>
+                <td><input type="text" class="data-input" id="f2" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="Lf2" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="nf2" placeholder="测量值"></td>
+                <td id="lambda_f2">-</td>
+                <td id="lg_lambda2">-</td>
+                <td id="lg_f2">-</td>
+            </tr>
+            <tr>
+                <td><input type="text" class="data-input" id="f3" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="Lf3" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="nf3" placeholder="测量值"></td>
+                <td id="lambda_f3">-</td>
+                <td id="lg_lambda3">-</td>
+                <td id="lg_f3">-</td>
+            </tr>
+            <tr>
+                <td><input type="text" class="data-input" id="f4" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="Lf4" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="nf4" placeholder="测量值"></td>
+                <td id="lambda_f4">-</td>
+                <td id="lg_lambda4">-</td>
+                <td id="lg_f4">-</td>
+            </tr>
+            <tr>
+                <td><input type="text" class="data-input" id="f5" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="Lf5" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="nf5" placeholder="测量值"></td>
+                <td id="lambda_f5">-</td>
+                <td id="lg_lambda5">-</td>
+                <td id="lg_f5">-</td>
+            </tr>
+        </table>
+        
+        <div style="margin: 15px 0;">
+            <button class="chart-btn" onclick="calculateTable2()">计算表2数据</button>
+        </div>
+
+        <h2>六、数据处理与分析</h2>
+        <div class="calculation-section">
+            <h3>1. 验证λ与T的关系（固定频率f=90Hz）</h3>
+            <div class="formula">理论关系：λ ∝ T^{1/2}，即lgλ与lgT的斜率应为0.5</div>
+            
+            <div style="margin: 15px 0;">
+                <button class="chart-btn" onclick="calculateSlope1()">计算lgλ-lgT斜率</button>
+            </div>
+            
+            <p>计算得到的斜率k₁ = <span id="slope1" class="calculation-result">待计算</span></p>
+            <p>相关系数r₁ = <span id="correlation1" class="calculation-result">待计算</span></p>
+            <p>验证结果：<span id="result1" class="calculation-result">待验证</span></p>
+            
+            <h3>2. 验证λ与f的关系（固定张力T=1.762N）</h3>
+            <div class="formula">理论关系：λ ∝ f^{-1}，即lgλ与lgf的斜率应为-1</div>
+            
+            <div style="margin: 15px 0;">
+                <button class="chart-btn" onclick="calculateSlope2()">计算lgλ-lgf斜率</button>
+            </div>
+            
+            <p>计算得到的斜率k₂ = <span id="slope2" class="calculation-result">待计算</span></p>
+            <p>相关系数r₂ = <span id="correlation2" class="calculation-result">待计算</span></p>
+            <p>验证结果：<span id="result2" class="calculation-result">待验证</span></p>
+            
+            <h3>3. 实验结论</h3>
+            <div id="conclusion" class="formula" style="min-height: 80px;">
+                根据以上数据分析，可以得出实验结论...
+            </div>
+        </div>
+
+        <div class="section-title">图表绘制</div>
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="chart-btn" onclick="drawLambdaTChart()">绘制lgλ-lgT关系图</button>
+            <button class="chart-btn" onclick="drawLambdaFChart()">绘制lgλ-lgf关系图</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="lambdaTChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="lambdaFChart"></canvas>
+        </div>
+
+        <h2>七、思考题</h2>
+        <div class="question-item">
+            1．求λ时为何要测几个半波长的总长？
+            <textarea class="thought-input" placeholder="请简要回答"></textarea>
+            <button class="thought-answer-btn" onclick="toggleAnswer(1)">显示参考答案</button>
+            <div id="answer1" class="thought-answer">
+                答：测量几个半波长的总长可以减小测量误差。单次测量半波长时，测量误差（如波节位置判断误差、刻度读数误差等）对结果影响较大；而测量多个半波长的总长后取平均，可以有效减小随机误差，提高波长测量的精确度。
+            </div>
+        </div>
+        <div class="question-item">
+            2．为了使lgλ-lgT直线图上的数据点分布比较均匀，砝码盘中的砝码质量应如何改变？
+            <textarea class="thought-input" placeholder="请简要回答"></textarea>
+            <button class="thought-answer-btn" onclick="toggleAnswer(2)">显示参考答案</button>
+            <div id="answer2" class="thought-answer">
+                答：应采用按几何级数或对数间隔改变砝码质量。因为λ ∝ √T，即lgλ = 0.5lgT + C，在lg坐标下呈线性关系。要使lgT坐标上的数据点分布均匀，应使lgT等间隔变化，即T应按几何级数变化，如使T的比值保持恒定。
+            </div>
+        </div>
+        <div class="question-item">
+            3．为何波源的簧片振动频率尽可能避开振动源的机械共振频率？
+            <textarea class="thought-input" placeholder="请简要回答"></textarea>
+            <button class="thought-answer-btn" onclick="toggleAnswer(3)">显示参考答案</button>
+            <div id="answer3" class="thought-answer">
+                答：避开机械共振频率有两个主要原因：1）在共振频率附近，簧片振幅会异常增大，导致弦线振动不稳定，难以形成清晰的驻波；2）共振时频率可能不稳定，会影响频率测量的准确性，导致实验误差增大。
+            </div>
+        </div>
+        <div class="question-item">
+            4．弦线的粗细和弹性对实验各有什么影响，应如何选择？
+            <textarea class="thought-input" placeholder="请简要回答"></textarea>
+            <button class="thought-answer-btn" onclick="toggleAnswer(4)">显示参考答案</button>
+            <div id="answer4" class="thought-answer">
+                答：1）弦线粗细：粗细适中的弦线较好。太细则张力下易断，太粗则驻波不明显；2）弦线弹性：应选择弹性较小的弦线。弹性大会导致波速公式V=√(T/μ)不再严格成立，且会吸收振动能量，使驻波难以形成。一般选择尼龙线、棉线等弹性较小的材料。
+            </div>
+        </div>
+
+        <h2>八、实验小结</h2>
+        <textarea class="summary-box" placeholder="请在此处填写实验小结，包括实验收获、遇到的问题及解决方案、改进建议等..."></textarea>
+
+        <h2>九、计算预习分数</h2>
+        <div class="score-section">
+            <p>请填写所有填空题后，点击计算分数</p>
+            <button class="score-btn" onclick="calculatePreScore()">计算预习分数</button>
+            <div class="score-display" id="scoreDisplay"></div>
+        </div>
+
+        <h2>十、自动评分并生成评语（温馨提醒：保存报告时，确保手机处于横屏状态）。</h2>
+        <div class="comment-section" id="commentSection">
+            <div class="comment-title">实验评语</div>
+            <div class="comment-content" id="commentContent">
+                <p style="text-align: center; color: #999;">点击"自动评分并生成评语"按钮生成实验评语和报告得分</p>
+            </div>
+            <div class="comment-footer" id="commentFooter" style="display: none;">
+                <div>指导教师：<span id="teacherName"></span></div>
+                <div>评语日期：<span id="currentDate"></span></div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="auto-grade-btn" onclick="autoGrade()">自动评分并生成评语</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 填空题答案（更新）
+        const answers = {
+            "驻波": ["驻波"],
+            "频率": ["频率"],
+            "数据处理": ["数据处理"],
+            "机械振动源": ["机械振动源", "振动源"],
+            "弦线": ["弦线", "弦"],
+            "信号源": ["信号源"],
+            "半个波长": ["半个波长", "半波长", "λ/2"],
+            "0.5": ["0.5", "½", "1/2", "0.50"],
+            "-1": ["-1", "负1", "负一"],
+            "正整数": ["正整数", "自然数", "整数"],
+            "mg": ["mg", "m*g", "m×g"],
+            "90": ["90", "90Hz", "90.00"],
+            "张力": ["张力", "拉力"],
+            "振幅较大而稳定": ["振幅较大而稳定", "稳定驻波", "明显驻波"],
+            "2L/n": ["2L/n", "2×L/n", "2L÷n"],
+            "粗细": ["粗细", "直径", "线径"],
+            "频率": ["频率", "振动频率"]
+        };
+
+        // 参考数据（来自说明书）
+        const referenceData = {
+            table1: {
+                m: [40, 80, 120, 160, 200], // 砝码质量 (g)
+                tm: [60, 100, 140, 180, 220], // 总质量 (g)
+                L: [50.5, 60.6, 69.2, 78.7, 84.4], // 弦线长度 (cm)
+                n: [4, 4, 4, 4, 4] // 半波波数
+            },
+            table2: {
+                f: [50, 70, 80, 90, 100], // 频率 (Hz)
+                L: [71.4, 50.6, 64.5, 77.7, 90.2], // 弦线长度 (cm)
+                n: [2, 2, 3, 4, 5] // 半波波数
+            }
+        };
+
+        // 思考题参考答案显示/隐藏
+        function toggleAnswer(questionNum) {
+            const answerDiv = document.getElementById(`answer${questionNum}`);
+            const button = event.target;
+            
+            if (answerDiv.style.display === 'block') {
+                answerDiv.style.display = 'none';
+                button.textContent = '显示参考答案';
+            } else {
+                answerDiv.style.display = 'block';
+                button.textContent = '隐藏参考答案';
+            }
+        }
+
+        // 更新单个填空题的状态图标
+        function updateAnswerStatusIcon(inputElement, status) {
+            const statusIcon = inputElement.nextElementSibling;
+            if (statusIcon && statusIcon.classList.contains('answer-status')) {
+                // 清除之前的样式
+                statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
+                
+                // 设置新样式和图标
+                if (status === 'correct') {
+                    statusIcon.textContent = '✓';
+                    statusIcon.classList.add('correct-icon');
+                } else if (status === 'incorrect') {
+                    statusIcon.textContent = '✗';
+                    statusIcon.classList.add('incorrect-icon');
+                } else if (status === 'empty') {
+                    statusIcon.textContent = '○';
+                    statusIcon.classList.add('empty-icon');
+                } else {
+                    statusIcon.textContent = '';
+                }
+            }
+        }
+
+        // 更新所有填空题的状态图标
+        function updateAllAnswerStatusIcons() {
+            const inputs = document.querySelectorAll('.fill-blank');
+            inputs.forEach(input => {
+                const userAnswer = input.value.trim();
+                const correctAnswers = answers[input.dataset.answer];
+                
+                if (userAnswer === '') {
+                    updateAnswerStatusIcon(input, 'empty');
+                } else if (correctAnswers && correctAnswers.some(ans => {
+                    // 处理特殊符号和大小写
+                    const userAns = userAnswer.toLowerCase()
+                        .replace(/×/g, '*')
+                        .replace(/÷/g, '/')
+                        .replace(/\s+/g, '');
+                    const correctAns = ans.toLowerCase()
+                        .replace(/×/g, '*')
+                        .replace(/÷/g, '/')
+                        .replace(/\s+/g, '');
+                    
+                    // 允许部分匹配（如"2L/n"匹配"2L/n"、"2L÷n"等）
+                    return userAns === correctAns || 
+                           userAns.includes(correctAns) || 
+                           correctAns.includes(userAns);
+                })) {
+                    updateAnswerStatusIcon(input, 'correct');
+                } else {
+                    updateAnswerStatusIcon(input, 'incorrect');
+                }
+            });
+        }
+
+        // 填入参考数据
+        function fillReferenceData() {
+            if (confirm("警告：参考数据仅供对照使用！若直接搬用参考数据，数据部分将计0分！\n\n是否继续填入参考数据？")) {
+                // 填入表1数据
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById(`m${i}`).value = referenceData.table1.m[i-1];
+                    document.getElementById(`tm${i}`).value = referenceData.table1.tm[i-1];
+                    document.getElementById(`L${i}`).value = referenceData.table1.L[i-1];
+                    document.getElementById(`n${i}`).value = referenceData.table1.n[i-1];
+                }
+                
+                // 填入表2数据
+                for (let i = 1; i <= 5; i++) {
+                    document.getElementById(`f${i}`).value = referenceData.table2.f[i-1];
+                    document.getElementById(`Lf${i}`).value = referenceData.table2.L[i-1];
+                    document.getElementById(`nf${i}`).value = referenceData.table2.n[i-1];
+                }
+                
+                // 计算数据
+                calculateTable1();
+                calculateTable2();
+                
+                alert("参考数据已填入。请注意：这些数据仅供对照，实际实验必须使用自己测量的数据！");
+            }
+        }
+
+        // 图表实例
+        let lambdaTChartInstance = null;
+        let lambdaFChartInstance = null;
+
+        // 计算表1数据
+        function calculateTable1() {
+            const g = 9.794; // 杭州地区重力加速度 (m/s²)
+            const m0 = 20; // 挂钩质量 (g)
+            
+            for (let i = 1; i <= 5; i++) {
+                const L = parseFloat(document.getElementById(`L${i}`).value) || 0;
+                const n = parseFloat(document.getElementById(`n${i}`).value) || 1;
+                const tm = parseFloat(document.getElementById(`tm${i}`).value) || 0;
+                
+                // 计算波长 λ = 2L/n
+                const lambda = n > 0 ? 2 * L / n : 0;
+                document.getElementById(`lambda${i}`).textContent = lambda.toFixed(2);
+                
+                // 计算张力 T = (m+m₀)g
+                const T = tm > 0 ? tm * 0.001 * g : 0; // 转换为kg后计算
+                document.getElementById(`T${i}`).textContent = T.toFixed(4);
+            }
+        }
+
+        // 计算表2数据
+        function calculateTable2() {
+            for (let i = 1; i <= 5; i++) {
+                const f = parseFloat(document.getElementById(`f${i}`).value) || 0;
+                const L = parseFloat(document.getElementById(`Lf${i}`).value) || 0;
+                const n = parseFloat(document.getElementById(`nf${i}`).value) || 1;
+                
+                // 计算波长 λ = 2L/n
+                const lambda = n > 0 ? 2 * L / n : 0;
+                document.getElementById(`lambda_f${i}`).textContent = lambda.toFixed(2);
+                
+                // 计算lgλ
+                const lgLambda = lambda > 0 ? Math.log10(lambda) : 0;
+                document.getElementById(`lg_lambda${i}`).textContent = lgLambda.toFixed(4);
+                
+                // 计算lgf
+                const lgF = f > 0 ? Math.log10(f) : 0;
+                document.getElementById(`lg_f${i}`).textContent = lgF.toFixed(4);
+            }
+        }
+
+        // 计算lgλ-lgT斜率
+        function calculateSlope1() {
+            calculateTable1();
+            
+            const lgLambdaArray = [];
+            const lgTArray = [];
+            
+            for (let i = 1; i <= 5; i++) {
+                const lambda = parseFloat(document.getElementById(`lambda${i}`).textContent) || 0;
+                const T = parseFloat(document.getElementById(`T${i}`).textContent) || 0;
+                
+                if (lambda > 0 && T > 0) {
+                    lgLambdaArray.push(Math.log10(lambda));
+                    lgTArray.push(Math.log10(T));
+                }
+            }
+            
+            if (lgLambdaArray.length < 2) {
+                alert("请先输入并计算表1数据！");
+                return null;
+            }
+            
+            // 使用最小二乘法计算斜率和相关系数
+            const result = linearRegression(lgTArray, lgLambdaArray);
+            
+            document.getElementById("slope1").textContent = result.slope.toFixed(4);
+            document.getElementById("correlation1").textContent = result.r.toFixed(4);
+            
+            // 验证结果（理论斜率应为0.5）
+            const expectedSlope = 0.5;
+            const error = Math.abs(result.slope - expectedSlope);
+            
+            if (error < 0.1) {
+                document.getElementById("result1").textContent = "验证通过！λ ∝ T^{1/2}关系成立";
+                document.getElementById("result1").style.color = "#2e7d32";
+            } else if (error < 0.2) {
+                document.getElementById("result1").textContent = "基本符合！存在一定误差";
+                document.getElementById("result1").style.color = "#ff9800";
+            } else {
+                document.getElementById("result1").textContent = "验证失败！请检查实验数据";
+                document.getElementById("result1").style.color = "#c62828";
+            }
+            
+            return result;
+        }
+
+        // 计算lgλ-lgf斜率
+        function calculateSlope2() {
+            calculateTable2();
+            
+            const lgLambdaArray = [];
+            const lgFArray = [];
+            
+            for (let i = 1; i <= 5; i++) {
+                const lgLambda = parseFloat(document.getElementById(`lg_lambda${i}`).textContent) || 0;
+                const lgF = parseFloat(document.getElementById(`lg_f${i}`).textContent) || 0;
+                
+                if (lgLambda !== 0 && lgF !== 0) {
+                    lgLambdaArray.push(lgLambda);
+                    lgFArray.push(lgF);
+                }
+            }
+            
+            if (lgLambdaArray.length < 2) {
+                alert("请先输入并计算表2数据！");
+                return null;
+            }
+            
+            // 使用最小二乘法计算斜率和相关系数
+            const result = linearRegression(lgFArray, lgLambdaArray);
+            
+            document.getElementById("slope2").textContent = result.slope.toFixed(4);
+            document.getElementById("correlation2").textContent = result.r.toFixed(4);
+            
+            // 验证结果（理论斜率应为-1）
+            const expectedSlope = -1;
+            const error = Math.abs(result.slope - expectedSlope);
+            
+            if (error < 0.1) {
+                document.getElementById("result2").textContent = "验证通过！λ ∝ f^{-1}关系成立";
+                document.getElementById("result2").style.color = "#2e7d32";
+            } else if (error < 0.2) {
+                document.getElementById("result2").textContent = "基本符合！存在一定误差";
+                document.getElementById("result2").style.color = "#ff9800";
+            } else {
+                document.getElementById("result2").textContent = "验证失败！请检查实验数据";
+                document.getElementById("result2").style.color = "#c62828";
+            }
+            
+            return result;
+        }
+
+        // 最小二乘法线性回归
+        function linearRegression(x, y) {
+            const n = x.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
+            
+            for (let i = 0; i < n; i++) {
+                sumX += x[i];
+                sumY += y[i];
+                sumXY += x[i] * y[i];
+                sumX2 += x[i] * x[i];
+                sumY2 += y[i] * y[i];
+            }
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            const r = (n * sumXY - sumX * sumY) / Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+            
+            return { slope, intercept, r };
+        }
+
+        // 绘制lgλ-lgT关系图
+        function drawLambdaTChart() {
+            const result = calculateSlope1();
+            if (!result) return;
+            
+            calculateTable1();
+            
+            const ctx = document.getElementById('lambdaTChart').getContext('2d');
+            const lgTArray = [];
+            const lgLambdaArray = [];
+            const dataPoints = [];
+            
+            for (let i = 1; i <= 5; i++) {
+                const lambda = parseFloat(document.getElementById(`lambda${i}`).textContent) || 0;
+                const T = parseFloat(document.getElementById(`T${i}`).textContent) || 0;
+                
+                if (lambda > 0 && T > 0) {
+                    const lgLambda = Math.log10(lambda);
+                    const lgT = Math.log10(T);
+                    lgTArray.push(lgT);
+                    lgLambdaArray.push(lgLambda);
+                    dataPoints.push({x: lgT, y: lgLambda});
+                }
+            }
+            
+            if (dataPoints.length < 2) {
+                alert("数据不足，无法绘制图表！");
+                return;
+            }
+            
+            if (lambdaTChartInstance) {
+                lambdaTChartInstance.destroy();
+            }
+            
+            // 计算回归线
+            const regressionPoints = [];
+            const minX = Math.min(...lgTArray);
+            const maxX = Math.max(...lgTArray);
+            regressionPoints.push({x: minX, y: result.intercept + result.slope * minX});
+            regressionPoints.push({x: maxX, y: result.intercept + result.slope * maxX});
+            
+            lambdaTChartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '实验数据点',
+                        data: dataPoints,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        pointRadius: 6
+                    }, {
+                        label: `回归直线 y = ${result.slope.toFixed(4)}x + ${result.intercept.toFixed(4)}`,
+                        data: regressionPoints,
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        type: 'line',
+                        fill: false,
+                        tension: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'lgλ-lgT关系图（验证λ ∝ T^{1/2}）'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        const point = dataPoints[context.dataIndex];
+                                        return `lgλ = ${point.y.toFixed(4)}, lgT = ${point.x.toFixed(4)}`;
+                                    }
+                                    return context.dataset.label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'lgT'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'lgλ'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 绘制lgλ-lgf关系图
+        function drawLambdaFChart() {
+            const result = calculateSlope2();
+            if (!result) return;
+            
+            calculateTable2();
+            
+            const ctx = document.getElementById('lambdaFChart').getContext('2d');
+            const lgFArray = [];
+            const lgLambdaArray = [];
+            const dataPoints = [];
+            
+            for (let i = 1; i <= 5; i++) {
+                const lgLambda = parseFloat(document.getElementById(`lg_lambda${i}`).textContent) || 0;
+                const lgF = parseFloat(document.getElementById(`lg_f${i}`).textContent) || 0;
+                
+                if (lgLambda !== 0 && lgF !== 0) {
+                    lgFArray.push(lgF);
+                    lgLambdaArray.push(lgLambda);
+                    dataPoints.push({x: lgF, y: lgLambda});
+                }
+            }
+            
+            if (dataPoints.length < 2) {
+                alert("数据不足，无法绘制图表！");
+                return;
+            }
+            
+            if (lambdaFChartInstance) {
+                lambdaFChartInstance.destroy();
+            }
+            
+            // 计算回归线
+            const regressionPoints = [];
+            const minX = Math.min(...lgFArray);
+            const maxX = Math.max(...lgFArray);
+            regressionPoints.push({x: minX, y: result.intercept + result.slope * minX});
+            regressionPoints.push({x: maxX, y: result.intercept + result.slope * maxX});
+            
+            lambdaFChartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '实验数据点',
+                        data: dataPoints,
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        pointRadius: 6
+                    }, {
+                        label: `回归直线 y = ${result.slope.toFixed(4)}x + ${result.intercept.toFixed(4)}`,
+                        data: regressionPoints,
+                        backgroundColor: 'rgba(153, 102, 255, 0.1)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        type: 'line',
+                        fill: false,
+                        tension: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'lgλ-lgf关系图（验证λ ∝ f^{-1}）'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        const point = dataPoints[context.dataIndex];
+                                        return `lgλ = ${point.y.toFixed(4)}, lgf = ${point.x.toFixed(4)}`;
+                                    }
+                                    return context.dataset.label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'lgf'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'lgλ'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 检查是否使用了参考数据
+        function checkReferenceDataUsage() {
+            let referenceCount = 0;
+            let totalCount = 0;
+            
+            // 检查表1数据
+            for (let i = 1; i <= 5; i++) {
+                const m = parseFloat(document.getElementById(`m${i}`).value) || 0;
+                const tm = parseFloat(document.getElementById(`tm${i}`).value) || 0;
+                const L = parseFloat(document.getElementById(`L${i}`).value) || 0;
+                
+                if (m > 0 || tm > 0 || L > 0) {
+                    totalCount += 3;
+                    
+                    if (Math.abs(m - referenceData.table1.m[i-1]) < 0.1) referenceCount++;
+                    if (Math.abs(tm - referenceData.table1.tm[i-1]) < 0.1) referenceCount++;
+                    if (Math.abs(L - referenceData.table1.L[i-1]) < 0.1) referenceCount++;
+                }
+            }
+            
+            // 检查表2数据
+            for (let i = 1; i <= 5; i++) {
+                const f = parseFloat(document.getElementById(`f${i}`).value) || 0;
+                const Lf = parseFloat(document.getElementById(`Lf${i}`).value) || 0;
+                
+                if (f > 0 || Lf > 0) {
+                    totalCount += 2;
+                    
+                    if (Math.abs(f - referenceData.table2.f[i-1]) < 0.1) referenceCount++;
+                    if (Math.abs(Lf - referenceData.table2.L[i-1]) < 0.1) referenceCount++;
+                }
+            }
+            
+            // 如果超过80%的数据与参考数据完全匹配，判定为直接搬用
+            if (totalCount > 0 && (referenceCount / totalCount) > 0.8) {
+                return true;
+            }
+            return false;
+        }
+
+        // 计算预习分数（仅填空题）- 修复版本
+        function calculatePreScore() {
+            const inputs = document.querySelectorAll('.fill-blank');
+            let correct = 0;
+            let total = inputs.length;
+            let emptyCount = 0;
+
+            inputs.forEach(input => {
+                const userAnswer = input.value.trim();
+                const correctAnswers = answers[input.dataset.answer];
+                
+                // 清除之前的样式
+                input.classList.remove('correct', 'incorrect', 'empty');
+                
+                if (userAnswer === '') {
+                    // 未填写的情况
+                    emptyCount++;
+                    input.classList.add('empty');
+                    updateAnswerStatusIcon(input, 'empty');
+                } else if (correctAnswers && correctAnswers.some(ans => {
+                    // 处理特殊符号和大小写
+                    const userAns = userAnswer.toLowerCase()
+                        .replace(/×/g, '*')
+                        .replace(/÷/g, '/')
+                        .replace(/\s+/g, '');
+                    const correctAns = ans.toLowerCase()
+                        .replace(/×/g, '*')
+                        .replace(/÷/g, '/')
+                        .replace(/\s+/g, '');
+                    
+                    // 允许部分匹配（如"2L/n"匹配"2L/n"、"2L÷n"等）
+                    return userAns === correctAns || 
+                           userAns.includes(correctAns) || 
+                           correctAns.includes(userAns);
+                })) {
+                    // 回答正确
+                    correct++;
+                    input.classList.add('correct');
+                    updateAnswerStatusIcon(input, 'correct');
+                } else {
+                    // 回答错误
+                    input.classList.add('incorrect');
+                    updateAnswerStatusIcon(input, 'incorrect');
+                }
+            });
+
+            // 计算分数，未答题不计入正确
+            const score = Math.round((correct / total) * 100);
+            
+            // 显示结果
+            let scoreText = `预习分数：${score}分（答对${correct}/${total}题）`;
+            if (emptyCount > 0) {
+                scoreText += `，未答：${emptyCount}题`;
+            }
+            if (correct === total) {
+                scoreText += " 🎉 满分！";
+            } else if (correct === 0) {
+                scoreText += " 😢 请认真预习后再作答！";
+            }
+            
+            document.getElementById('scoreDisplay').innerHTML = scoreText;
+            return {score, correct, total, emptyCount};
+        }
+
+        // 自动评分并生成评语 - 根据新的评分标准修改
+        function autoGrade() {
+            const preScoreResult = calculatePreScore();
+            const preScore = preScoreResult.score;
+            const slope1Result = calculateSlope1();
+            const slope2Result = calculateSlope2();
+            const summary = document.querySelector('.summary-box').value.trim();
+            const chart1Drawn = lambdaTChartInstance !== null;
+            const chart2Drawn = lambdaFChartInstance !== null;
+            
+            // 检查是否直接搬用参考数据
+            const usedReferenceData = checkReferenceDataUsage();
+            
+            // 计算综合分数（根据新的评分标准）
+            let totalScore = 0;
+            let scoreBreakdown = [];
+            
+            // 1. 预习填空（25%）
+            const preScoreWeighted = Math.round(preScore * 0.25);
+            totalScore += preScoreWeighted;
+            scoreBreakdown.push(`预习填空：${preScore}×25%=${preScoreWeighted}`);
+            
+            // 2. 数据及其合理性（25%）- 直接搬用参考数据计0分
+            let dataScore = 0;
+            if (usedReferenceData) {
+                // 如果直接搬用参考数据，数据部分得0分
+                dataScore = 0;
+                scoreBreakdown.push(`数据记录：0×25%=0（直接搬用参考数据）`);
+            } else {
+                // 计算数据完整性分数
+                let dataCompleteness = 0;
+                const dataInputs = document.querySelectorAll('.data-input');
+                let filledCount = 0;
+                dataInputs.forEach(input => {
+                    if (input.value.trim() !== '') filledCount++;
+                });
+                dataCompleteness = Math.round((filledCount / dataInputs.length) * 100);
+                
+                // 检查实验结果合理性
+                let experimentQuality = 0;
+                if (slope1Result && slope2Result) {
+                    const error1 = Math.abs(slope1Result.slope - 0.5);
+                    const error2 = Math.abs(slope2Result.slope + 1);
+                    
+                    let quality1 = 0, quality2 = 0;
+                    if (error1 < 0.1) quality1 = 100;
+                    else if (error1 < 0.2) quality1 = 80;
+                    else if (error1 < 0.3) quality1 = 60;
+                    else quality1 = 40;
+                    
+                    if (error2 < 0.1) quality2 = 100;
+                    else if (error2 < 0.2) quality2 = 80;
+                    else if (error2 < 0.3) quality2 = 60;
+                    else quality2 = 40;
+                    
+                    experimentQuality = Math.round((quality1 + quality2) / 2);
+                }
+                
+                dataScore = Math.round((dataCompleteness * 0.6 + experimentQuality * 0.4) * 0.25);
+                scoreBreakdown.push(`数据完整性与合理性：(${dataCompleteness}×60%+${experimentQuality}×40%)×0.25=${dataScore}`);
+            }
+            totalScore += dataScore;
+            
+            // 3. 数据验证结果（10%）
+            let verificationScore = 0;
+            if (slope1Result && slope2Result) {
+                const error1 = Math.abs(slope1Result.slope - 0.5);
+                const error2 = Math.abs(slope2Result.slope + 1);
+                
+                let score1 = 0, score2 = 0;
+                if (error1 < 0.1) score1 = 100;
+                else if (error1 < 0.15) score1 = 80;
+                else if (error1 < 0.2) score1 = 60;
+                else if (error1 < 0.25) score1 = 40;
+                else score1 = 20;
+                
+                if (error2 < 0.1) score2 = 100;
+                else if (error2 < 0.15) score2 = 80;
+                else if (error2 < 0.2) score2 = 60;
+                else if (error2 < 0.25) score2 = 40;
+                else score2 = 20;
+                
+                verificationScore = Math.round((score1 + score2) / 2 * 0.1);
+            }
+            totalScore += verificationScore;
+            scoreBreakdown.push(`数据验证：${verificationScore/0.1}×10%=${verificationScore}`);
+            
+            // 4. 图表（10%）
+            let chartScore = 0;
+            if (chart1Drawn && chart2Drawn) chartScore = 100;
+            else if (chart1Drawn || chart2Drawn) chartScore = 50;
+            
+            const chartScoreWeighted = Math.round(chartScore * 0.1);
+            totalScore += chartScoreWeighted;
+            scoreBreakdown.push(`图表绘制：${chartScore}×10%=${chartScoreWeighted}`);
+            
+            // 5. 思考题（20%）
+            let thoughtScore = 0;
+            const thoughtInputs = document.querySelectorAll('.thought-input');
+            let thoughtFilled = 0;
+            let thoughtTotalLength = 0;
+            
+            thoughtInputs.forEach(input => {
+                const answer = input.value.trim();
+                if (answer !== '') {
+                    thoughtFilled++;
+                    thoughtTotalLength += answer.length;
+                }
+            });
+            
+            // 根据填写情况和内容质量评分
+            const fillRate = thoughtFilled / thoughtInputs.length;
+            const avgLength = thoughtFilled > 0 ? thoughtTotalLength / thoughtFilled : 0;
+            
+            if (fillRate === 1 && avgLength > 50) thoughtScore = 100;
+            else if (fillRate >= 0.8 && avgLength > 40) thoughtScore = 80;
+            else if (fillRate >= 0.6 && avgLength > 30) thoughtScore = 60;
+            else if (fillRate >= 0.4 && avgLength > 20) thoughtScore = 40;
+            else if (fillRate >= 0.2) thoughtScore = 20;
+            else thoughtScore = 0;
+            
+            const thoughtScoreWeighted = Math.round(thoughtScore * 0.2);
+            totalScore += thoughtScoreWeighted;
+            scoreBreakdown.push(`思考题：${thoughtScore}×20%=${thoughtScoreWeighted}`);
+            
+            // 6. 小结（10%）
+            let summaryScore = 0;
+            const summaryLength = summary.length;
+            // 检查关键词数量（简单的关键词检查）
+            const keywords = ['实验', '收获', '问题', '解决', '改进', '建议', '理解', '掌握', '学会', '操作'];
+            let keywordCount = 0;
+            keywords.forEach(keyword => {
+                if (summary.includes(keyword)) keywordCount++;
+            });
+            
+            if (summaryLength > 50 && keywordCount >= 5) summaryScore = 100;
+            else if (summaryLength > 40 && keywordCount >= 4) summaryScore = 80;
+            else if (summaryLength > 30 && keywordCount >= 3) summaryScore = 60;
+            else if (summaryLength > 20 && keywordCount >= 2) summaryScore = 40;
+            else if (summaryLength > 10) summaryScore = 20;
+            else summaryScore = 0;
+            
+            const summaryScoreWeighted = Math.round(summaryScore * 0.1);
+            totalScore += summaryScoreWeighted;
+            scoreBreakdown.push(`实验小结：${summaryScore}×10%=${summaryScoreWeighted}`);
+            
+            // 生成评语
+            let comment = "";
+            let grade = "不及格";
+            let gradeColor = "#c62828";
+            
+            if (usedReferenceData) {
+                grade = "不及格";
+                gradeColor = "#c62828";
+                comment = `❌ 实验报告不合格！检测到直接搬用参考数据，数据部分计0分！综合得分${totalScore}分。必须使用实际实验测量数据完成报告！`;
+            } else if (totalScore >= 90) {
+                grade = "优秀";
+                gradeColor = "#2e7d32";
+                comment = `🎉 实验报告非常出色！综合得分${totalScore}分。预习扎实（${preScore}分），数据记录完整准确，实验验证成功，思考题回答充分，小结详实。`;
+            } else if (totalScore >= 80) {
+                grade = "良好";
+                gradeColor = "#388e3c";
+                comment = `👍 实验报告质量较高！综合得分${totalScore}分。预习较好（${preScore}分），数据记录较为完整，实验验证基本成功，分析较为充分。`;
+            } else if (totalScore >= 70) {
+                grade = "中等";
+                gradeColor = "#f57c00";
+                comment = `✊ 实验报告基本合格！综合得分${totalScore}分。预习一般（${preScore}分），数据记录和计算存在一定误差，分析较为简单。`;
+            } else if (totalScore >= 60) {
+                grade = "及格";
+                gradeColor = "#ff9800";
+                comment = `⚠️ 实验报告勉强及格！综合得分${totalScore}分。预习不足（${preScore}分），数据记录或计算存在明显问题，分析不足。`;
+            } else {
+                grade = "不及格";
+                gradeColor = "#d32f2f";
+                comment = `❌ 实验报告未达到基本要求！报告得分${totalScore}分。请重新认真学习实验原理，补充完整实验记录！`;
+            }
+            
+            // 具体建议
+            let suggestions = [];
+            if (preScore < 70) suggestions.push("预习部分需要加强，请认真阅读实验原理");
+            if (usedReferenceData) suggestions.push("必须使用实际测量数据");
+            else if (dataScore < 15) suggestions.push("数据记录需要更加完整准确");
+            if (verificationScore < 8) suggestions.push("数据验证需要更精确，请检查实验操作");
+            if (thoughtScore < 60) suggestions.push("思考题回答需要更加充分详细");
+            if (summaryScore < 60) suggestions.push("实验小结需要更加详实，应包含实验收获、问题和改进建议");
+            if (chartScoreWeighted < 8) suggestions.push("请完成图表的绘制和分析");
+            
+            if (suggestions.length > 0) {
+                comment += ` 改进建议：${suggestions.join('；')}。`;
+            }
+            
+            // 显示详细分数分解
+            comment += ` 评分详情：${scoreBreakdown.join('，')}，总评：${grade}（${totalScore}分）。`;
+            
+            // 获取指导教师姓名和当前日期
+            const teacherName = document.querySelector('.info-input[placeholder="请输入指导教师"]').value || '未填写';
+            const currentDate = new Date().toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // 更新实验结论
+            let conclusionText = `实验结论：`;
+            if (slope1Result && slope2Result) {
+                conclusionText += `通过实验验证了弦线上横波的传播规律。`;
+                conclusionText += ` 1) 当频率固定时，波长λ与张力T的${slope1Result.slope.toFixed(4)}次方成正比（理论值0.5，相对误差${Math.abs((slope1Result.slope-0.5)/0.5*100).toFixed(1)}%）；`;
+                conclusionText += ` 2) 当张力固定时，波长λ与频率f的${(-slope2Result.slope).toFixed(4)}次方成反比（理论值1，相对误差${Math.abs((slope2Result.slope+1)/1*100).toFixed(1)}%）。`;
+                conclusionText += ` 验证了公式 λ = (1/f)·√(T/μ) 的正确性。`;
+            } else {
+                conclusionText += `根据数据分析，可以验证弦线上横波的传播规律。请根据计算结果填写具体结论。`;
+            }
+            document.getElementById('conclusion').textContent = conclusionText;
+            
+            // 更新评语内容
+            document.getElementById('commentContent').innerHTML = comment;
+            document.getElementById('commentContent').style.color = gradeColor;
+            document.getElementById('teacherName').textContent = teacherName;
+            document.getElementById('currentDate').textContent = currentDate;
+            document.getElementById('commentFooter').style.display = 'block';
+            
+            // 使用MathJax重新渲染公式
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        // 初始化页面
+        window.onload = function() {
+            // 添加输入框变化监听
+            const dataInputs = document.querySelectorAll('.data-input');
+            dataInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    if (this.id.startsWith('m') || this.id.startsWith('tm') || this.id.startsWith('L') || this.id.startsWith('n')) {
+                        if (this.id.match(/\d/)) {
+                            calculateTable1();
+                        }
+                    }
+                    if (this.id.startsWith('f') || this.id.startsWith('Lf') || this.id.startsWith('nf')) {
+                        if (this.id.match(/\d/)) {
+                            calculateTable2();
+                        }
+                    }
+                });
+            });
+            
+            // 添加填空框变化监听
+            const fillBlanks = document.querySelectorAll('.fill-blank');
+            fillBlanks.forEach(input => {
+                input.addEventListener('change', function() {
+                    // 移除之前的样式
+                    this.classList.remove('correct', 'incorrect', 'empty');
+                    
+                    // 清空状态图标
+                    const statusIcon = this.nextElementSibling;
+                    if (statusIcon && statusIcon.classList.contains('answer-status')) {
+                        statusIcon.textContent = '';
+                        statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
+                    }
+                });
+            });
+            
+            // 初始化MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        };
+    </script>
+</body>
+</html>

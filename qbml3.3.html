@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>切变模量与转动惯量测定实验报告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #bdc3c7;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            font-weight: 500;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-weight: 500;
+        }
+        .basic-info {
+            background: rgba(236, 240, 241, 0.5);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(189, 195, 199, 0.2);
+        }
+        .basic-info table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .basic-info td {
+            padding: 12px;
+            border: none;
+        }
+        .basic-info td:first-child {
+            font-weight: 600;
+            color: #2c3e50;
+            width: 15%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ecf0f1;
+        }
+        th {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            font-weight: 500;
+        }
+        tr:nth-child(even) {
+            background-color: rgba(236, 240, 241, 0.3);
+        }
+        tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        .fill-blank {
+            border: none;
+            border-bottom: 2px solid #3498db;
+            background: rgba(52, 152, 219, 0.1);
+            padding: 4px 8px;
+            text-align: center;
+            min-width: 80px;
+            font-family: inherit;
+            color: #2c3e50;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .fill-blank:focus {
+            outline: none;
+            background: rgba(52, 152, 219, 0.2);
+            border-bottom: 2px solid #2980b9;
+        }
+        .data-input {
+            width: 70px;
+            text-align: center;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            padding: 6px;
+            transition: all 0.3s ease;
+        }
+        .data-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        .formula {
+            background: rgba(255, 245, 157, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #f1c40f;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .experiment-content {
+            background: rgba(200, 230, 201, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border: 1px solid rgba(76, 175, 80, 0.1);
+        }
+        .experiment-content ol {
+            margin-left: 20px;
+        }
+        .experiment-content li {
+            margin: 12px 0;
+            line-height: 1.7;
+        }
+        .calculation-section {
+            background: rgba(179, 229, 252, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border: 1px solid rgba(33, 150, 243, 0.1);
+        }
+        .score-section {
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid #4caf50;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .score-btn {
+            background: linear-gradient(to bottom, #4caf50, #388e3c);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .score-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .chart-btn {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .chart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .score-display {
+            font-size: 24px;
+            color: #2e7d32;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        .correct {
+            color: #2e7d32 !important;
+            border-bottom: 2px solid #4caf50 !important;
+            background-color: rgba(76, 175, 80, 0.1) !important;
+        }
+        .incorrect {
+            color: #c62828 !important;
+            border-bottom: 2px solid #f44336 !important;
+            background-color: rgba(244, 67, 54, 0.1) !important;
+        }
+        .empty {
+            color: #757575 !important;
+            border-bottom: 2px dashed #bdbdbd !important;
+            background-color: rgba(189, 189, 189, 0.1) !important;
+        }
+        .info-input {
+            border: none;
+            border-bottom: 2px solid #3498db;
+            background: rgba(52, 152, 219, 0.1);
+            padding: 6px 8px;
+            text-align: left;
+            min-width: 150px;
+            font-family: inherit;
+            color: #2c3e50;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .info-input:focus {
+            outline: none;
+            background: rgba(52, 152, 219, 0.2);
+            border-bottom: 2px solid #2980b9;
+        }
+        .chart-container {
+            width: 80%;
+            margin: 30px auto;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .summary-box {
+            min-height: 150px;
+            border: 1px solid rgba(52, 152, 219, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            width: 100%;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .comment-section {
+            background: rgba(255, 243, 224, 0.7);
+            border: 2px solid #ff9800;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .comment-title {
+            color: #e65100;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .comment-content {
+            color: #bf360c;
+            font-size: 16px;
+            line-height: 1.8;
+            text-align: justify;
+        }
+        .auto-grade-btn {
+            background: linear-gradient(to bottom, #ff9800, #f57c00);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .auto-grade-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .comment-footer {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px dashed #ff9800;
+            text-align: right;
+            font-size: 14px;
+            color: #e65100;
+            font-weight: 500;
+        }
+        .section-title {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 20px 0 10px 0;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .calculation-result {
+            font-weight: bold;
+            color: #2c3e50;
+            padding: 8px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+        .warning-box {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid #ff9800;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            color: #e65100;
+        }
+        .reference-btn {
+            background: linear-gradient(to bottom, #9c27b0, #7b1fa2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .reference-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .question-item {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        /* 新增样式：思考题部分 */
+        .thought-answer {
+            display: none;
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 3px solid #4caf50;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #2e7d32;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .thought-answer-btn {
+            background: linear-gradient(to bottom, #2196f3, #1976d2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .thought-answer-btn:hover {
+            transform: translateY(-1px);
+        }
+        .thought-input {
+            width: 100%;
+            min-height: 80px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        .thought-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        /* 新增：填空题状态图标样式 */
+        .answer-status {
+            display: inline-block;
+            margin-left: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+            width: 20px;
+            height: 20px;
+            text-align: center;
+            line-height: 20px;
+            border-radius: 50%;
+        }
+        .answer-status.correct-icon {
+            color: #4caf50;
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+        .answer-status.incorrect-icon {
+            color: #f44336;
+            background-color: rgba(244, 67, 54, 0.1);
+        }
+        .answer-status.empty-icon {
+            color: #9e9e9e;
+            background-color: rgba(158, 158, 158, 0.1);
+        }
+        .fill-blank-container {
+            position: relative;
+            display: inline-block;
+        }
+        .score-details {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(52, 152, 219, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #3498db;
+        }
+        .score-details .score-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        .score-details .score-item:last-child {
+            border-bottom: none;
+        }
+        .score-details .score-item-name {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        .score-details .score-item-value {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        .result-comparison {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+        }
+        .result-comparison th, .result-comparison td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        .result-comparison th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .result-comparison .highlight {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+        /* 填空题容器优化 */
+        .fill-blank-wrapper {
+            display: inline-block;
+            position: relative;
+            margin: 0 5px;
+        }
+        .fill-blank-with-icon {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>切变模量与转动惯量测定实验报告</h1>
+        
+        <div class="basic-info">
+            <table>
+                <tr>
+                    <td>实验名称</td>
+                    <td><input type="text" class="info-input" placeholder="请输入实验名称" value="切变模量与转动惯量测定实验"></td>
+                    <td>实验时间</td>
+                    <td><input type="text" class="info-input" placeholder="请输入实验时间"></td>
+                </tr>
+                <tr>
+                    <td>专业</td>
+                    <td><input type="text" class="info-input" placeholder="请输入专业"></td>
+                    <td>实验地点</td>
+                    <td><input type="text" class="info-input" placeholder="请输入实验地点"></td>
+                </tr>
+                <tr>
+                    <td>班级</td>
+                    <td><input type="text" class="info-input" placeholder="请输入班级"></td>
+                    <td>指导教师</td>
+                    <td><input type="text" class="info-input" placeholder="请输入指导教师" value="马厂"></td>
+                </tr>
+                <tr>
+                    <td>学号</td>
+                    <td><input type="text" class="info-input" placeholder="请输入学号"></td>
+                    <td>同组人</td>
+                    <td><input type="text" class="info-input" placeholder="请输入同组人"></td>
+                </tr>
+                <tr>
+                    <td>姓名</td>
+                    <td><input type="text" class="info-input" placeholder="请输入姓名"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+
+        <h2>一、实验目的</h2>
+        <div class="question-item">
+            1．掌握基本<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="长度和时间" placeholder="请填写"><span class="answer-status"></span></span>测量仪器的使用方法；
+        </div>
+        <div class="question-item">
+            2．学习用<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="扭摆法" placeholder="请填写"><span class="answer-status"></span></span>测量材料的切变模量，了解测量材料切变模量的基本方法；
+        </div>
+        <div class="question-item">
+            3．学习用扭摆法测量各种形状刚体绕<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="同一轴" placeholder="请填写"><span class="answer-status"></span></span>转动的转动惯量。
+        </div>
+
+        <h2>二、实验仪器</h2>
+        <div class="question-item">
+            1．实验仪器包括：(1).爪手 (2).环状刚体 (3).<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="待测材料" placeholder="请填写"><span class="answer-status"></span></span> (4).霍尔开关；
+        </div>
+        <div class="question-item">
+            2．还包括：(5).铷铁硼小磁钢 (6).底座 (7).<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="数字式计数计时仪" placeholder="请填写"><span class="answer-status"></span></span> (8).标志旋钮 (9).扭动旋钮。
+        </div>
+        <div class="question-item">
+            3．本实验中，钢丝的固定支点用字母<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="O" placeholder="请填写"><span class="answer-status"></span></span>表示，爪手的支点用字母O'表示。
+        </div>
+
+        <h2>三、实验原理</h2>
+        <div class="question-item">
+            1．在切变角比较小的情况下，作用在单位面积上的切力F/A与切变角α成正比，即F/A = <span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="G" placeholder="请填写"><span class="answer-status"></span></span>α；
+        </div>
+        <div class="question-item">
+            2．式中，G是一个物理常数，称为<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="切变模量" placeholder="请填写"><span class="answer-status"></span></span>；
+        </div>
+        <div class="question-item">
+            3．对于细长圆柱体（钢丝），外力矩M外 = <span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="0.5πG" placeholder="请填写"><span class="answer-status"></span></span>R⁴Φ₀/L；
+        </div>
+        <div class="question-item">
+            4．设爪手对其中心轴的转动惯量为I₀，根据转动定律，得到的微分方程是：d²Φ₀/dt² + <span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="D" placeholder="请填写"><span class="answer-status"></span></span>/I₀Φ₀ = 0；
+        </div>
+        <div class="question-item">
+            5．这个微分方程的解表明系统作简谐振动，其振动周期T₀ = <span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="2π" placeholder="请填写"><span class="answer-status"></span></span>√(I₀/D)；
+        </div>
+        <div class="question-item">
+            6．环状刚体和爪手的总转动惯量I' = <span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="I₀+I₁" placeholder="请填写"><span class="answer-status"></span></span>，其中I₁为环状刚体的转动惯量；
+        </div>
+        <div class="question-item">
+            7．通过测量可以得到关系式：T环² - T₀² = 4π²I₁/D；
+        </div>
+        <div class="question-item">
+            8．将D = 0.5πGR⁴/L代入上式，可求出切变模量G = <span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="8πL" placeholder="请填写"><span class="answer-status"></span></span>I₁/(R⁴(T环²-T₀²))；
+        </div>
+        <div class="question-item">
+            9．由刚体理论可知，环状刚体绕中心轴作水平转动的转动惯量理论值I₁ = <span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="M" placeholder="请填写"><span class="answer-status"></span></span>(b²+c²)/2；
+        </div>
+        <div class="question-item">
+            10．式中，b为环的<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="内半径" placeholder="请填写"><span class="answer-status"></span></span>，c为环的<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="外半径" placeholder="请填写"><span class="answer-status"></span></span>，M为环的质量。
+        </div>
+
+        <h2>四、实验内容</h2>
+        <div class="question-item">
+            1．用米尺测量钢丝OO'的间距L。用游标卡尺测圆环内半径b、外半径c、钢丝直径2R、圆柱长度l₁及<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="方柱长度" placeholder="请填写"><span class="answer-status"></span></span>l₂；
+        </div>
+        <div class="question-item">
+            2．用物理天平或电子天平称圆环、圆柱和方柱的<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="质量" placeholder="请填写"><span class="answer-status"></span></span>；
+        </div>
+        <div class="question-item">
+            3．由于钢丝很长，容易满足α ≪ 1°的条件，实验时扭摆的自由振动时的角振幅φᵢ可以取很大，如2π等；
+        </div>
+        <div class="question-item">
+            4．用霍尔开关计数计时仪测量爪手在单独摆动和分别加上圆环、圆柱和方柱后摆动<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="5个周期" placeholder="请填写"><span class="answer-status"></span></span>（N=10）时所用的总时间；
+        </div>
+        <div class="question-item">
+            5．每一种情况重复测量<span class="fill-blank-wrapper"><input type="text" class="fill-blank" data-answer="3次" placeholder="请填写"><span class="answer-status"></span></span>，分别算出它们的周期T₀、T环、T方柱和T圆柱。
+        </div>
+
+        <div class="warning-box">
+            ⚠️ 警告：以下表格数据需根据实际实验测量填写！若直接搬用参考数据，数据部分将计0分！
+            <div style="margin-top: 10px;">
+                <button class="reference-btn" onclick="fillReferenceData()">填入参考数据（仅供对照）</button>
+            </div>
+        </div>
+
+        <h2>五、实验数据记录</h2>
+        
+        <div class="section-title">表1 几何尺寸测量（单位：mm）</div>
+        <table>
+            <tr>
+                <th>测量次数</th>
+                <th>圆环内直径 2b</th>
+                <th>圆环外直径 2c</th>
+                <th>钢丝直径 2R</th>
+                <th>钢丝长度 L</th>
+                <th>圆柱长度 l₁</th>
+                <th>方柱长度 l₂</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td><input type="text" class="data-input" id="b1" data-param="b" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="c1" data-param="c" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="r1" data-param="r" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="l1" data-param="l" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="cyl1" data-param="cyl" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="sq1" data-param="sq" placeholder="测量值"></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><input type="text" class="data-input" id="b2" data-param="b" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="c2" data-param="c" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="r2" data-param="r" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="l2" data-param="l" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="cyl2" data-param="cyl" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="sq2" data-param="sq" placeholder="测量值"></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><input type="text" class="data-input" id="b3" data-param="b" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="c3" data-param="c" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="r3" data-param="r" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="l3" data-param="l" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="cyl3" data-param="cyl" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="sq3" data-param="sq" placeholder="测量值"></td>
+            </tr>
+            <tr>
+                <td>平均值</td>
+                <td id="b_avg">-</td>
+                <td id="c_avg">-</td>
+                <td id="r_avg">-</td>
+                <td id="l_avg">-</td>
+                <td id="cyl_avg">-</td>
+                <td id="sq_avg">-</td>
+            </tr>
+        </table>
+        
+        <div class="section-title">表2 测量试样的质量</div>
+        <table>
+            <tr>
+                <th>试样</th>
+                <th>圆环</th>
+                <th>方柱</th>
+                <th>圆柱</th>
+            </tr>
+            <tr>
+                <td>质量（kg）</td>
+                <td><input type="text" class="data-input" id="mass_ring" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="mass_square" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="mass_cylinder" placeholder="测量值"></td>
+            </tr>
+        </table>
+        
+        <div class="section-title">表3 振动周期测量（计数 N=10，计时为 5 个周期）</div>
+        <table>
+            <tr>
+                <th>样品</th>
+                <th>第一次总时间/s</th>
+                <th>第二次总时间/s</th>
+                <th>第三次总时间/s</th>
+                <th>平均周期/s</th>
+            </tr>
+            <tr>
+                <td>空载 T₀</td>
+                <td><input type="text" class="data-input" id="t01" data-param="t0" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="t02" data-param="t0" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="t03" data-param="t0" placeholder="测量值"></td>
+                <td id="t0_avg">-</td>
+            </tr>
+            <tr>
+                <td>圆环 T环</td>
+                <td><input type="text" class="data-input" id="tr1" data-param="tr" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="tr2" data-param="tr" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="tr3" data-param="tr" placeholder="测量值"></td>
+                <td id="tr_avg">-</td>
+            </tr>
+            <tr>
+                <td>圆柱 T圆柱</td>
+                <td><input type="text" class="data-input" id="tc1" data-param="tc" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="tc2" data-param="tc" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="tc3" data-param="tc" placeholder="测量值"></td>
+                <td id="tc_avg">-</td>
+            </tr>
+            <tr>
+                <td>方柱 T方柱</td>
+                <td><input type="text" class="data-input" id="ts1" data-param="ts" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="ts2" data-param="ts" placeholder="测量值"></td>
+                <td><input type="text" class="data-input" id="ts3" data-param="ts" placeholder="测量值"></td>
+                <td id="ts_avg">-</td>
+            </tr>
+        </table>
+
+        <h2>六、数据处理</h2>
+        <div class="calculation-section">
+            <h3>1. 圆环、方柱、圆柱绕竖直轴水平转动的转动惯量计算</h3>
+            
+            <div style="margin: 15px 0;">
+                <button class="chart-btn" onclick="calculateAll()">计算所有结果</button>
+            </div>
+            
+            <table>
+                <tr>
+                    <th>试样</th>
+                    <th>圆环</th>
+                    <th>方柱</th>
+                    <th>圆柱</th>
+                </tr>
+                <tr>
+                    <td>转动惯量（kg·m²）</td>
+                    <td id="I_ring">= (c² + b²) * M_ring / 8000000</td>
+                    <td id="I_square">= M_square * l₂² / 12000000</td>
+                    <td id="I_cylinder">= M_cylinder * l₁² / 12000000</td>
+                </tr>
+                <tr>
+                    <td>计算结果</td>
+                    <td><span id="I_ring_result" class="calculation-result">待计算</span></td>
+                    <td><span id="I_square_result" class="calculation-result">待计算</span></td>
+                    <td><span id="I_cylinder_result" class="calculation-result">待计算</span></td>
+                </tr>
+            </table>
+            
+            <h3>2. 利用圆环的转动惯量理论值I₁，计算钢丝的切变模量值</h3>
+            <p>该钢丝材料的切变模量公认值为 7.80×10¹⁰ N/m²</p>
+            <div class="formula">公式：G = 8πLI₁/(R⁴(T环² - T₀²))</div>
+            
+            <div style="margin: 15px 0;">
+                <p>钢丝的切变模量 G = <span id="G_result" class="calculation-result">待计算</span> N/m²</p>
+                <p>相对误差 = <span id="error_result" class="calculation-result">待计算</span> </p>
+            </div>
+        </div>
+
+        <div class="section-title">图表绘制</div>
+        <div style="text-align: center; margin: 20px 0;">
+            <button class="chart-btn" onclick="drawInertiaChart()">绘制转动惯量对比图</button>
+            <button class="chart-btn" onclick="drawPeriodChart()">绘制振动周期对比图</button>
+        </div>
+        <div class="chart-container">
+            <canvas id="inertiaChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="periodChart"></canvas>
+        </div>
+
+        <!-- 新增：思考题部分 -->
+        <h2>七、思考题</h2>
+        <div class="question-item">
+            1．如果扭摆的角振幅为2π，根据钢丝的长度和直径估算一下，实验是否满足切变角远小于1度的条件？
+            <textarea class="thought-input" id="thought1" placeholder="请简要回答"></textarea>
+            <button class="thought-answer-btn" onclick="toggleAnswer(1)">显示参考答案</button>
+            <div id="answer1" class="thought-answer">
+                答：根据实验数据估算：钢丝长度L约600mm，半径R约0.2mm，角振幅Φ₀=2π。切变角α≈RΦ₀/L=0.2×2π/600≈0.0021rad≈0.12°。由于0.12°小于1°，因此满足切变角远小于1度的条件。这表明实验设计合理，小角度近似成立。
+            </div>
+        </div>
+        <div class="question-item">
+            2．同一个环状刚体绕不同轴转动，其转动惯量为何不同？
+            <textarea class="thought-input" id="thought2" placeholder="请简要回答"></textarea>
+            <button class="thought-answer-btn" onclick="toggleAnswer(2)">显示参考答案</button>
+            <div id="answer2" class="thought-answer">
+                答：转动惯量取决于质量分布和转轴位置。对于同一环状刚体，绕不同轴转动时，质量相对于转轴的距离分布不同。根据平行轴定理，绕任意轴的转动惯量等于绕质心轴的转动惯量加上质量乘以两轴距离的平方。因此转轴离质心越远，转动惯量越大。
+            </div>
+        </div>
+        <div class="question-item">
+            3．在测量过程中，如何判断扭摆系统是否真正处于简谐振动状态？有哪些因素会影响系统的简谐振动特性？
+            <textarea class="thought-input" id="thought3" placeholder="请简要回答"></textarea>
+            <button class="thought-answer-btn" onclick="toggleAnswer(3)">显示参考答案</button>
+            <div id="answer3" class="thought-answer">
+                答：判断标准：1）周期是否恒定；2）振幅是否按指数衰减；3）位移与时间关系是否近似正弦曲线。影响因素：1）切变角过大导致非线性；2）空气阻尼和摩擦；3）钢丝材料非线性；4）安装不对称；5）环境振动干扰。应确保小角度条件，减少阻尼，提高测量精度。
+            </div>
+        </div>
+
+        <h2>八、实验小结</h2>
+        <textarea class="summary-box" id="experiment-summary" placeholder="请在此处填写实验小结，包括实验收获、遇到的问题及解决方案、改进建议等..."></textarea>
+
+        <h2>九、计算预习分数</h2>
+        <div class="score-section">
+            <p>请填写所有填空题后，点击计算分数</p>
+            <button class="score-btn" onclick="calculatePreScore()">计算预习分数</button>
+            <div class="score-display" id="scoreDisplay"></div>
+        </div>
+
+        <h2>十、自动评分并生成评语（温馨提醒：保存报告时，确保手机处于横屏状态）</h2>
+        <div class="comment-section" id="commentSection">
+            <div class="comment-title">实验评语</div>
+            <div class="comment-content" id="commentContent">
+                <p style="text-align: center; color: #999;">点击"自动评分并生成评语"按钮生成实验评语和报告得分</p>
+            </div>
+            <!-- 新增：评分详情显示区域 -->
+            <div id="scoreDetails" class="score-details" style="display: none;">
+                <div class="score-item">
+                    <span class="score-item-name">预习填空（25%）</span>
+                    <span class="score-item-value" id="detailPreScore">0/25</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-item-name">数据记录（25%）</span>
+                    <span class="score-item-value" id="detailDataScore">0/25</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-item-name">数据处理与计算（20%）</span>
+                    <span class="score-item-value" id="detailCalcScore">0/20</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-item-name">思考题（15%）</span>
+                    <span class="score-item-value" id="detailThoughtScore">0/15</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-item-name">实验小结（15%）</span>
+                    <span class="score-item-value" id="detailSummaryScore">0/15</span>
+                </div>
+                <div class="score-item" style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #3498db; font-size: 1.1em;">
+                    <span class="score-item-name" style="font-weight: bold;">总分</span>
+                    <span class="score-item-value" id="detailTotalScore" style="font-size: 1.2em; color: #2e7d32;">0/100</span>
+                </div>
+            </div>
+            <div class="comment-footer" id="commentFooter" style="display: none;">
+                <div>指导教师：<span id="teacherName"></span></div>
+                <div>评语日期：<span id="currentDate"></span></div>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="auto-grade-btn" onclick="autoGrade()">自动评分并生成评语</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 填空题答案
+        const answers = {
+            "长度和时间": ["长度和时间", "长度时间", "长度与时间"],
+            "扭摆法": ["扭摆法"],
+            "同一轴": ["同一轴", "同轴"],
+            "待测材料": ["待测材料", "被测材料"],
+            "数字式计数计时仪": ["数字式计数计时仪", "计数计时仪", "计时仪"],
+            "O": ["O", "o"],
+            "G": ["G", "G*"],
+            "切变模量": ["切变模量"],
+            "0.5πG": ["0.5πG", "πG/2"],
+            "D": ["D"],
+            "2π": ["2π"],
+            "I₀+I₁": ["I₀+I₁", "I0+I1", "I₀+I1", "I0+I₁"],
+            "8πL": ["8πL"],
+            "M": ["M"],
+            "内半径": ["内半径", "内半径b"],
+            "外半径": ["外半径", "外半径c"],
+            "方柱长度": ["方柱长度"],
+            "质量": ["质量"],
+            "5个周期": ["5个周期", "5周期"],
+            "3次": ["3次", "三次"]
+        };
+
+        // 参考数据（来自Excel文件）
+        const referenceData = {
+            geometry: {
+                b: [79.82, 79.82, 79.82], // 圆环内直径 2b
+                c: [109.92, 109.92, 109.92], // 圆环外直径 2c
+                r: [0.4, 0.4, 0.4], // 钢丝直径 2R
+                l: [616, 616, 616], // 钢丝长度 L
+                cyl: [119.9, 119.9, 119.9], // 圆柱长度 l₁
+                sq: [120, 120, 120] // 方柱长度 l₂
+            },
+            mass: {
+                ring: 0.55469, // 圆环质量 (kg)
+                square: 0.31226, // 方柱质量 (kg)
+                cylinder: 0.18713 // 圆柱质量 (kg)
+            },
+            periods: {
+                t0: [27, 27, 27], // 空载总时间 (s)
+                tr: [69, 68, 69], // 圆环总时间 (s)
+                tc: [44, 44.2, 44.1], // 圆柱总时间 (s)
+                ts: [50.8, 50.8, 50.8] // 方柱总时间 (s)
+            }
+        };
+
+        // 思考题参考答案显示/隐藏
+        function toggleAnswer(questionNum) {
+            const answerDiv = document.getElementById(`answer${questionNum}`);
+            const button = event.target;
+            
+            if (answerDiv.style.display === 'block') {
+                answerDiv.style.display = 'none';
+                button.textContent = '显示参考答案';
+            } else {
+                answerDiv.style.display = 'block';
+                button.textContent = '隐藏参考答案';
+            }
+        }
+
+        // 更新单个填空题的状态图标
+        function updateAnswerStatusIcon(inputElement, status) {
+            const statusIcon = inputElement.nextElementSibling;
+            if (statusIcon && statusIcon.classList.contains('answer-status')) {
+                // 清除之前的样式
+                statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
+                
+                // 设置新样式和图标
+                if (status === 'correct') {
+                    statusIcon.textContent = '✓';
+                    statusIcon.classList.add('correct-icon');
+                    inputElement.classList.remove('incorrect', 'empty');
+                    inputElement.classList.add('correct');
+                } else if (status === 'incorrect') {
+                    statusIcon.textContent = '✗';
+                    statusIcon.classList.add('incorrect-icon');
+                    inputElement.classList.remove('correct', 'empty');
+                    inputElement.classList.add('incorrect');
+                } else if (status === 'empty') {
+                    statusIcon.textContent = '○';
+                    statusIcon.classList.add('empty-icon');
+                    inputElement.classList.remove('correct', 'incorrect');
+                    inputElement.classList.add('empty');
+                } else {
+                    statusIcon.textContent = '';
+                    inputElement.classList.remove('correct', 'incorrect', 'empty');
+                }
+            }
+        }
+
+        // 检查单个填空题答案
+        function checkSingleAnswer(input) {
+            const userAnswer = input.value.trim();
+            const correctAnswers = answers[input.dataset.answer];
+            
+            if (userAnswer === '') {
+                updateAnswerStatusIcon(input, 'empty');
+                return false;
+            } else if (correctAnswers && correctAnswers.some(ans => {
+                // 处理特殊符号和大小写
+                const userAns = userAnswer.toLowerCase()
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/')
+                    .replace(/\s+/g, '');
+                const correctAns = ans.toLowerCase()
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/')
+                    .replace(/\s+/g, '');
+                
+                // 允许部分匹配
+                return userAns === correctAns || 
+                       userAns.includes(correctAns) || 
+                       correctAns.includes(userAns);
+            })) {
+                updateAnswerStatusIcon(input, 'correct');
+                return true;
+            } else {
+                updateAnswerStatusIcon(input, 'incorrect');
+                return false;
+            }
+        }
+
+        // 更新所有填空题的状态图标
+        function updateAllAnswerStatusIcons() {
+            const inputs = document.querySelectorAll('.fill-blank');
+            inputs.forEach(input => {
+                checkSingleAnswer(input);
+            });
+        }
+
+        // 实时检查填空题答案（输入时）
+        function setupRealTimeAnswerCheck() {
+            const inputs = document.querySelectorAll('.fill-blank');
+            inputs.forEach(input => {
+                // 添加输入事件监听
+                input.addEventListener('input', function() {
+                    // 延迟检查，避免频繁更新
+                    setTimeout(() => {
+                        checkSingleAnswer(this);
+                    }, 300);
+                });
+                
+                // 添加失去焦点事件监听
+                input.addEventListener('blur', function() {
+                    checkSingleAnswer(this);
+                });
+            });
+        }
+
+        // 填入参考数据
+        function fillReferenceData() {
+            if (confirm("警告：参考数据仅供对照使用！若直接搬用参考数据，数据部分将计0分！\n\n是否继续填入参考数据？")) {
+                // 填入几何尺寸数据
+                document.getElementById('b1').value = referenceData.geometry.b[0];
+                document.getElementById('b2').value = referenceData.geometry.b[1];
+                document.getElementById('b3').value = referenceData.geometry.b[2];
+                
+                document.getElementById('c1').value = referenceData.geometry.c[0];
+                document.getElementById('c2').value = referenceData.geometry.c[1];
+                document.getElementById('c3').value = referenceData.geometry.c[2];
+                
+                document.getElementById('r1').value = referenceData.geometry.r[0];
+                document.getElementById('r2').value = referenceData.geometry.r[1];
+                document.getElementById('r3').value = referenceData.geometry.r[2];
+                
+                document.getElementById('l1').value = referenceData.geometry.l[0];
+                document.getElementById('l2').value = referenceData.geometry.l[1];
+                document.getElementById('l3').value = referenceData.geometry.l[2];
+                
+                document.getElementById('cyl1').value = referenceData.geometry.cyl[0];
+                document.getElementById('cyl2').value = referenceData.geometry.cyl[1];
+                document.getElementById('cyl3').value = referenceData.geometry.cyl[2];
+                
+                document.getElementById('sq1').value = referenceData.geometry.sq[0];
+                document.getElementById('sq2').value = referenceData.geometry.sq[1];
+                document.getElementById('sq3').value = referenceData.geometry.sq[2];
+                
+                // 填入质量数据
+                document.getElementById('mass_ring').value = referenceData.mass.ring;
+                document.getElementById('mass_square').value = referenceData.mass.square;
+                document.getElementById('mass_cylinder').value = referenceData.mass.cylinder;
+                
+                // 填入周期数据
+                document.getElementById('t01').value = referenceData.periods.t0[0];
+                document.getElementById('t02').value = referenceData.periods.t0[1];
+                document.getElementById('t03').value = referenceData.periods.t0[2];
+                
+                document.getElementById('tr1').value = referenceData.periods.tr[0];
+                document.getElementById('tr2').value = referenceData.periods.tr[1];
+                document.getElementById('tr3').value = referenceData.periods.tr[2];
+                
+                document.getElementById('tc1').value = referenceData.periods.tc[0];
+                document.getElementById('tc2').value = referenceData.periods.tc[1];
+                document.getElementById('tc3').value = referenceData.periods.tc[2];
+                
+                document.getElementById('ts1').value = referenceData.periods.ts[0];
+                document.getElementById('ts2').value = referenceData.periods.ts[1];
+                document.getElementById('ts3').value = referenceData.periods.ts[2];
+                
+                // 更新平均值
+                calculateAverages();
+                // 更新填空题状态
+                updateAllAnswerStatusIcons();
+                
+                alert("参考数据已填入。请注意：这些数据仅供对照，实际实验必须使用自己测量的数据！");
+            }
+        }
+
+        // 图表实例
+        let inertiaChartInstance = null;
+        let periodChartInstance = null;
+
+        // 计算平均值
+        function calculateAverages() {
+            // 几何尺寸平均值
+            const bVals = [parseFloat(document.getElementById('b1').value) || 0,
+                          parseFloat(document.getElementById('b2').value) || 0,
+                          parseFloat(document.getElementById('b3').value) || 0];
+            const bAvg = bVals.reduce((a,b) => a+b)/3;
+            document.getElementById('b_avg').textContent = isNaN(bAvg) ? "-" : bAvg.toFixed(2);
+            
+            const cVals = [parseFloat(document.getElementById('c1').value) || 0,
+                          parseFloat(document.getElementById('c2').value) || 0,
+                          parseFloat(document.getElementById('c3').value) || 0];
+            const cAvg = cVals.reduce((a,b) => a+b)/3;
+            document.getElementById('c_avg').textContent = isNaN(cAvg) ? "-" : cAvg.toFixed(2);
+            
+            const rVals = [parseFloat(document.getElementById('r1').value) || 0,
+                          parseFloat(document.getElementById('r2').value) || 0,
+                          parseFloat(document.getElementById('r3').value) || 0];
+            const rAvg = rVals.reduce((a,b) => a+b)/3;
+            document.getElementById('r_avg').textContent = isNaN(rAvg) ? "-" : rAvg.toFixed(2);
+            
+            const lVals = [parseFloat(document.getElementById('l1').value) || 0,
+                          parseFloat(document.getElementById('l2').value) || 0,
+                          parseFloat(document.getElementById('l3').value) || 0];
+            const lAvg = lVals.reduce((a,b) => a+b)/3;
+            document.getElementById('l_avg').textContent = isNaN(lAvg) ? "-" : lAvg.toFixed(0);
+            
+            const cylVals = [parseFloat(document.getElementById('cyl1').value) || 0,
+                            parseFloat(document.getElementById('cyl2').value) || 0,
+                            parseFloat(document.getElementById('cyl3').value) || 0];
+            const cylAvg = cylVals.reduce((a,b) => a+b)/3;
+            document.getElementById('cyl_avg').textContent = isNaN(cylAvg) ? "-" : cylAvg.toFixed(1);
+            
+            const sqVals = [parseFloat(document.getElementById('sq1').value) || 0,
+                           parseFloat(document.getElementById('sq2').value) || 0,
+                           parseFloat(document.getElementById('sq3').value) || 0];
+            const sqAvg = sqVals.reduce((a,b) => a+b)/3;
+            document.getElementById('sq_avg').textContent = isNaN(sqAvg) ? "-" : sqAvg.toFixed(0);
+            
+            // 周期平均值（注意：输入的是总时间，需要除以5得到周期）
+            const t0Vals = [parseFloat(document.getElementById('t01').value) || 0,
+                           parseFloat(document.getElementById('t02').value) || 0,
+                           parseFloat(document.getElementById('t03').value) || 0];
+            const t0Avg = t0Vals.reduce((a,b) => a+b)/15; // 除以15 = 3次测量 * 5个周期
+            document.getElementById('t0_avg').textContent = isNaN(t0Avg) ? "-" : t0Avg.toFixed(2);
+            
+            const trVals = [parseFloat(document.getElementById('tr1').value) || 0,
+                           parseFloat(document.getElementById('tr2').value) || 0,
+                           parseFloat(document.getElementById('tr3').value) || 0];
+            const trAvg = trVals.reduce((a,b) => a+b)/15;
+            document.getElementById('tr_avg').textContent = isNaN(trAvg) ? "-" : trAvg.toFixed(2);
+            
+            const tcVals = [parseFloat(document.getElementById('tc1').value) || 0,
+                           parseFloat(document.getElementById('tc2').value) || 0,
+                           parseFloat(document.getElementById('tc3').value) || 0];
+            const tcAvg = tcVals.reduce((a,b) => a+b)/15;
+            document.getElementById('tc_avg').textContent = isNaN(tcAvg) ? "-" : tcAvg.toFixed(2);
+            
+            const tsVals = [parseFloat(document.getElementById('ts1').value) || 0,
+                           parseFloat(document.getElementById('ts2').value) || 0,
+                           parseFloat(document.getElementById('ts3').value) || 0];
+            const tsAvg = tsVals.reduce((a,b) => a+b)/15;
+            document.getElementById('ts_avg').textContent = isNaN(tsAvg) ? "-" : tsAvg.toFixed(2);
+            
+            return {
+                bAvg: parseFloat(document.getElementById('b_avg').textContent)/2, // 半径
+                cAvg: parseFloat(document.getElementById('c_avg').textContent)/2, // 半径
+                rAvg: parseFloat(document.getElementById('r_avg').textContent)/2, // 半径
+                lAvg: parseFloat(document.getElementById('l_avg').textContent),
+                cylAvg: parseFloat(document.getElementById('cyl_avg').textContent),
+                sqAvg: parseFloat(document.getElementById('sq_avg').textContent),
+                t0Avg: t0Avg,
+                trAvg: trAvg,
+                tcAvg: tcAvg,
+                tsAvg: tsAvg
+            };
+        }
+
+        // 计算预习分数（仅填空题）
+        function calculatePreScore() {
+            const inputs = document.querySelectorAll('.fill-blank');
+            let correct = 0;
+            let total = inputs.length;
+            let emptyCount = 0;
+
+            inputs.forEach(input => {
+                const userAnswer = input.value.trim();
+                const correctAnswers = answers[input.dataset.answer];
+                
+                if (userAnswer === '') {
+                    // 未填写的情况
+                    emptyCount++;
+                    updateAnswerStatusIcon(input, 'empty');
+                } else if (correctAnswers && correctAnswers.some(ans => {
+                    // 处理特殊符号和大小写
+                    const userAns = userAnswer.toLowerCase()
+                        .replace(/×/g, '*')
+                        .replace(/÷/g, '/')
+                        .replace(/\s+/g, '');
+                    const correctAns = ans.toLowerCase()
+                        .replace(/×/g, '*')
+                        .replace(/÷/g, '/')
+                        .replace(/\s+/g, '');
+                    
+                    // 允许部分匹配
+                    return userAns === correctAns || 
+                           userAns.includes(correctAns) || 
+                           correctAns.includes(userAns);
+                })) {
+                    // 回答正确
+                    correct++;
+                    updateAnswerStatusIcon(input, 'correct');
+                } else {
+                    // 回答错误
+                    updateAnswerStatusIcon(input, 'incorrect');
+                }
+            });
+
+            // 计算分数
+            const score = Math.round((correct / total) * 100);
+            
+            // 显示结果
+            let scoreText = `预习分数：${score}分（答对${correct}/${total}题）`;
+            if (emptyCount > 0) {
+                scoreText += `，未答：${emptyCount}题`;
+            }
+            if (correct === total) {
+                scoreText += " 🎉 满分！";
+            } else if (correct === 0) {
+                scoreText += " 😢 请认真预习后再作答！";
+            }
+            
+            document.getElementById('scoreDisplay').innerHTML = scoreText;
+            return {score, correct, total, emptyCount};
+        }
+
+        // 检查是否使用了参考数据
+        function checkReferenceDataUsage() {
+            const geometryParams = ['b', 'c', 'r', 'l', 'cyl', 'sq'];
+            let referenceCount = 0;
+            let totalCount = 0;
+            
+            // 检查几何尺寸数据
+            geometryParams.forEach(param => {
+                for (let i = 1; i <= 3; i++) {
+                    const input = document.querySelector(`.data-input[data-param="${param}"]:nth-of-type(${i})`);
+                    if (input && input.value) {
+                        totalCount++;
+                        const userValue = parseFloat(input.value);
+                        const refValue = referenceData.geometry[param][i-1];
+                        
+                        if (Math.abs(userValue - refValue) < 0.01) { // 完全匹配
+                            referenceCount++;
+                        }
+                    }
+                }
+            });
+            
+            // 检查质量数据
+            const massIds = ['mass_ring', 'mass_square', 'mass_cylinder'];
+            const massRefs = [referenceData.mass.ring, referenceData.mass.square, referenceData.mass.cylinder];
+            
+            massIds.forEach((id, index) => {
+                const input = document.getElementById(id);
+                if (input && input.value) {
+                    totalCount++;
+                    const userValue = parseFloat(input.value);
+                    const refValue = massRefs[index];
+                    
+                    if (Math.abs(userValue - refValue) < 0.0001) { // 完全匹配
+                        referenceCount++;
+                    }
+                }
+            });
+            
+            // 检查周期数据
+            const periodParams = ['t0', 'tr', 'tc', 'ts'];
+            periodParams.forEach(param => {
+                for (let i = 1; i <= 3; i++) {
+                    const input = document.querySelector(`.data-input[data-param="${param}"]:nth-of-type(${i})`);
+                    if (input && input.value) {
+                        totalCount++;
+                        const userValue = parseFloat(input.value);
+                        const refValue = referenceData.periods[param][i-1];
+                        
+                        if (Math.abs(userValue - refValue) < 0.1) { // 完全匹配
+                            referenceCount++;
+                        }
+                    }
+                }
+            });
+            
+            // 如果超过80%的数据与参考数据完全匹配，判定为直接搬用
+            if (totalCount > 0 && (referenceCount / totalCount) > 0.8) {
+                return true; // 判定为直接搬用参考数据
+            }
+            return false; // 未直接搬用
+        }
+
+        // 计算所有结果
+        function calculateAll() {
+            const avgs = calculateAverages();
+            
+            // 获取质量
+            const massRing = parseFloat(document.getElementById('mass_ring').value) || 0;
+            const massSquare = parseFloat(document.getElementById('mass_square').value) || 0;
+            const massCylinder = parseFloat(document.getElementById('mass_cylinder').value) || 0;
+            
+            // 计算转动惯量
+            // 圆环：I = M(b² + c²)/2
+            const I_ring = massRing * (avgs.bAvg*avgs.bAvg + avgs.cAvg*avgs.cAvg) / 2 * 1e-6; // 转换为kg·m²
+            document.getElementById('I_ring_result').textContent = isNaN(I_ring) ? "待计算" : I_ring.toExponential(4);
+            
+            // 方柱：I = M*l²/12
+            const I_square = massSquare * avgs.sqAvg * avgs.sqAvg / 12 * 1e-6; // 转换为kg·m²
+            document.getElementById('I_square_result').textContent = isNaN(I_square) ? "待计算" : I_square.toExponential(4);
+            
+            // 圆柱：I = M*l²/12
+            const I_cylinder = massCylinder * avgs.cylAvg * avgs.cylAvg / 12 * 1e-6; // 转换为kg·m²
+            document.getElementById('I_cylinder_result').textContent = isNaN(I_cylinder) ? "待计算" : I_cylinder.toExponential(4);
+            
+            // 计算切变模量 G
+            // G = 8πLI₁/(R⁴(T环² - T₀²))
+            const R = avgs.rAvg * 1e-3; // 转换为m
+            const L = avgs.lAvg * 1e-3; // 转换为m
+            const T0 = avgs.t0Avg;
+            const Tr = avgs.trAvg;
+            
+            let G = 0;
+            if (!isNaN(R) && !isNaN(L) && !isNaN(T0) && !isNaN(Tr) && Tr*Tr > T0*T0) {
+                G = 8 * Math.PI * L * I_ring / (Math.pow(R, 4) * (Tr*Tr - T0*T0));
+            }
+            document.getElementById('G_result').textContent = isNaN(G) || G <= 0 ? "待计算" : G.toExponential(4);
+            
+            // 计算相对误差（公认值 7.80×10¹⁰ N/m²）
+            const G_standard = 7.80e10;
+            let error = 0;
+            if (!isNaN(G) && G > 0) {
+                error = Math.abs(G - G_standard) / G_standard * 100;
+            }
+            document.getElementById('error_result').textContent = isNaN(error) ? "待计算" : error.toFixed(2) + "%";
+            
+            return { I_ring, I_square, I_cylinder, G, error };
+        }
+
+        // 绘制转动惯量对比图
+        function drawInertiaChart() {
+            const results = calculateAll();
+            const ctx = document.getElementById('inertiaChart').getContext('2d');
+            
+            if (inertiaChartInstance) {
+                inertiaChartInstance.destroy();
+            }
+            
+            inertiaChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['圆环', '方柱', '圆柱'],
+                    datasets: [{
+                        label: '转动惯量 (kg·m²)',
+                        data: [results.I_ring, results.I_square, results.I_cylinder],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '不同试样的转动惯量对比'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '转动惯量 (kg·m²)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 绘制振动周期对比图
+        function drawPeriodChart() {
+            const avgs = calculateAverages();
+            const ctx = document.getElementById('periodChart').getContext('2d');
+            
+            if (periodChartInstance) {
+                periodChartInstance.destroy();
+            }
+            
+            periodChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['空载', '圆环', '圆柱', '方柱'],
+                    datasets: [{
+                        label: '振动周期 (s)',
+                        data: [avgs.t0Avg, avgs.trAvg, avgs.tcAvg, avgs.tsAvg],
+                        backgroundColor: [
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(54, 162, 235, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(54, 162, 235, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '不同试样的振动周期对比'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '振动周期 (s)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 自动评分并生成评语 - 按照新的评分权重更新
+        function autoGrade() {
+            const preScoreResult = calculatePreScore();
+            const preScore = preScoreResult.score;
+            const results = calculateAll();
+            const summary = document.getElementById('experiment-summary').value.trim();
+            const chart1Drawn = inertiaChartInstance !== null;
+            const chart2Drawn = periodChartInstance !== null;
+            
+            // 检查是否直接搬用参考数据
+            const usedReferenceData = checkReferenceDataUsage();
+            
+            // 计算综合分数（按照新的权重）
+            let totalScore = 0;
+            
+            // 1. 预习填空（25%）
+            const preScoreWeighted = Math.round(preScore * 0.25);
+            totalScore += preScoreWeighted;
+            document.getElementById('detailPreScore').textContent = `${preScoreWeighted}/25`;
+            
+            // 2. 数据记录（25%）
+            let dataScore = 0;
+            if (usedReferenceData) {
+                // 如果直接搬用参考数据，数据部分得0分
+                dataScore = 0;
+            } else {
+                // 计算数据完整性分数
+                let dataCompleteness = 0;
+                const dataInputs = document.querySelectorAll('.data-input');
+                let filledCount = 0;
+                dataInputs.forEach(input => {
+                    if (input.value.trim() !== '') filledCount++;
+                });
+                dataCompleteness = Math.round((filledCount / dataInputs.length) * 100);
+                
+                // 检查实验结果合理性
+                let experimentQuality = 0;
+                if (results.G && !isNaN(results.G) && results.G > 0) {
+                    if (results.error < 10) experimentQuality = 100;
+                    else if (results.error < 15) experimentQuality = 90;
+                    else if (results.error < 20) experimentQuality = 80;
+                    else if (results.error < 25) experimentQuality = 70;
+                    else if (results.error < 30) experimentQuality = 60;
+                    else experimentQuality = 50;
+                }
+                
+                dataScore = Math.round((dataCompleteness * 0.6 + experimentQuality * 0.4) * 0.25);
+            }
+            totalScore += dataScore;
+            document.getElementById('detailDataScore').textContent = `${dataScore}/25`;
+            
+            // 3. 数据处理与计算（20%）
+            let calculationScore = 0;
+            // 检查是否完成了计算
+            const I_ring = document.getElementById('I_ring_result').textContent;
+            const I_square = document.getElementById('I_square_result').textContent;
+            const I_cylinder = document.getElementById('I_cylinder_result').textContent;
+            const G_value = document.getElementById('G_result').textContent;
+            const error_value = document.getElementById('error_result').textContent;
+            
+            if (I_ring !== '待计算' && I_square !== '待计算' && I_cylinder !== '待计算' && 
+                G_value !== '待计算' && error_value !== '待计算') {
+                // 所有计算都完成了
+                let errorScore = 0;
+                if (!isNaN(results.error)) {
+                    if (results.error < 10) errorScore = 100;
+                    else if (results.error < 15) errorScore = 90;
+                    else if (results.error < 20) errorScore = 80;
+                    else if (results.error < 25) errorScore = 70;
+                    else if (results.error < 30) errorScore = 60;
+                    else errorScore = 50;
+                }
+                
+                calculationScore = Math.round((100 * 0.5 + errorScore * 0.5) * 0.2);
+            } else if (I_ring !== '待计算' || I_square !== '待计算' || I_cylinder !== '待计算' || 
+                      G_value !== '待计算' || error_value !== '待计算') {
+                // 部分计算完成
+                calculationScore = Math.round(60 * 0.2);
+            } else {
+                // 没有进行计算
+                calculationScore = Math.round(20 * 0.2);
+            }
+            
+            totalScore += calculationScore;
+            document.getElementById('detailCalcScore').textContent = `${calculationScore}/20`;
+            
+            // 4. 思考题（15%）
+            let thoughtScore = 0;
+            const thoughtInputs = document.querySelectorAll('.thought-input');
+            let thoughtFilled = 0;
+            let thoughtTotalLength = 0;
+            
+            thoughtInputs.forEach(input => {
+                const answer = input.value.trim();
+                if (answer !== '') {
+                    thoughtFilled++;
+                    thoughtTotalLength += answer.length;
+                }
+            });
+            
+            // 根据填写情况和内容质量评分
+            const fillRate = thoughtFilled / thoughtInputs.length;
+            const avgLength = thoughtFilled > 0 ? thoughtTotalLength / thoughtFilled : 0;
+            
+            if (fillRate === 1 && avgLength > 50) thoughtScore = 100;
+            else if (fillRate >= 0.8 && avgLength > 40) thoughtScore = 80;
+            else if (fillRate >= 0.6 && avgLength > 30) thoughtScore = 60;
+            else if (fillRate >= 0.4 && avgLength > 20) thoughtScore = 40;
+            else if (fillRate >= 0.2) thoughtScore = 20;
+            else thoughtScore = 0;
+            
+            const thoughtScoreWeighted = Math.round(thoughtScore * 0.15);
+            totalScore += thoughtScoreWeighted;
+            document.getElementById('detailThoughtScore').textContent = `${thoughtScoreWeighted}/15`;
+            
+            // 5. 小结（15%）
+            let summaryScore = 0;
+            const summaryLength = summary.length;
+            // 检查关键词数量
+            const keywords = ['切变模量', '转动惯量', '扭摆法', '误差分析', '实验', '收获', '问题', '解决', '改进', '振动'];
+            let keywordCount = 0;
+            keywords.forEach(keyword => {
+                if (summary.includes(keyword)) keywordCount++;
+            });
+            
+            if (summaryLength > 50 && keywordCount >= 5) summaryScore = 100;
+            else if (summaryLength > 40 && keywordCount >= 4) summaryScore = 80;
+            else if (summaryLength > 30 && keywordCount >= 3) summaryScore = 60;
+            else if (summaryLength > 20 && keywordCount >= 2) summaryScore = 40;
+            else if (summaryLength > 10) summaryScore = 20;
+            else summaryScore = 0;
+            
+            const summaryScoreWeighted = Math.round(summaryScore * 0.15);
+            totalScore += summaryScoreWeighted;
+            document.getElementById('detailSummaryScore').textContent = `${summaryScoreWeighted}/15`;
+            
+            // 显示总分
+            document.getElementById('detailTotalScore').textContent = `${totalScore}/100`;
+            document.getElementById('scoreDetails').style.display = 'block';
+            
+            // 生成评语
+            let comment = "";
+            let grade = "不及格";
+            let gradeColor = "#c62828";
+            
+            if (usedReferenceData) {
+                grade = "不及格";
+                gradeColor = "#c62828";
+                comment = `❌ 实验报告不合格！检测到直接搬用参考数据，数据部分计0分！报告得分${totalScore}分。必须使用实际实验测量数据完成报告！`;
+            } else if (totalScore >= 90) {
+                grade = "优秀";
+                gradeColor = "#2e7d32";
+                comment = `🎉 实验报告非常出色！报告得分${totalScore}分。预习扎实（${preScore}分），数据记录完整准确，数据处理正确，思考题回答充分，小结详实。`;
+            } else if (totalScore >= 80) {
+                grade = "良好";
+                gradeColor = "#388e3c";
+                comment = `👍 实验报告质量较高！报告得分${totalScore}分。预习较好（${preScore}分），数据记录较为完整，计算正确，分析较为充分。`;
+            } else if (totalScore >= 70) {
+                grade = "中等";
+                gradeColor = "#f57c00";
+                comment = `✊ 实验报告基本合格！报告得分${totalScore}分。预习一般（${preScore}分），数据记录和计算存在一定误差（切变模量相对误差${results.error.toFixed(2)}%），分析较为简单。`;
+            } else if (totalScore >= 60) {
+                grade = "及格";
+                gradeColor = "#ff9800";
+                comment = `⚠️ 实验报告勉强及格！报告得分${totalScore}分。预习不足（${preScore}分），数据记录或计算存在明显问题（切变模量相对误差${results.error.toFixed(2)}%），分析不足。`;
+            } else {
+                grade = "不及格";
+                gradeColor = "#d32f2f";
+                comment = `❌ 实验报告未达到基本要求！报告得分${totalScore}分。请重新认真学习实验原理，补充完整实验记录！`;
+            }
+            
+            // 具体建议
+            let suggestions = [];
+            if (preScoreWeighted < 20) suggestions.push("预习部分需要加强，请认真阅读实验原理");
+            if (usedReferenceData) suggestions.push("必须使用实际测量数据");
+            else if (dataScore < 15) suggestions.push("数据记录需要更加完整准确");
+            if (calculationScore < 15) suggestions.push("数据处理和误差分析需要更加认真仔细");
+            if (thoughtScoreWeighted < 10) suggestions.push("思考题回答需要更加充分详细");
+            if (summaryScoreWeighted < 10) suggestions.push("实验小结需要更加详实，应包含实验收获、问题和改进建议");
+            
+            if (suggestions.length > 0) {
+                comment += ` 改进建议：${suggestions.join('；')}。`;
+            }
+            
+            comment += ` 报告得分：${grade}（${totalScore}分）。`;
+            
+            // 获取指导教师姓名和当前日期
+            const teacherName = document.querySelector('.info-input[placeholder="请输入指导教师"]').value || '马厂';
+            const currentDate = new Date().toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // 更新评语内容
+            document.getElementById('commentContent').innerHTML = comment;
+            document.getElementById('commentContent').style.color = gradeColor;
+            document.getElementById('teacherName').textContent = teacherName;
+            document.getElementById('currentDate').textContent = currentDate;
+            document.getElementById('commentFooter').style.display = 'block';
+        }
+
+        // 初始化页面
+        window.onload = function() {
+            calculateAverages();
+            
+            // 添加输入框变化监听
+            const dataInputs = document.querySelectorAll('.data-input');
+            dataInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    calculateAverages();
+                });
+            });
+            
+            // 设置默认日期
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.querySelector('.info-input[placeholder="请输入实验时间"]');
+            if (dateInput && !dateInput.value) {
+                dateInput.value = today;
+            }
+            
+            // 设置实时答案检查
+            setupRealTimeAnswerCheck();
+            
+            // 初始更新所有填空题状态
+            updateAllAnswerStatusIcons();
+        };
+    </script>
+</body>
+</html>
