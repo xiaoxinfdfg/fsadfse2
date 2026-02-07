@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI视觉辅助的牛顿第二定律动态测量与分析系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/regression@2.0.1/dist/regression.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.92);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            overflow: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eaeaea;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.4rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #3498db, #2c3e50);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .experiment-info {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.5rem;
+            margin: 25px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .system-description {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .ai-role-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid #3498db;
+        }
+        
+        .ai-role-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .ai-role-card h3 {
+            color: #2980b9;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .ai-role-card h3 i {
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .data-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+        
+        .file-input-container {
+            flex-grow: 1;
+        }
+        
+        .file-input-label {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        
+        .file-input-label:hover {
+            background: #2980b9;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #27ae60;
+        }
+        
+        .btn-reset {
+            background: #e74c3c;
+        }
+        
+        .btn-reset:hover {
+            background: #c0392b;
+        }
+        
+        .btn-generate {
+            background: #9b59b6;
+        }
+        
+        .btn-generate:hover {
+            background: #8e44ad;
+        }
+        
+        .btn-template {
+            background: #f39c12;
+        }
+        
+        .btn-template:hover {
+            background: #d68910;
+        }
+        
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .chart-title {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        .results-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-top: 30px;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .result-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+            position: relative;
+        }
+        
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        
+        .result-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .validation-result {
+            background: #e8f6f3;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #1abc9c;
+        }
+        
+        .good-fit {
+            color: #27ae60;
+        }
+        
+        .moderate-fit {
+            color: #f39c12;
+        }
+        
+        .poor-fit {
+            color: #e74c3c;
+        }
+        
+        .comparison-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .advantage-card, .limitation-card {
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .advantage-card {
+            background: #e8f6f3;
+            border-left: 4px solid #1abc9c;
+        }
+        
+        .limitation-card {
+            background: #fdebd0;
+            border-left: 4px solid #f39c12;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        .icon {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-top: 5px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        .input-container {
+            margin-bottom: 10px;
+        }
+        
+        .unit {
+            position: absolute;
+            right: 20px;
+            top: 50px;
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+        
+        .edit-icon {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            color: #3498db;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+        
+        .edit-icon:hover {
+            color: #2980b9;
+        }
+        
+        .parameter-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 5px solid #2ecc71;
+        }
+        
+        .parameter-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .parameter-title {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .parameter-title .icon {
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI视觉辅助的牛顿第二定律动态测量与分析系统</h1>
+            <p class="subtitle">基于高速摄像头与AI算法的非接触式运动测量系统，实时追踪滑块运动，验证F=ma</p>
+        </header>
+        
+        <div class="experiment-info">
+            <h2>实验原理</h2>
+            <p>利用高速摄像头实时拍摄气垫导轨上滑块的加速运动，通过目标检测与追踪算法（如YOLO、光流法）自动追踪滑块上标记点的位置。对连续的图像帧进行AI处理，获取高精度、高时间分辨率的位置-时间数据，进而通过微分和拟合直接得到加速度。</p>
+        </div>
+        
+        <div class="system-description">
+            <div class="ai-role-card">
+                <h3><span class="icon">🔍</span> AI角色1：智能传感器</h3>
+                <p>替代传统的光电门或人工刻度尺读数，实现非接触、全场、连续的动态位移测量。</p>
+            </div>
+            <div class="ai-role-card">
+                <h3><span class="icon">📊</span> AI角色2：数据优化器</h3>
+                <p>AI算法可以滤除视频中的随机噪声（如光线抖动）、自动矫正镜头畸变，并通过算法（如卡尔曼滤波）优化轨迹，提升原始数据的精度。</p>
+            </div>
+            <div class="ai-role-card">
+                <h3><span class="icon">⚡</span> AI角色3：实时分析助手</h3>
+                <p>实时绘制s-t, v-t, a-t图，并自动拟合线性关系，瞬时验证"F=ma"，给出拟合优度（R²）。</p>
+            </div>
+        </div>
+        
+        <h2 class="section-title">实验参数设置</h2>
+        <div class="parameter-controls">
+            <div class="parameter-card">
+                <h3 class="parameter-title"><span class="icon">⚖️</span> 系统参数设置</h3>
+                <div class="input-container">
+                    <label class="result-label">系统总质量 (m (kg))</label>
+                    <input type="number" id="massInput" class="input-field" value="0.240" step="0.001" min="0.001" max="10">
+                    <div class="unit">kg</div>
+                </div>
+                <div class="input-container">
+                    <label class="result-label">施加拉力 (F (N))</label>
+                    <input type="number" id="forceInput" class="input-field" value="0.098" step="0.001" min="0.001" max="10">
+                    <div class="unit">N</div>
+                </div>
+                <div class="input-container">
+                    <label class="result-label">重力加速度 (g (m/s²))</label>
+                    <input type="number" id="gravityInput" class="input-field" value="9.8" step="0.1" min="9.7" max="9.9">
+                    <div class="unit">m/s²</div>
+                </div>
+                <button id="updateParamsBtn" class="btn" style="margin-top: 15px; width: 100%;">
+                    <span class="icon">🔄</span> 更新参数并重新计算
+                </button>
+            </div>
+            
+            <div class="parameter-card">
+                <h3 class="parameter-title"><span class="icon">📐</span> 参数说明</h3>
+                <p><strong>系统总质量：</strong>滑块质量 + 砝码总质量。在气垫导轨实验中，通常滑块质量为0.230kg，1个砝码质量为0.005kg。</p>
+                <p><strong>施加拉力：</strong>等于砝码总重力，F = m砝码 × g。</p>
+                <p><strong>理论加速度：</strong>根据牛顿第二定律 F = ma 计算，a = F/m。</p>
+                <p><strong>重力加速度：</strong>本地重力加速度，通常取9.8 m/s²，可根据实际地理位置调整。</p>
+            </div>
+        </div>
+        
+        <h2 class="section-title">数据导入与分析</h2>
+        <div class="data-controls">
+            <div class="file-input-container">
+                <label for="fileInput" class="file-input-label">
+                    <span class="icon">📁</span> 导入s-t数据文件 (CSV格式)
+                </label>
+                <input type="file" id="fileInput" accept=".csv">
+            </div>
+            <button id="templateBtn" class="btn btn-template">
+                <span class="icon">📄</span> 导出s-t数据模板
+            </button>
+            <button id="generateDataBtn" class="btn btn-generate">
+                <span class="icon">🔧</span> 生成模拟数据
+            </button>
+            <button id="analyzeBtn" class="btn">
+                <span class="icon">📈</span> 分析数据
+            </button>
+            <button id="resetBtn" class="btn btn-reset">
+                <span class="icon">🔄</span> 重置
+            </button>
+        </div>
+        
+        <div class="charts-container">
+            <div class="chart-box">
+                <h3 class="chart-title">位移-时间图 (s-t)</h3>
+                <div class="chart-container">
+                    <canvas id="stChart"></canvas>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">二次拟合方程</div>
+                    <div id="stEquation" class="result-value">s = --</div>
+                    <div class="result-label">拟合优度 (R²)</div>
+                    <div id="stR2" class="result-value">--</div>
+                </div>
+            </div>
+            
+            <div class="chart-box">
+                <h3 class="chart-title">速度-时间图 (v-t)</h3>
+                <div class="chart-container">
+                    <canvas id="vtChart"></canvas>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">线性拟合方程</div>
+                    <div id="vtEquation" class="result-value">v = --</div>
+                    <div class="result-label">拟合优度 (R²)</div>
+                    <div id="vtR2" class="result-value">--</div>
+                </div>
+            </div>
+            
+            <div class="chart-box">
+                <h3 class="chart-title">加速度-时间图 (a-t)</h3>
+                <div class="chart-container">
+                    <canvas id="atChart"></canvas>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">加速度平均值</div>
+                    <div id="avgAcceleration" class="result-value">-- m/s²</div>
+                    <div class="result-label">加速度标准差</div>
+                    <div id="accelerationStd" class="result-value">-- m/s²</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="results-panel">
+            <h2 class="section-title">牛顿第二定律验证 (F=ma)</h2>
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-label">系统总质量 (m)</div>
+                    <div id="massDisplay" class="result-value">0.250 kg</div>
+                    <div class="result-label" id="massDescription">(滑块0.200kg + 砝码0.050kg)</div>
+                    <span class="edit-icon" onclick="editParameter('mass')">✏️ 编辑</span>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">施加拉力 (F)</div>
+                    <div id="forceDisplay" class="result-value">0.490 N</div>
+                    <div class="result-label" id="forceDescription">(砝码重力：0.050kg × 9.8m/s²)</div>
+                    <span class="edit-icon" onclick="editParameter('force')">✏️ 编辑</span>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">测量加速度 (a)</div>
+                    <div id="measuredAcceleration" class="result-value">-- m/s²</div>
+                    <div class="result-label">(由v-t图斜率计算)</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">理论加速度 (F/m)</div>
+                    <div id="theoreticalAcceleration" class="result-value">1.960 m/s²</div>
+                    <div class="result-label">(根据F=ma计算)</div>
+                </div>
+            </div>
+            
+            <div id="validationResult" class="validation-result">
+                <h3>验证结果</h3>
+                <p id="validationText">请导入或生成数据开始分析</p>
+                <div id="r2Value" class="result-value">R² = --</div>
+                <p id="fitQuality">拟合优度评估：--</p>
+            </div>
+        </div>
+        
+        <h2 class="section-title">与传统方法对比</h2>
+        <div class="comparison-section">
+            <div class="advantage-card">
+                <h3>AI视觉方法的优势</h3>
+                <ul>
+                    <li><strong>效率：</strong>传统光电门法需多次改变位置测量，本系统一次运行即可获得全过程数据，效率提升数倍。</li>
+                    <li><strong>精度：</strong>光电门测的是平均速度，加速度由两点数据计算得出，误差较大。AI视觉法可获得连续的速度和加速度曲线，并通过大量数据点拟合，精度显著提高。</li>
+                    <li><strong>教学效果：</strong>提供直观的、实时的可视化图像和图表，将抽象的运动学和动力学概念具象化。</li>
+                </ul>
+            </div>
+            <div class="limitation-card">
+                <h3>AI视觉方法的局限性</h3>
+                <ul>
+                    <li><strong>数据需求：</strong>AI模型需要大量、多样的标注视频数据进行训练，以适应不同光照、背景、遮挡情况。</li>
+                    <li><strong>可解释性：</strong>深度学习模型有时是"黑箱"，其内部的追踪逻辑不如光电门的物理原理直观。</li>
+                    <li><strong>系统复杂度与成本：</strong>高于简单的光电门装置。</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>AI视觉辅助的"牛顿第二定律"高精度动态测量与分析系统 | 实验物理与计算机科学交叉应用</p>
+            <p>© 2023 智能物理实验系统 | 数据可视化与拟合分析工具</p>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let originalData = [];
+        let filteredData = [];
+        let stChart, vtChart, atChart;
+        
+        // 实验参数
+        let mass = 0.250; // kg
+        let force = 0.049; // N
+        let gravity = 9.8; // m/s²
+        let theoreticalAcceleration = force / mass; // m/s²
+        
+        // DOM元素
+        const fileInput = document.getElementById('fileInput');
+        const generateDataBtn = document.getElementById('generateDataBtn');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const templateBtn = document.getElementById('templateBtn');
+        const updateParamsBtn = document.getElementById('updateParamsBtn');
+        const massInput = document.getElementById('massInput');
+        const forceInput = document.getElementById('forceInput');
+        const gravityInput = document.getElementById('gravityInput');
+        const massDisplay = document.getElementById('massDisplay');
+        const forceDisplay = document.getElementById('forceDisplay');
+        const theoreticalAccelerationDisplay = document.getElementById('theoreticalAcceleration');
+        const massDescription = document.getElementById('massDescription');
+        const forceDescription = document.getElementById('forceDescription');
+        
+        // 初始化参数显示
+        function updateParameterDisplays() {
+            massDisplay.textContent = mass.toFixed(3) + " kg";
+            forceDisplay.textContent = force.toFixed(3) + " N";
+            theoreticalAccelerationDisplay.textContent = theoreticalAcceleration.toFixed(4) + " m/s²";
+            
+            // 更新描述
+            const massValue = mass.toFixed(3);
+            const forceValue = force.toFixed(3);
+            const gravityValue = gravity.toFixed(1);
+            
+            // 根据输入值更新描述
+            massDescription.textContent = `(自定义系统总质量)`;
+            forceDescription.textContent = `(自定义施加拉力)`;
+        }
+        
+        // 更新实验参数
+        function updateParameters() {
+            const newMass = parseFloat(massInput.value);
+            const newForce = parseFloat(forceInput.value);
+            const newGravity = parseFloat(gravityInput.value);
+            
+            if (isNaN(newMass) || newMass <= 0) {
+                alert('请输入有效的系统总质量 (大于0)');
+                massInput.value = mass.toFixed(3);
+                return;
+            }
+            
+            if (isNaN(newForce) || newForce <= 0) {
+                alert('请输入有效的施加拉力 (大于0)');
+                forceInput.value = force.toFixed(3);
+                return;
+            }
+            
+            if (isNaN(newGravity) || newGravity < 9.7 || newGravity > 9.9) {
+                alert('请输入有效的重力加速度 (9.7-9.9 m/s²)');
+                gravityInput.value = gravity.toFixed(1);
+                return;
+            }
+            
+            mass = newMass;
+            force = newForce;
+            gravity = newGravity;
+            theoreticalAcceleration = force / mass;
+            
+            updateParameterDisplays();
+            
+            // 如果已有数据，重新分析
+            if (originalData.length > 0) {
+                analyzeData();
+            }
+        }
+        
+        // 编辑参数快捷方式
+        function editParameter(param) {
+            if (param === 'mass') {
+                massInput.focus();
+                massInput.select();
+            } else if (param === 'force') {
+                forceInput.focus();
+                forceInput.select();
+            }
+        }
+        
+        // 初始化图表
+        function initializeCharts() {
+            const stCtx = document.getElementById('stChart').getContext('2d');
+            const vtCtx = document.getElementById('vtChart').getContext('2d');
+            const atCtx = document.getElementById('atChart').getContext('2d');
+            
+            // 位移-时间图
+            stChart = new Chart(stCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '原始数据',
+                        data: [],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.5)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }, {
+                        label: '拟合曲线',
+                        data: [],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'transparent',
+                        pointRadius: 0,
+                        borderWidth: 2,
+                        fill: false,
+                        showLine: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '时间 t (s)'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '位移 s (m)'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+            
+            // 速度-时间图
+            vtChart = new Chart(vtCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '速度数据',
+                        data: [],
+                        borderColor: '#2ecc71',
+                        backgroundColor: 'rgba(46, 204, 113, 0.5)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }, {
+                        label: '拟合直线',
+                        data: [],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'transparent',
+                        pointRadius: 0,
+                        borderWidth: 2,
+                        fill: false,
+                        showLine: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '时间 t (s)'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '速度 v (m/s)'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+            
+            // 加速度-时间图
+            atChart = new Chart(atCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '加速度数据',
+                        data: [],
+                        borderColor: '#9b59b6',
+                        backgroundColor: 'rgba(155, 89, 182, 0.5)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '时间 t (s)'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '加速度 a (m/s²)'
+                            },
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 生成模拟数据 - 根据当前理论加速度生成
+        function generateSimulatedData() {
+            const data = [];
+            const totalTime = 2.0; // 总时间2秒
+            const numPoints = 41; // 数据点数量
+            const a = theoreticalAcceleration; // 使用当前理论加速度
+            const v0 = 0.1; // 初速度 (m/s)
+            const s0 = 0.05; // 初始位移 (m)
+            
+            // 添加一些随机噪声
+            const noiseLevel = 0.003;
+            
+            for (let i = 0; i < numPoints; i++) {
+                const t = i * totalTime / (numPoints - 1);
+                // s = s0 + v0*t + 0.5*a*t²
+                const s = s0 + v0 * t + 0.5 * a * t * t + (Math.random() - 0.5) * noiseLevel;
+                data.push({t, s});
+            }
+            
+            return data;
+        }
+        
+        // 导出s-t数据模板
+        function exportDataTemplate() {
+            // 创建一个示例数据模板
+            const templateData = [
+                "t(s),s(m)",
+                "0.000,0.0500",
+                "0.050,0.0512",
+                "0.100,0.0555",
+                "0.150,0.0628",
+                "0.200,0.0732",
+                "0.250,0.0866",
+                "0.300,0.1030",
+                "0.350,0.1224",
+                "0.400,0.1449",
+                "0.450,0.1704",
+                "0.500,0.1990",
+                "# 这是CSV数据文件模板",
+                "# 第一列为时间t，单位：秒(s)",
+                "# 第二列为位移s，单位：米(m)",
+                "# 请按照此格式准备您的实验数据",
+                "# 删除注释行后导入系统进行分析"
+            ];
+            
+            const csvContent = templateData.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", "s-t数据模板.csv");
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+        
+        // 处理上传的数据文件
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    const lines = content.split('\n');
+                    const data = [];
+                    
+                    // 跳过可能的标题行，解析CSV数据
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        // 跳过空行和注释行
+                        if (line && line.length > 0 && !line.startsWith('#')) {
+                            const parts = line.split(',');
+                            if (parts.length >= 2) {
+                                const t = parseFloat(parts[0]);
+                                const s = parseFloat(parts[1]);
+                                if (!isNaN(t) && !isNaN(s)) {
+                                    data.push({t, s});
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (data.length > 0) {
+                        originalData = data;
+                        analyzeData();
+                    } else {
+                        alert('无法从文件中读取有效数据。请确保CSV文件格式正确：第一列为时间t(s)，第二列为位移s(m)。');
+                    }
+                } catch (error) {
+                    alert('读取文件时出错：' + error.message);
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        // 使用卡尔曼滤波平滑数据（简化的低通滤波）
+        function applyKalmanFilter(data) {
+            if (data.length < 2) return data;
+            
+            const filtered = [];
+            let x = data[0].s; // 初始状态估计
+            let p = 1.0; // 初始估计误差协方差
+            const q = 0.0001; // 过程噪声协方差
+            const r = 0.01; // 测量噪声协方差
+            
+            for (let i = 0; i < data.length; i++) {
+                // 预测步骤
+                const x_pred = x;
+                const p_pred = p + q;
+                
+                // 更新步骤
+                const k = p_pred / (p_pred + r); // 卡尔曼增益
+                x = x_pred + k * (data[i].s - x_pred);
+                p = (1 - k) * p_pred;
+                
+                filtered.push({t: data[i].t, s: x});
+            }
+            
+            return filtered;
+        }
+        
+        // 计算导数和拟合
+        function analyzeData() {
+            if (originalData.length === 0) {
+                alert('请先导入或生成数据');
+                return;
+            }
+            
+            // 应用卡尔曼滤波（模拟AI数据优化）
+            filteredData = applyKalmanFilter(originalData);
+            
+            // 计算速度和加速度
+            const velocities = [];
+            const accelerations = [];
+            
+            for (let i = 1; i < filteredData.length; i++) {
+                const dt = filteredData[i].t - filteredData[i-1].t;
+                if (dt > 0) {
+                    const v = (filteredData[i].s - filteredData[i-1].s) / dt;
+                    velocities.push({
+                        t: (filteredData[i].t + filteredData[i-1].t) / 2,
+                        v: v
+                    });
+                    
+                    // 计算加速度（需要至少两个速度点）
+                    if (i >= 2 && velocities.length >= 2) {
+                        const v1 = velocities[velocities.length-2].v;
+                        const v2 = velocities[velocities.length-1].v;
+                        const t1 = velocities[velocities.length-2].t;
+                        const t2 = velocities[velocities.length-1].t;
+                        const dt_v = t2 - t1;
+                        
+                        if (dt_v > 0) {
+                            const a = (v2 - v1) / dt_v;
+                            accelerations.push({
+                                t: (t1 + t2) / 2,
+                                a: a
+                            });
+                        }
+                    }
+                }
+            }
+            
+            // 更新s-t图表
+            updateChart(stChart, filteredData, 'st');
+            
+            // 更新v-t图表
+            updateChart(vtChart, velocities, 'vt');
+            
+            // 更新a-t图表
+            updateChart(atChart, accelerations, 'at');
+            
+            // 进行曲线拟合
+            performFitting(filteredData, velocities, accelerations);
+            
+            // 验证F=ma
+            validateNewtonSecondLaw(velocities, accelerations);
+        }
+        
+        // 更新图表数据
+        function updateChart(chart, data, chartType) {
+            if (data.length === 0) return;
+            
+            if (chartType === 'st') {
+                chart.data.datasets[0].data = data.map(d => ({x: d.t, y: d.s}));
+            } else if (chartType === 'vt') {
+                chart.data.datasets[0].data = data.map(d => ({x: d.t, y: d.v}));
+            } else if (chartType === 'at') {
+                chart.data.datasets[0].data = data.map(d => ({x: d.t, y: d.a}));
+            }
+            
+            chart.update();
+        }
+        
+        // 执行曲线拟合
+        function performFitting(sData, vData, aData) {
+            if (sData.length === 0) return;
+            
+            // s-t 二次拟合：s = a0 + a1*t + a2*t²
+            const n = sData.length;
+            let sum_t = 0, sum_t2 = 0, sum_t3 = 0, sum_t4 = 0;
+            let sum_s = 0, sum_t_s = 0, sum_t2_s = 0;
+            
+            for (let i = 0; i < n; i++) {
+                const t = sData[i].t;
+                const s = sData[i].s;
+                const t2 = t * t;
+                const t3 = t2 * t;
+                const t4 = t3 * t;
+                
+                sum_t += t;
+                sum_t2 += t2;
+                sum_t3 += t3;
+                sum_t4 += t4;
+                sum_s += s;
+                sum_t_s += t * s;
+                sum_t2_s += t2 * s;
+            }
+            
+            // 解正规方程求二次拟合系数
+            const D = n * (sum_t2 * sum_t4 - sum_t3 * sum_t3) - sum_t * (sum_t * sum_t4 - sum_t2 * sum_t3) + sum_t2 * (sum_t * sum_t3 - sum_t2 * sum_t2);
+            const D0 = sum_s * (sum_t2 * sum_t4 - sum_t3 * sum_t3) - sum_t * (sum_t_s * sum_t4 - sum_t2_s * sum_t3) + sum_t2 * (sum_t_s * sum_t3 - sum_t2_s * sum_t2);
+            const D1 = n * (sum_t_s * sum_t4 - sum_t2_s * sum_t3) - sum_s * (sum_t * sum_t4 - sum_t2 * sum_t3) + sum_t2 * (sum_t * sum_t2_s - sum_t2 * sum_t_s);
+            const D2 = n * (sum_t2 * sum_t2_s - sum_t3 * sum_t_s) - sum_t * (sum_t * sum_t2_s - sum_t2 * sum_t_s) + sum_s * (sum_t * sum_t3 - sum_t2 * sum_t2);
+            
+            const a0 = D0 / D;
+            const a1 = D1 / D;
+            const a2 = D2 / D;
+            
+            // 计算s-t拟合优度R²
+            let ss_tot = 0, ss_res = 0;
+            const mean_s = sum_s / n;
+            
+            for (let i = 0; i < n; i++) {
+                const t = sData[i].t;
+                const s = sData[i].s;
+                const s_pred = a0 + a1 * t + a2 * t * t;
+                ss_tot += (s - mean_s) * (s - mean_s);
+                ss_res += (s - s_pred) * (s - s_pred);
+            }
+            
+            const r2_st = 1 - ss_res / ss_tot;
+            
+            // 更新s-t拟合曲线
+            const fitData = [];
+            const t_min = Math.min(...sData.map(d => d.t));
+            const t_max = Math.max(...sData.map(d => d.t));
+            
+            for (let t = t_min; t <= t_max; t += (t_max - t_min) / 100) {
+                const s = a0 + a1 * t + a2 * t * t;
+                fitData.push({x: t, y: s});
+            }
+            
+            stChart.data.datasets[1].data = fitData;
+            stChart.update();
+            
+            // 显示s-t拟合结果
+            document.getElementById('stEquation').textContent = 
+                `s = ${a2.toFixed(4)}t² + ${a1.toFixed(4)}t + ${a0.toFixed(4)}`;
+            document.getElementById('stR2').textContent = r2_st.toFixed(4);
+            
+            // v-t 线性拟合：v = b0 + b1*t
+            if (vData.length > 0) {
+                const m = vData.length;
+                let sum_t_v = 0, sum_v = 0, sum_t_v_v = 0, sum_t2_v = 0;
+                
+                for (let i = 0; i < m; i++) {
+                    const t = vData[i].t;
+                    const v = vData[i].v;
+                    
+                    sum_t_v += t;
+                    sum_v += v;
+                    sum_t_v_v += t * v;
+                    sum_t2_v += t * t;
+                }
+                
+                const mean_t_v = sum_t_v / m;
+                const mean_v = sum_v / m;
+                
+                let ss_xy = 0, ss_xx = 0;
+                for (let i = 0; i < m; i++) {
+                    const t = vData[i].t;
+                    const v = vData[i].v;
+                    ss_xy += (t - mean_t_v) * (v - mean_v);
+                    ss_xx += (t - mean_t_v) * (t - mean_t_v);
+                }
+                
+                const b1 = ss_xy / ss_xx;
+                const b0 = mean_v - b1 * mean_t_v;
+                
+                // 计算v-t拟合优度R²
+                let ss_tot_v = 0, ss_res_v = 0;
+                
+                for (let i = 0; i < m; i++) {
+                    const t = vData[i].t;
+                    const v = vData[i].v;
+                    const v_pred = b0 + b1 * t;
+                    ss_tot_v += (v - mean_v) * (v - mean_v);
+                    ss_res_v += (v - v_pred) * (v - v_pred);
+                }
+                
+                const r2_vt = 1 - ss_res_v / ss_tot_v;
+                
+                // 更新v-t拟合直线
+                const vFitData = [];
+                const t_min_v = Math.min(...vData.map(d => d.t));
+                const t_max_v = Math.max(...vData.map(d => d.t));
+                
+                for (let t = t_min_v; t <= t_max_v; t += (t_max_v - t_min_v) / 50) {
+                    const v = b0 + b1 * t;
+                    vFitData.push({x: t, y: v});
+                }
+                
+                vtChart.data.datasets[1].data = vFitData;
+                vtChart.update();
+                
+                // 显示v-t拟合结果
+                document.getElementById('vtEquation').textContent = 
+                    `v = ${b1.toFixed(4)}t + ${b0.toFixed(4)}`;
+                document.getElementById('vtR2').textContent = r2_vt.toFixed(4);
+                
+                // 计算平均加速度
+                let sum_a = 0;
+                for (let i = 0; i < aData.length; i++) {
+                    sum_a += aData[i].a;
+                }
+                const avg_a = sum_a / aData.length;
+                
+                // 计算加速度标准差
+                let sum_var = 0;
+                for (let i = 0; i < aData.length; i++) {
+                    sum_var += Math.pow(aData[i].a - avg_a, 2);
+                }
+                const std_a = Math.sqrt(sum_var / aData.length);
+                
+                document.getElementById('avgAcceleration').textContent = avg_a.toFixed(4) + " m/s²";
+                document.getElementById('accelerationStd').textContent = std_a.toFixed(4) + " m/s²";
+                document.getElementById('measuredAcceleration').textContent = b1.toFixed(4) + " m/s²";
+                
+                return {a_slope: b1, r2_vt: r2_vt};
+            }
+            
+            return {a_slope: 0, r2_vt: 0};
+        }
+        
+        // 验证牛顿第二定律
+        function validateNewtonSecondLaw(vData, aData) {
+            if (vData.length === 0) return;
+            
+            const fittingResult = performFitting(filteredData, vData, aData);
+            const measuredAcceleration = fittingResult.a_slope;
+            const r2_vt = fittingResult.r2_vt;
+            
+            // 计算相对误差
+            const relativeError = Math.abs((measuredAcceleration - theoreticalAcceleration) / theoreticalAcceleration) * 100;
+            
+            // 更新验证结果
+            const validationText = document.getElementById('validationText');
+            const r2Value = document.getElementById('r2Value');
+            const fitQuality = document.getElementById('fitQuality');
+            
+            let validationMessage = "";
+            let r2Class = "";
+            let fitQualityText = "";
+            
+            if (r2_vt > 0.98) {
+                validationMessage = `测量加速度(${measuredAcceleration.toFixed(4)} m/s²)与理论值(${theoreticalAcceleration.toFixed(4)} m/s²)非常接近，相对误差${relativeError.toFixed(2)}%，验证了F=ma。`;
+                r2Class = "good-fit";
+                fitQualityText = "拟合优度优秀，数据质量高";
+            } else if (r2_vt > 0.90) {
+                validationMessage = `测量加速度(${measuredAcceleration.toFixed(4)} m/s²)与理论值(${theoreticalAcceleration.toFixed(4)} m/s²)较为接近，相对误差${relativeError.toFixed(2)}%，基本验证了F=ma。`;
+                r2Class = "moderate-fit";
+                fitQualityText = "拟合优度良好，数据质量较好";
+            } else {
+                validationMessage = `测量加速度(${measuredAcceleration.toFixed(4)} m/s²)与理论值(${theoreticalAcceleration.toFixed(4)} m/s²)差异较大，相对误差${relativeError.toFixed(2)}%，需要检查实验数据或系统误差。`;
+                r2Class = "poor-fit";
+                fitQualityText = "拟合优度一般，可能存在系统误差或噪声干扰";
+            }
+            
+            validationText.textContent = validationMessage;
+            r2Value.textContent = `R² = ${r2_vt.toFixed(4)}`;
+            r2Value.className = `result-value ${r2Class}`;
+            fitQuality.textContent = `拟合优度评估：${fitQualityText}`;
+        }
+        
+        // 重置系统
+        function resetSystem() {
+            originalData = [];
+            filteredData = [];
+            
+            // 重置图表
+            stChart.data.datasets[0].data = [];
+            stChart.data.datasets[1].data = [];
+            stChart.update();
+            
+            vtChart.data.datasets[0].data = [];
+            vtChart.data.datasets[1].data = [];
+            vtChart.update();
+            
+            atChart.data.datasets[0].data = [];
+            atChart.update();
+            
+            // 重置显示结果
+            document.getElementById('stEquation').textContent = 's = --';
+            document.getElementById('stR2').textContent = '--';
+            document.getElementById('vtEquation').textContent = 'v = --';
+            document.getElementById('vtR2').textContent = '--';
+            document.getElementById('avgAcceleration').textContent = '-- m/s²';
+            document.getElementById('accelerationStd').textContent = '-- m/s²';
+            document.getElementById('measuredAcceleration').textContent = '-- m/s²';
+            document.getElementById('validationText').textContent = '请导入或生成数据开始分析';
+            document.getElementById('r2Value').textContent = 'R² = --';
+            document.getElementById('r2Value').className = 'result-value';
+            document.getElementById('fitQuality').textContent = '拟合优度评估：--';
+            
+            // 重置文件输入
+            fileInput.value = '';
+        }
+        
+        // 事件监听器
+        fileInput.addEventListener('change', handleFileUpload);
+        
+        templateBtn.addEventListener('click', exportDataTemplate);
+        
+        generateDataBtn.addEventListener('click', function() {
+            originalData = generateSimulatedData();
+            analyzeData();
+        });
+        
+        analyzeBtn.addEventListener('click', analyzeData);
+        
+        resetBtn.addEventListener('click', resetSystem);
+        
+        updateParamsBtn.addEventListener('click', updateParameters);
+        
+        // 添加输入框的实时计算功能
+        massInput.addEventListener('change', function() {
+            // 当质量改变时，自动计算理论加速度
+            const newMass = parseFloat(massInput.value);
+            if (!isNaN(newMass) && newMass > 0) {
+                const newTheoreticalAcceleration = force / newMass;
+                theoreticalAccelerationDisplay.textContent = newTheoreticalAcceleration.toFixed(4) + " m/s²";
+            }
+        });
+        
+        forceInput.addEventListener('change', function() {
+            // 当力改变时，自动计算理论加速度
+            const newForce = parseFloat(forceInput.value);
+            if (!isNaN(newForce) && newForce > 0) {
+                const newTheoreticalAcceleration = newForce / mass;
+                theoreticalAccelerationDisplay.textContent = newTheoreticalAcceleration.toFixed(4) + " m/s²";
+            }
+        });
+        
+        // 初始化
+        initializeCharts();
+        updateParameterDisplays();
+        
+        // 初始生成模拟数据
+        setTimeout(function() {
+            originalData = generateSimulatedData();
+            analyzeData();
+        }, 500);
+    </script>
+</body>
+</html>
