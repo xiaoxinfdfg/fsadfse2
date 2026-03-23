@@ -225,7 +225,6 @@
             border-bottom: 2px solid #2980b9;
         }
         
-        /* ========== 修改：图形绘制部分样式 ========== */
         .chart-container {
             position: relative;
             height: 400px;
@@ -236,15 +235,6 @@
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
             width: 100%;
         }
-        /* 移除原来的.chart-container样式 */
-        /* .chart-container {
-            width: 80%;
-            margin: 30px auto;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        } */
         
         .summary-box {
             min-height: 150px;
@@ -449,6 +439,82 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 8px rgba(0,0,0,0.15);
         }
+        /* 保存工具栏样式 */
+        .save-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .save-btn {
+            background: linear-gradient(to bottom, #6c5ce7, #5649c0);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .save-btn.danger {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+        }
+        .save-btn.success {
+            background: linear-gradient(to bottom, #27ae60, #229954);
+        }
+        .save-time {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-right: auto;
+            align-self: center;
+        }
+        .auto-save-indicator {
+            font-size: 12px;
+            color: #27ae60;
+            margin-right: 15px;
+            align-self: center;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .score-details {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(52, 152, 219, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #3498db;
+        }
+        .score-details .score-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        .score-details .score-item:last-child {
+            border-bottom: none;
+        }
+        .score-details .score-item-name {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        .score-details .score-item-value {
+            color: #2e7d32;
+            font-weight: bold;
+        }
         @media (max-width: 768px) {
             .parameter-inputs {
                 flex-direction: column;
@@ -457,8 +523,15 @@
             .btn-group {
                 flex-direction: column;
             }
-            .score-btn, .chart-btn, .auto-grade-btn, .reference-btn {
+            .score-btn, .chart-btn, .auto-grade-btn, .reference-btn, .save-btn {
                 width: 100%;
+            }
+            .save-toolbar {
+                flex-direction: column;
+            }
+            .save-time, .auto-save-indicator {
+                text-align: center;
+                margin-right: 0;
             }
         }
     </style>
@@ -467,7 +540,18 @@
     <div class="container">
         <h1>杨氏模量测量实验报告</h1>
         
-        <div class="basic-info">
+        <!-- 保存工具栏 -->
+        <div class="save-toolbar">
+            <div class="auto-save-indicator" id="autoSaveIndicator">⚡ 自动保存已开启</div>
+            <div class="save-time" id="lastSaveTime">上次保存：未保存</div>
+            <button class="save-btn" onclick="manualSave()">💾 手动保存</button>
+            <button class="save-btn" onclick="manualLoad()">📂 加载上次保存</button>
+            <button class="save-btn success" onclick="exportData()">📥 导出备份</button>
+            <button class="save-btn" onclick="importData()">📤 导入备份</button>
+            <button class="save-btn danger" onclick="clearSavedData()">🗑️ 清除数据</button>
+        </div>
+        
+         <div class="basic-info">
             <table>
                 <tr>
                     <td>实验名称</td>
@@ -514,11 +598,10 @@
         </div>
 
         <h2>二、实验仪器</h2>
-<!-- 插入实验仪器图片 -->
-<img src="https://xiaoxinfdfg.github.io/fsadfse2/ysmltu1.png" 
-     alt="实验仪器示意图" 
-     class="apparatus-img"
-     style="max-width: 80%; margin: 20px auto; display: block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <img src="https://xiaoxinfdfg.github.io/fsadfse2/ysmltu1.png" 
+             alt="实验仪器示意图" 
+             class="apparatus-img"
+             style="max-width: 80%; margin: 20px auto; display: block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
         <div class="question-item">
             本实验采用卧式杨氏模量综合实验仪，它由 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="激光光杠杆" placeholder="请填写" id="blank2-1"><span class="answer-status"></span></span>、卧式杨氏模量测试架、测量仪和 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="千分尺定标" placeholder="请填写" id="blank2-2"><span class="answer-status"></span></span> 测量装置等部分组成。
         </div>
@@ -687,7 +770,6 @@
             </div>
         </div>
 
-        <!-- ========== 修改：图形绘制部分 ========== -->
         <h2>六、图形绘制</h2>
         <div class="section" style="margin-top: 30px; padding: 20px; background-color: #f9fafc; border-radius: 8px; border-left: 4px solid #4a6fa5;">
             <div class="chart-container">
@@ -701,7 +783,7 @@
         <h2>七、思考题</h2>
         <div class="question-item">
             1．光杠杆放大法测量微小长度变化的原理是什么？有何优点？
-            <textarea class="thought-input" placeholder="请简要回答"></textarea>
+            <textarea class="thought-input" id="thought1" placeholder="请简要回答"></textarea>
             <button class="thought-answer-btn" onclick="toggleAnswer(1)">显示参考答案</button>
             <div id="answer1" class="thought-answer">
                 答：光杠杆放大法的原理是利用光的反射定律将微小的长度变化转换为光点在标尺上的较大位移。当金属丝伸长ΔL时，光杠杆后足随之移动，使平面镜转动微小角度θ，反射光线偏转2θ角度，在远处标尺上形成明显的光点位移Δx。优点：放大倍数大（可达几十到几百倍），结构简单，测量精度高，非接触测量。
@@ -709,7 +791,7 @@
         </div>
         <div class="question-item">
             2．实验中为何采用逐差法处理数据？逐差法的优点是什么？
-            <textarea class="thought-input" placeholder="请简要回答"></textarea>
+            <textarea class="thought-input" id="thought2" placeholder="请简要回答"></textarea>
             <button class="thought-answer-btn" onclick="toggleAnswer(2)">显示参考答案</button>
             <div id="answer2" class="thought-answer">
                 答：采用逐差法是因为实验数据是等间距变化的（等量增加砝码）。逐差法的优点：1)充分利用所有实验数据，减小随机误差；2)可以绕过一些具有定值的未知量，简化计算；3)可以验证数据的线性关系，检查测量是否有误；4)计算出的结果具有平均意义，提高测量精度。
@@ -717,7 +799,7 @@
         </div>
         <div class="question-item">
             3．影响杨氏模量测量精度的主要因素有哪些？如何减小这些误差？
-            <textarea class="thought-input" placeholder="请简要回答"></textarea>
+            <textarea class="thought-input" id="thought3" placeholder="请简要回答"></textarea>
             <button class="thought-answer-btn" onclick="toggleAnswer(3)">显示参考答案</button>
             <div id="answer3" class="thought-answer">
                 答：主要影响因素及减小方法：1)金属丝直径d测量误差（影响最大，因为d²项）- 用螺旋测微计多点测量取平均；2)光杠杆常数b测量误差 - 用卡尺精确测量；3)长度L和D测量误差 - 用钢卷尺多次测量；4)Δx测量误差 - 等待光点稳定后读数，避免视差；5)金属丝不直或夹具不紧 - 调整实验装置；6)温度变化 - 控制实验室温度恒定。
@@ -734,11 +816,20 @@
             <div class="score-display" id="scoreDisplay"></div>
         </div>
 
-        <h2>十、自动评分并生成评语（温馨提醒：保存报告时，确保手机处于横屏状态）</h2>
+        <h2>十、自动评分并生成评语</h2>
         <div class="comment-section" id="commentSection">
             <div class="comment-title">实验评语</div>
             <div class="comment-content" id="commentContent">
                 <p style="text-align: center; color: #999;">点击"自动评分并生成评语"按钮生成实验评语和报告得分</p>
+            </div>
+            <div id="scoreDetails" class="score-details" style="display: none;">
+                <div class="score-item"><span class="score-item-name">预习填空（25%）</span><span class="score-item-value" id="detailPreScore">0/25</span></div>
+                <div class="score-item"><span class="score-item-name">数据记录（25%）</span><span class="score-item-value" id="detailDataScore">0/25</span></div>
+                <div class="score-item"><span class="score-item-name">数据计算与验证（15%）</span><span class="score-item-value" id="detailCalcScore">0/15</span></div>
+                <div class="score-item"><span class="score-item-name">图表绘制（10%）</span><span class="score-item-value" id="detailChartScore">0/10</span></div>
+                <div class="score-item"><span class="score-item-name">思考题（15%）</span><span class="score-item-value" id="detailThoughtScore">0/15</span></div>
+                <div class="score-item"><span class="score-item-name">实验小结（10%）</span><span class="score-item-value" id="detailSummaryScore">0/10</span></div>
+                <div class="score-item" style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #3498db;"><span class="score-item-name" style="font-weight: bold;">总分</span><span class="score-item-value" id="detailTotalScore">0/100</span></div>
             </div>
             <div class="comment-footer" id="commentFooter" style="display: none;">
                 <div>指导教师：<span id="teacherName"></span></div>
@@ -751,43 +842,273 @@
     </div>
 
     <script>
-        // 定义正确答案
+        // 正确答案
         const correctAnswers = {
-            'blank1-1': '光杠杆',
-            'blank1-2': '位移传感器',
-            'blank1-3': '杨氏模量',
-            'blank1-4': '逐差法',
-            'blank2-1': '激光光杠杆',
-            'blank2-2': '千分尺定标',
-            'blank3-1': '输出电压',
-            'blank3-2': '应力',
-            'blank3-3': '应变',
-            'blank3-4': '游标卡尺',
-            'blank3-5': '数字拉力计',
-            'blank3-6': '霍尔电势差',
-            'blank3-7': '平面镜',
-            'blank3-8': '中垂线',
-            'blank3-9': '一字型',
-            'blank3-10': '直尺',
-            'blank3-11': '光杠杆常数',
-            'blank3-12': '光杠杆镜面至直尺',
-            'blank4-1': '游标卡尺',
-            'blank4-2': '拉力'
+            'blank1-1': '光杠杆', 'blank1-2': '位移传感器', 'blank1-3': '杨氏模量', 'blank1-4': '逐差法',
+            'blank2-1': '激光光杠杆', 'blank2-2': '千分尺定标',
+            'blank3-1': '输出电压', 'blank3-2': '应力', 'blank3-3': '应变', 'blank3-4': '游标卡尺',
+            'blank3-5': '数字拉力计', 'blank3-6': '霍尔电势差', 'blank3-7': '平面镜', 'blank3-8': '中垂线',
+            'blank3-9': '一字型', 'blank3-10': '直尺', 'blank3-11': '光杠杆常数', 'blank3-12': '光杠杆镜面至直尺',
+            'blank4-1': '游标卡尺', 'blank4-2': '拉力'
         };
 
         // 参考数据
-        const referenceData = {
-            x: [180, 179, 177, 175, 174, 172, 170]
-        };
+        const referenceData = { x: [180, 179, 177, 175, 174, 172, 170] };
 
-        // 图表实例
+        // 自动保存相关变量
+        let autoSaveTimer = null;
+        let lastSaveTime = null;
         let chart = null;
+
+        // ========== 保存功能 ==========
         
+        function loadAllSavedData() {
+            try {
+                // 加载基本信息
+                document.querySelectorAll('.info-input').forEach(input => {
+                    const savedValue = localStorage.getItem(input.id);
+                    if (savedValue !== null) input.value = savedValue;
+                });
+                
+                // 加载填空题
+                document.querySelectorAll('.fill-blank').forEach(input => {
+                    const savedValue = localStorage.getItem(input.id);
+                    if (savedValue !== null) input.value = savedValue;
+                });
+                
+                // 加载参数
+                const paramIds = ['param-D', 'param-L', 'param-b', 'param-d'];
+                paramIds.forEach(id => {
+                    const savedValue = localStorage.getItem(id);
+                    if (savedValue !== null) document.getElementById(id).value = savedValue;
+                });
+                
+                // 加载x数据
+                for (let i = 1; i <= 7; i++) {
+                    const savedValue = localStorage.getItem(`x${i}`);
+                    if (savedValue !== null) document.getElementById(`x${i}`).value = savedValue;
+                }
+                
+                // 加载思考题
+                const thoughtIds = ['thought1', 'thought2', 'thought3'];
+                thoughtIds.forEach(id => {
+                    const savedValue = localStorage.getItem(id);
+                    if (savedValue !== null) document.getElementById(id).value = savedValue;
+                });
+                
+                // 加载实验小结
+                const savedSummary = localStorage.getItem('summary');
+                if (savedSummary !== null) document.getElementById('summary').value = savedSummary;
+                
+                // 更新上次保存时间显示
+                const savedTime = localStorage.getItem('lastSaveTime');
+                if (savedTime) {
+                    lastSaveTime = new Date(parseInt(savedTime));
+                    updateLastSaveTime();
+                }
+                
+                // 重新计算
+                calculateData();
+                updateAllAnswerStatusIcons();
+                
+                console.log('数据加载完成');
+            } catch (e) {
+                console.error('加载数据失败:', e);
+            }
+        }
+
+        function saveAllData() {
+            try {
+                // 保存基本信息
+                document.querySelectorAll('.info-input').forEach(input => {
+                    localStorage.setItem(input.id, input.value);
+                });
+                
+                // 保存填空题
+                document.querySelectorAll('.fill-blank').forEach(input => {
+                    localStorage.setItem(input.id, input.value);
+                });
+                
+                // 保存参数
+                const paramIds = ['param-D', 'param-L', 'param-b', 'param-d'];
+                paramIds.forEach(id => {
+                    const input = document.getElementById(id);
+                    if (input) localStorage.setItem(id, input.value);
+                });
+                
+                // 保存x数据
+                for (let i = 1; i <= 7; i++) {
+                    const input = document.getElementById(`x${i}`);
+                    if (input) localStorage.setItem(`x${i}`, input.value);
+                }
+                
+                // 保存思考题
+                const thoughtIds = ['thought1', 'thought2', 'thought3'];
+                thoughtIds.forEach(id => {
+                    const input = document.getElementById(id);
+                    if (input) localStorage.setItem(id, input.value);
+                });
+                
+                // 保存实验小结
+                localStorage.setItem('summary', document.getElementById('summary').value);
+                
+                // 保存时间戳
+                lastSaveTime = new Date();
+                localStorage.setItem('lastSaveTime', lastSaveTime.getTime().toString());
+                updateLastSaveTime();
+                
+                console.log('数据保存成功');
+                return true;
+            } catch (e) {
+                console.error('保存数据失败:', e);
+                return false;
+            }
+        }
+
+        function updateLastSaveTime() {
+            if (lastSaveTime) {
+                const timeStr = lastSaveTime.toLocaleTimeString();
+                document.getElementById('lastSaveTime').textContent = `上次保存：${timeStr}`;
+            }
+        }
+
+        function manualSave() {
+            if (saveAllData()) {
+                alert('✅ 数据已成功保存到本地！');
+            } else {
+                alert('❌ 保存失败，请重试');
+            }
+        }
+
+        function manualLoad() {
+            loadAllSavedData();
+            alert('📂 已加载上次保存的数据！');
+        }
+
+        function clearSavedData() {
+            if (confirm('⚠️ 确定要清除所有已保存的数据吗？\n\n这将删除所有本地存储的实验数据，但不会清空当前页面填写的内容。')) {
+                localStorage.clear();
+                lastSaveTime = null;
+                document.getElementById('lastSaveTime').textContent = '上次保存：未保存';
+                alert('🗑️ 已清除所有保存的数据');
+            }
+        }
+
+        function exportData() {
+            const data = {
+                info: {},
+                fillBlanks: {},
+                params: {},
+                xValues: {},
+                thoughts: {},
+                summary: document.getElementById('summary').value,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            // 收集基本信息
+            document.querySelectorAll('.info-input').forEach(input => {
+                data.info[input.id] = input.value;
+            });
+            
+            // 收集填空题
+            document.querySelectorAll('.fill-blank').forEach(input => {
+                data.fillBlanks[input.id] = input.value;
+            });
+            
+            // 收集参数
+            const paramIds = ['param-D', 'param-L', 'param-b', 'param-d'];
+            paramIds.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) data.params[id] = input.value;
+            });
+            
+            // 收集x数据
+            for (let i = 1; i <= 7; i++) {
+                const input = document.getElementById(`x${i}`);
+                if (input) data.xValues[`x${i}`] = input.value;
+            }
+            
+            // 收集思考题
+            const thoughtIds = ['thought1', 'thought2', 'thought3'];
+            thoughtIds.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) data.thoughts[id] = input.value;
+            });
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            const dateStr = new Date().toLocaleDateString().replace(/\//g, '-');
+            a.download = `杨氏模量实验_${dateStr}.json`;
+            a.click();
+            URL.revokeObjectURL(blob.url);
+            alert('📥 数据已导出为JSON文件');
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        // 恢复基本信息
+                        Object.entries(data.info || {}).forEach(([id, val]) => {
+                            const el = document.getElementById(id);
+                            if (el) el.value = val;
+                        });
+                        
+                        // 恢复填空题
+                        Object.entries(data.fillBlanks || {}).forEach(([id, val]) => {
+                            const el = document.getElementById(id);
+                            if (el) el.value = val;
+                        });
+                        
+                        // 恢复参数
+                        Object.entries(data.params || {}).forEach(([id, val]) => {
+                            const el = document.getElementById(id);
+                            if (el) el.value = val;
+                        });
+                        
+                        // 恢复x数据
+                        Object.entries(data.xValues || {}).forEach(([id, val]) => {
+                            const el = document.getElementById(id);
+                            if (el) el.value = val;
+                        });
+                        
+                        // 恢复思考题
+                        Object.entries(data.thoughts || {}).forEach(([id, val]) => {
+                            const el = document.getElementById(id);
+                            if (el) el.value = val;
+                        });
+                        
+                        // 恢复实验小结
+                        if (data.summary) document.getElementById('summary').value = data.summary;
+                        
+                        // 重新计算
+                        calculateData();
+                        updateAllAnswerStatusIcons();
+                        
+                        alert('✅ 数据导入成功！');
+                    } catch (error) {
+                        console.error(error);
+                        alert('❌ 文件格式错误，导入失败');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
         // 思考题参考答案显示/隐藏
         function toggleAnswer(questionNum) {
             const answerDiv = document.getElementById(`answer${questionNum}`);
             const button = event.target;
-            
             if (answerDiv.style.display === 'block') {
                 answerDiv.style.display = 'none';
                 button.textContent = '显示参考答案';
@@ -797,53 +1118,11 @@
             }
         }
 
-        // 填入参考数据
-        function fillReferenceData() {
-            if (confirm("警告：参考数据仅供对照使用！若直接搬用参考数据，数据部分将计0分！\n\n是否继续填入参考数据？")) {
-                for (let i = 1; i <= 7; i++) {
-                    document.getElementById(`x${i}`).value = referenceData.x[i-1];
-                }
-                
-                calculateData();
-                
-                alert("参考数据已填入。请注意：这些数据仅供对照，实际实验必须使用自己测量的数据！");
-            }
-        }
-
-        // 检查是否使用了参考数据
-        function checkReferenceDataUsage() {
-            let referenceCount = 0;
-            let totalCount = 0;
-            
-            // 检查表格数据
-            for (let i = 1; i <= 7; i++) {
-                const xValue = parseFloat(document.getElementById(`x${i}`).value) || 0;
-                
-                if (xValue !== 0) {
-                    totalCount++;
-                    
-                    // 检查是否与参考数据完全匹配
-                    if (Math.abs(xValue - referenceData.x[i-1]) < 0.01) {
-                        referenceCount++;
-                    }
-                }
-            }
-            
-            // 如果超过80%的数据与参考数据完全匹配，判定为直接搬用
-            if (totalCount > 0 && (referenceCount / totalCount) > 0.8) {
-                return true;
-            }
-            return false;
-        }
-
-        // 更新单个填空题的状态图标
+        // 更新填空题状态图标
         function updateAnswerStatusIcon(inputElement, status) {
             const statusIcon = inputElement.nextElementSibling;
             if (statusIcon && statusIcon.classList.contains('answer-status')) {
-                // 清除之前的样式
                 statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
-                
-                // 设置新样式和图标
                 if (status === 'correct') {
                     statusIcon.textContent = '✓';
                     statusIcon.classList.add('correct-icon');
@@ -859,25 +1138,58 @@
             }
         }
 
-        // 计算实验数据 - 完全按照Excel中的公式计算
+        function updateAllAnswerStatusIcons() {
+            document.querySelectorAll('.fill-blank').forEach(input => {
+                const userAnswer = input.value.trim();
+                const correctAnswer = correctAnswers[input.id];
+                if (userAnswer === '') {
+                    updateAnswerStatusIcon(input, 'empty');
+                } else if (correctAnswer && userAnswer === correctAnswer) {
+                    updateAnswerStatusIcon(input, 'correct');
+                } else {
+                    updateAnswerStatusIcon(input, 'incorrect');
+                }
+            });
+        }
+
+        // 填入参考数据
+        function fillReferenceData() {
+            if (confirm("警告：参考数据仅供对照使用！若直接搬用参考数据，数据部分将计0分！\n\n是否继续填入参考数据？")) {
+                for (let i = 1; i <= 7; i++) {
+                    document.getElementById(`x${i}`).value = referenceData.x[i-1];
+                }
+                calculateData();
+                alert("参考数据已填入。请注意：这些数据仅供对照，实际实验必须使用自己测量的数据！");
+            }
+        }
+
+        // 检查是否使用了参考数据
+        function checkReferenceDataUsage() {
+            let referenceCount = 0, totalCount = 0;
+            for (let i = 1; i <= 7; i++) {
+                const xValue = parseFloat(document.getElementById(`x${i}`).value) || 0;
+                if (xValue !== 0) {
+                    totalCount++;
+                    if (Math.abs(xValue - referenceData.x[i-1]) < 0.01) referenceCount++;
+                }
+            }
+            return totalCount > 0 && (referenceCount / totalCount) > 0.8;
+        }
+
+        // 计算实验数据
         function calculateData() {
-            // 获取参数值
             const D = parseFloat(document.getElementById('param-D').value) || 1500;
             const L = parseFloat(document.getElementById('param-L').value) || 800;
             const b = parseFloat(document.getElementById('param-b').value) || 75;
             const d = parseFloat(document.getElementById('param-d').value) || 0.5;
             
-            // 获取x值
             const xValues = [];
             for (let i = 1; i <= 7; i++) {
-                const x = parseFloat(document.getElementById(`x${i}`).value) || 0;
-                xValues.push(x);
+                xValues.push(parseFloat(document.getElementById(`x${i}`).value) || 0);
             }
             
-            // 计算Δx值（按照Excel公式：Δx = |x_i - x₁|）
+            const x1 = xValues[0];
             const dxValues = [];
-            const x1 = xValues[0]; // 第一次测量的x值
-            
             for (let i = 0; i < xValues.length; i++) {
                 if (i === 0) {
                     dxValues.push(0);
@@ -889,45 +1201,30 @@
                 }
             }
             
-            // 计算Yi值（按照Excel公式：Yi = 8*L*D*F_i*1000000/(3.14*d²*b*Δx_i)）
             const FValues = [0, 4.9, 9.8, 14.7, 19.6, 24.5, 29.4];
-            const YiValues = [];
-            let sumYi = 0;
-            let countYi = 0;
+            let sumYi = 0, countYi = 0;
             
-            // 第1次（F=0）不计算
             document.getElementById('Yi1').textContent = '-';
-            
-            // 计算第2-7次的杨氏模量（共6个值）
             for (let i = 2; i <= 7; i++) {
-                const F = FValues[i-1]; // F值的索引从0开始，第i次对应FValues[i-1]
-                const dx = dxValues[i-1]; // dx值的索引从0开始
-                
-                // 按照Excel公式：Yi = 8*L*D*F*1000000/(3.14*d²*b*Δx)
+                const F = FValues[i-1];
+                const dx = dxValues[i-1];
                 if (dx > 0 && F > 0) {
                     const numerator = 8 * L * D * F * 1000000;
                     const denominator = 3.14 * d * d * b * dx;
-                    const Yi = numerator / denominator / 1e11; // 转换为×10¹¹ Pa单位
-                    
-                    YiValues.push(Yi);
+                    const Yi = numerator / denominator / 1e11;
                     sumYi += Yi;
                     countYi++;
                     document.getElementById(`Yi${i}`).textContent = Yi.toFixed(3);
                 } else {
-                    YiValues.push(0);
                     document.getElementById(`Yi${i}`).textContent = '-';
                 }
             }
             
-            // 计算Y的平均值（仅使用第2-7次的有效值）
             if (countYi > 0) {
-                const avgYi = sumYi / countYi;
-                document.getElementById('y-average').textContent = avgYi.toFixed(3);
+                document.getElementById('y-average').textContent = (sumYi / countYi).toFixed(3);
             } else {
                 document.getElementById('y-average').textContent = '-';
             }
-            
-            console.log(`计算完成：共计算${countYi}个有效杨氏模量值（第2-7次）`);
         }
 
         // 绘制图表
@@ -935,25 +1232,17 @@
             calculateData();
             const ctx = document.getElementById('chart').getContext('2d');
             
-            // 获取x和F值
             const xValues = [];
             const FValues = [0, 4.9, 9.8, 14.7, 19.6, 24.5, 29.4];
-            
             for (let i = 1; i <= 7; i++) {
-                const x = parseFloat(document.getElementById(`x${i}`).value) || 0;
-                xValues.push(x);
+                xValues.push(parseFloat(document.getElementById(`x${i}`).value) || 0);
             }
             
-            // 如果已有图表，销毁它
-            if (chart) {
-                chart.destroy();
-            }
+            if (chart) chart.destroy();
             
-            // 计算Y轴的最大值，增加高度（增加20%的余量）
             const maxXValue = Math.max(...xValues);
-            const yAxisMax = maxXValue * 1.2; // 增加20%的高度
+            const yAxisMax = maxXValue * 1.2;
             
-            // 创建新图表 - F为横坐标，x为纵坐标
             chart = new Chart(ctx, {
                 type: 'scatter',
                 data: {
@@ -970,409 +1259,227 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: '拉力 F (N)',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return value + ' N';
-                                }
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '位移 x (mm)',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return value.toFixed(2) + ' mm';
-                                }
-                            },
-                            // 增加Y轴高度
-                            min: 0,
-                            max: yAxisMax > 0 ? yAxisMax : 2.5, // 至少显示到2.5mm
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            }
-                        }
+                        x: { title: { display: true, text: '拉力 F (N)', font: { size: 14, weight: 'bold' } } },
+                        y: { title: { display: true, text: '位移 x (mm)', font: { size: 14, weight: 'bold' } }, min: 0, max: yAxisMax > 0 ? yAxisMax : 2.5 }
                     },
                     plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 14
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `F=${context.parsed.x}N, x=${context.parsed.y.toFixed(2)}mm`;
-                                }
-                            }
-                        }
+                        legend: { position: 'top' },
+                        tooltip: { callbacks: { label: ctx => `F=${ctx.parsed.x}N, x=${ctx.parsed.y.toFixed(2)}mm` } }
                     }
                 }
             });
             
             // 添加线性拟合
-            addLinearFit(FValues, xValues);
-        }
-        
-        // 添加线性拟合
-        function addLinearFit(FValues, xValues) {
-            // 计算线性回归（排除第一个点，因为F=0）
             const filteredF = FValues.slice(1);
             const filteredX = xValues.slice(1);
             const n = filteredF.length;
-            
             let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-            
             for (let i = 0; i < n; i++) {
-                sumX += filteredF[i]; // X是F
-                sumY += filteredX[i]; // Y是x
+                sumX += filteredF[i];
+                sumY += filteredX[i];
                 sumXY += filteredF[i] * filteredX[i];
                 sumX2 += filteredF[i] * filteredF[i];
             }
-            
             const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
             const intercept = (sumY - slope * sumX) / n;
-            
-            // 计算R²
             let ssRes = 0, ssTot = 0;
             const yMean = sumY / n;
-            
             for (let i = 0; i < n; i++) {
                 const yPred = slope * filteredF[i] + intercept;
                 ssRes += Math.pow(filteredX[i] - yPred, 2);
                 ssTot += Math.pow(filteredX[i] - yMean, 2);
             }
-            
             const rSquared = 1 - (ssRes / ssTot);
             
-            // 生成拟合线数据点
             const minX = Math.min(...filteredF);
             const maxX = Math.max(...filteredF);
-            const fitX = [minX, maxX];
-            const fitY = [slope * minX + intercept, slope * maxX + intercept];
-            
-            // 添加拟合线到图表
             chart.data.datasets.push({
                 label: `线性拟合: x = ${slope.toFixed(3)}F + ${intercept.toFixed(3)} (R²=${rSquared.toFixed(4)})`,
-                data: fitX.map((x, i) => ({x: x, y: fitY[i]})),
-                backgroundColor: 'rgba(231, 76, 60, 0)',
+                data: [{x: minX, y: slope * minX + intercept}, {x: maxX, y: slope * maxX + intercept}],
                 borderColor: 'rgba(231, 76, 60, 1)',
                 borderWidth: 2,
                 pointRadius: 0,
                 type: 'line',
                 fill: false
             });
-            
             chart.update();
-            
-            // 显示拟合方程
-            alert(`线性拟合方程: x = ${slope.toFixed(3)}F + ${intercept.toFixed(3)}\n决定系数 R² = ${rSquared.toFixed(4)}`);
         }
 
-        // 计算预习分数（仅填空题）- 带对错图标效果
+        // 计算预习分数
         function calculatePreScore() {
             const inputs = document.querySelectorAll('.fill-blank');
-            let correct = 0;
-            let total = inputs.length;
-            let emptyCount = 0;
-
+            let correct = 0, total = inputs.length, emptyCount = 0;
             inputs.forEach(input => {
                 const userAnswer = input.value.trim();
                 const correctAnswer = correctAnswers[input.id];
-                
-                // 清除之前的样式
                 input.classList.remove('correct', 'incorrect', 'empty');
-                
                 if (userAnswer === '') {
-                    // 未填写的情况
                     emptyCount++;
                     input.classList.add('empty');
                     updateAnswerStatusIcon(input, 'empty');
                 } else if (correctAnswer && userAnswer === correctAnswer) {
-                    // 回答正确
                     correct++;
                     input.classList.add('correct');
                     updateAnswerStatusIcon(input, 'correct');
                 } else {
-                    // 回答错误
                     input.classList.add('incorrect');
                     updateAnswerStatusIcon(input, 'incorrect');
                 }
             });
-
-            // 计算分数，未答题不计入正确
             const score = Math.round((correct / total) * 100);
-            
-            // 显示结果
             let scoreText = `预习分数：${score}分（答对${correct}/${total}题）`;
-            if (emptyCount > 0) {
-                scoreText += `，未答：${emptyCount}题`;
-            }
-            if (correct === total) {
-                scoreText += " 🎉 满分！";
-            } else if (correct === 0) {
-                scoreText += " 😢 请认真预习后再作答！";
-            }
-            
+            if (emptyCount > 0) scoreText += `，未答：${emptyCount}题`;
+            if (correct === total) scoreText += " 🎉 满分！";
+            else if (correct === 0) scoreText += " 😢 请认真预习后再作答！";
             document.getElementById('scoreDisplay').innerHTML = scoreText;
             return {score, correct, total, emptyCount};
         }
 
-        // 自动评分并生成评语
+        // 自动评分
         function autoGrade() {
             const preScoreResult = calculatePreScore();
             const preScore = preScoreResult.score;
             const summary = document.getElementById('summary').value.trim();
             const chartDrawn = chart !== null;
-            
-            // 获取Y的平均值
             const yAvgText = document.getElementById('y-average').textContent;
             const yAvg = yAvgText !== '-' ? parseFloat(yAvgText) : 0;
-            
-            // 检查是否使用了参考数据
             const usedReferenceData = checkReferenceDataUsage();
             
-            // 计算报告得分
             let totalScore = 0;
-            let scoreBreakdown = [];
             
             // 1. 预习填空（25%）
             const preScoreWeighted = Math.round(preScore * 0.25);
             totalScore += preScoreWeighted;
-            scoreBreakdown.push(`预习填空：${preScore}×25%=${preScoreWeighted}`);
+            document.getElementById('detailPreScore').textContent = `${preScoreWeighted}/25`;
             
-            // 2. 数据及其合理性（25%）- 直接搬用参考数据计0分
+            // 2. 数据记录（25%）
             let dataScore = 0;
             if (usedReferenceData) {
-                // 如果直接搬用参考数据，数据部分得0分
                 dataScore = 0;
-                scoreBreakdown.push(`数据记录：0×25%=0（直接搬用参考数据）`);
             } else {
-                // 计算数据完整性分数
-                let dataCompleteness = 0;
                 const dataInputs = document.querySelectorAll('.data-input');
                 let filledCount = 0;
-                dataInputs.forEach(input => {
-                    if (input.value.trim() !== '') filledCount++;
-                });
-                dataCompleteness = Math.round((filledCount / dataInputs.length) * 100);
-                
-                // 检查实验结果合理性（金属杨氏模量一般在0.5-2.5×10^11 Pa之间）
+                dataInputs.forEach(input => { if (input.value.trim() !== '') filledCount++; });
+                const dataCompleteness = Math.round((filledCount / dataInputs.length) * 100);
                 let experimentQuality = 0;
-                if (yAvg > 0.5 && yAvg < 2.5) {
-                    experimentQuality = 100;
-                } else if (yAvg > 0.2 && yAvg < 5.0) {
-                    experimentQuality = 80;
-                } else if (yAvg > 0) {
-                    experimentQuality = 60;
-                } else {
-                    experimentQuality = 0;
-                }
-                
+                if (yAvg > 0.5 && yAvg < 2.5) experimentQuality = 100;
+                else if (yAvg > 0.2 && yAvg < 5.0) experimentQuality = 80;
+                else if (yAvg > 0) experimentQuality = 60;
                 dataScore = Math.round((dataCompleteness * 0.6 + experimentQuality * 0.4) * 0.25);
-                scoreBreakdown.push(`数据完整性与合理性：(${dataCompleteness}×60%+${experimentQuality}×40%)×0.25=${dataScore}`);
             }
             totalScore += dataScore;
+            document.getElementById('detailDataScore').textContent = `${dataScore}/25`;
             
             // 3. 数据计算与验证（15%）
             let calculationScore = 0;
             if (yAvg > 0 && !usedReferenceData) {
-                // 检查计算是否完成
-                let calcCompleteness = 0;
                 let calcFilled = 0;
                 for (let i = 1; i <= 7; i++) {
-                    const yi = document.getElementById(`Yi${i}`).textContent;
-                    if (yi !== '-') calcFilled++;
+                    if (document.getElementById(`Yi${i}`).textContent !== '-') calcFilled++;
                 }
-                calcCompleteness = Math.round((calcFilled / 7) * 100);
-                
-                calculationScore = Math.round(calcCompleteness * 0.15);
+                calculationScore = Math.round((calcFilled / 7) * 100 * 0.15);
             }
             totalScore += calculationScore;
-            scoreBreakdown.push(`计算结果：${calculationScore/0.15}×15%=${calculationScore}`);
+            document.getElementById('detailCalcScore').textContent = `${calculationScore}/15`;
             
             // 4. 图表（10%）
-            let chartScore = 0;
-            if (chartDrawn) chartScore = 100;
-            
+            const chartScore = chartDrawn ? 100 : 0;
             const chartScoreWeighted = Math.round(chartScore * 0.1);
             totalScore += chartScoreWeighted;
-            scoreBreakdown.push(`图表绘制：${chartScore}×10%=${chartScoreWeighted}`);
+            document.getElementById('detailChartScore').textContent = `${chartScoreWeighted}/10`;
             
             // 5. 思考题（15%）
             let thoughtScore = 0;
             const thoughtInputs = document.querySelectorAll('.thought-input');
-            let thoughtFilled = 0;
-            let thoughtTotalLength = 0;
-            
+            let thoughtFilled = 0, thoughtTotalLength = 0;
             thoughtInputs.forEach(input => {
                 const answer = input.value.trim();
-                if (answer !== '') {
-                    thoughtFilled++;
-                    thoughtTotalLength += answer.length;
-                }
+                if (answer !== '') { thoughtFilled++; thoughtTotalLength += answer.length; }
             });
-            
-            // 根据填写情况和内容质量评分
             const fillRate = thoughtFilled / thoughtInputs.length;
             const avgLength = thoughtFilled > 0 ? thoughtTotalLength / thoughtFilled : 0;
-            
             if (fillRate === 1 && avgLength > 50) thoughtScore = 100;
             else if (fillRate >= 0.8 && avgLength > 40) thoughtScore = 80;
             else if (fillRate >= 0.6 && avgLength > 30) thoughtScore = 60;
             else if (fillRate >= 0.4 && avgLength > 20) thoughtScore = 40;
             else if (fillRate >= 0.2) thoughtScore = 20;
-            else thoughtScore = 0;
-            
             const thoughtScoreWeighted = Math.round(thoughtScore * 0.15);
             totalScore += thoughtScoreWeighted;
-            scoreBreakdown.push(`思考题：${thoughtScore}×15%=${thoughtScoreWeighted}`);
+            document.getElementById('detailThoughtScore').textContent = `${thoughtScoreWeighted}/15`;
             
             // 6. 小结（10%）
             let summaryScore = 0;
             const summaryLength = summary.length;
-            // 检查关键词数量
-            const keywords = ['实验', '收获', '问题', '解决', '改进', '建议', '理解', '掌握', '学会', '操作'];
+            const keywords = ['实验', '收获', '问题', '解决', '改进', '建议', '理解', '掌握'];
             let keywordCount = 0;
-            keywords.forEach(keyword => {
-                if (summary.includes(keyword)) keywordCount++;
-            });
-            
+            keywords.forEach(k => { if (summary.includes(k)) keywordCount++; });
             if (summaryLength > 100 && keywordCount >= 5) summaryScore = 100;
             else if (summaryLength > 80 && keywordCount >= 4) summaryScore = 80;
             else if (summaryLength > 60 && keywordCount >= 3) summaryScore = 60;
             else if (summaryLength > 40 && keywordCount >= 2) summaryScore = 40;
             else if (summaryLength > 20) summaryScore = 20;
-            else summaryScore = 0;
-            
             const summaryScoreWeighted = Math.round(summaryScore * 0.1);
             totalScore += summaryScoreWeighted;
-            scoreBreakdown.push(`实验小结：${summaryScore}×10%=${summaryScoreWeighted}`);
+            document.getElementById('detailSummaryScore').textContent = `${summaryScoreWeighted}/10`;
+            
+            document.getElementById('detailTotalScore').textContent = `${totalScore}/100`;
+            document.getElementById('scoreDetails').style.display = 'block';
             
             // 生成评语
-            let comment = "";
-            let grade = "不及格";
-            let gradeColor = "#c62828";
-            
+            let comment = "", grade = "不及格", gradeColor = "#c62828";
             if (usedReferenceData) {
                 grade = "不及格";
                 gradeColor = "#c62828";
-                comment = `❌ 实验报告不合格！检测到直接搬用参考数据，数据部分计0分！报告得分${totalScore}分。必须使用实际实验测量数据完成报告！`;
+                comment = `❌ 实验报告不合格！检测到直接搬用参考数据，数据部分计0分！报告得分${totalScore}分。`;
             } else if (totalScore >= 90) {
-                grade = "优秀";
-                gradeColor = "#2e7d32";
-                comment = `🎉 实验报告非常出色！综合得分${totalScore}分。预习扎实（${preScore}分），数据记录完整准确，杨氏模量计算合理（${yAvg.toFixed(3)}×10¹¹ Pa），思考题回答充分，小结详实。`;
+                grade = "优秀"; gradeColor = "#2e7d32";
+                comment = `🎉 实验报告非常出色！综合得分${totalScore}分。预习扎实（${preScore}分），数据记录完整准确，杨氏模量计算合理（${yAvg.toFixed(3)}×10¹¹ Pa）。`;
             } else if (totalScore >= 80) {
-                grade = "良好";
-                gradeColor = "#388e3c";
-                comment = `👍 实验报告质量较高！综合得分${totalScore}分。预习较好（${preScore}分），数据记录较为完整，杨氏模量计算基本合理（${yAvg.toFixed(3)}×10¹¹ Pa），分析较为充分。`;
+                grade = "良好"; gradeColor = "#388e3c";
+                comment = `👍 实验报告质量较高！综合得分${totalScore}分。预习较好（${preScore}分），数据记录较为完整，杨氏模量计算基本合理（${yAvg.toFixed(3)}×10¹¹ Pa）。`;
             } else if (totalScore >= 70) {
-                grade = "中等";
-                gradeColor = "#f57c00";
-                comment = `✊ 实验报告基本合格！综合得分${totalScore}分。预习一般（${preScore}分），数据记录和计算存在一定误差，分析较为简单。`;
+                grade = "中等"; gradeColor = "#f57c00";
+                comment = `✊ 实验报告基本合格！综合得分${totalScore}分。预习一般（${preScore}分），数据记录和计算存在一定误差。`;
             } else if (totalScore >= 60) {
-                grade = "及格";
-                gradeColor = "#ff9800";
-                comment = `⚠️ 实验报告勉强及格！综合得分${totalScore}分。预习不足（${preScore}分），数据记录或计算存在明显问题，分析不足。`;
+                grade = "及格"; gradeColor = "#ff9800";
+                comment = `⚠️ 实验报告勉强及格！综合得分${totalScore}分。预习不足（${preScore}分），数据记录或计算存在明显问题。`;
             } else {
-                grade = "不及格";
-                gradeColor = "#d32f2f";
-                comment = `❌ 实验报告未达到基本要求！报告得分${totalScore}分。请重新认真学习实验原理，补充完整实验记录！`;
+                grade = "不及格"; gradeColor = "#d32f2f";
+                comment = `❌ 实验报告未达到基本要求！报告得分${totalScore}分。`;
             }
             
-            // 具体建议
-            let suggestions = [];
-            if (preScore < 70) suggestions.push("预习部分需要加强，请认真阅读实验原理");
-            if (usedReferenceData) suggestions.push("必须使用实际测量数据");
-            else if (dataScore < 15) suggestions.push("数据记录需要更加完整准确");
-            if (calculationScore < 10) suggestions.push("数据计算需要更精确，请检查计算过程");
-            if (thoughtScore < 60) suggestions.push("思考题回答需要更加充分详细");
-            if (summaryScore < 60) suggestions.push("实验小结需要更加详实，应包含实验收获、问题和改进建议");
-            if (chartScoreWeighted < 8) suggestions.push("请完成图表的绘制和分析");
-            
-            if (suggestions.length > 0) {
-                comment += ` 改进建议：${suggestions.join('；')}。`;
-            }
-            
-            // 显示详细分数分解
-            comment += ` 评分详情：${scoreBreakdown.join('，')}，总评：${grade}（${totalScore}分）。`;
-            
-            // 获取指导教师姓名和当前日期
-            const teacherName = document.getElementById('instructor').value || '未填写';
-            const currentDate = new Date().toLocaleDateString('zh-CN', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            
-            // 更新评语内容
+            const teacherName = document.getElementById('instructor').value || '马厂';
+            const currentDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
             document.getElementById('commentContent').innerHTML = comment;
             document.getElementById('commentContent').style.color = gradeColor;
             document.getElementById('teacherName').textContent = teacherName;
             document.getElementById('currentDate').textContent = currentDate;
             document.getElementById('commentFooter').style.display = 'block';
-            
-            // 显示提示
-            alert(`自动评分完成！\n报告得分: ${totalScore}分\n评分等级: ${grade}\n请查看下方详细评语。`);
         }
 
-        // 初始化页面
+        // 初始化
         window.onload = function() {
-            // 添加输入框变化监听
-            const dataInputs = document.querySelectorAll('.data-input');
-            dataInputs.forEach(input => {
-                input.addEventListener('change', function() {
-                    // 自动计算数据
-                    calculateData();
-                });
+            loadAllSavedData();
+            
+            document.addEventListener('input', function(e) {
+                if (e.target.matches('.info-input, .fill-blank, .data-input, .param-input, .thought-input, #summary')) {
+                    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+                    autoSaveTimer = setTimeout(() => saveAllData(), 1000);
+                }
+            });
+            setInterval(() => saveAllData(), 60000);
+            
+            document.querySelectorAll('.data-input, .param-input').forEach(input => {
+                input.addEventListener('change', () => calculateData());
             });
             
-            // 添加参数输入框变化监听
-            const paramInputs = document.querySelectorAll('.param-input');
-            paramInputs.forEach(input => {
-                input.addEventListener('change', function() {
-                    // 自动计算数据
-                    calculateData();
-                });
-            });
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('expDate');
+            if (dateInput && !dateInput.value) dateInput.value = today;
             
-            // 添加填空框变化监听
-            const fillBlanks = document.querySelectorAll('.fill-blank');
-            fillBlanks.forEach(input => {
-                input.addEventListener('change', function() {
-                    // 移除之前的样式
-                    this.classList.remove('correct', 'incorrect', 'empty');
-                    
-                    // 清空状态图标
-                    const statusIcon = this.nextElementSibling;
-                    if (statusIcon && statusIcon.classList.contains('answer-status')) {
-                        statusIcon.textContent = '';
-                        statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
-                    }
-                });
-            });
-            
-            // 初始化计算数据
             calculateData();
+            if (window.MathJax) MathJax.typesetPromise();
         };
     </script>
 </body>
-
 </html>
