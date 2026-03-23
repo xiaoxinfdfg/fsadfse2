@@ -437,7 +437,7 @@
             background-color: rgba(255, 235, 238, 0.3);
             font-weight: bold;
         }
-        /* 新增样式：填空题答案状态图标 */
+        /* 填空题答案状态图标 */
         .answer-status {
             display: inline-block;
             margin-left: 8px;
@@ -455,10 +455,86 @@
         .answer-status.empty-icon {
             color: #9e9e9e;
         }
-        /* 填空题容器 */
         .fill-blank-container {
             position: relative;
             display: inline-block;
+        }
+        /* 保存工具栏样式 */
+        .save-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .save-btn {
+            background: linear-gradient(to bottom, #6c5ce7, #5649c0);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .save-btn.danger {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+        }
+        .save-btn.success {
+            background: linear-gradient(to bottom, #27ae60, #229954);
+        }
+        .save-time {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-right: auto;
+            align-self: center;
+        }
+        .auto-save-indicator {
+            font-size: 12px;
+            color: #27ae60;
+            margin-right: 15px;
+            align-self: center;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        /* 评分详情样式 */
+        .score-details {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(52, 152, 219, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #3498db;
+        }
+        .score-details .score-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        .score-details .score-item:last-child {
+            border-bottom: none;
+        }
+        .score-details .score-item-name {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        .score-details .score-item-value {
+            color: #2e7d32;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -466,35 +542,46 @@
     <div class="container">
         <h1>气体比热容比的测定实验报告</h1>
         
+        <!-- 保存工具栏 -->
+        <div class="save-toolbar">
+            <div class="auto-save-indicator" id="autoSaveIndicator">⚡ 自动保存已开启</div>
+            <div class="save-time" id="lastSaveTime">上次保存：未保存</div>
+            <button class="save-btn" onclick="manualSave()">💾 手动保存</button>
+            <button class="save-btn" onclick="manualLoad()">📂 加载上次保存</button>
+            <button class="save-btn success" onclick="exportData()">📥 导出备份</button>
+            <button class="save-btn" onclick="importData()">📤 导入备份</button>
+            <button class="save-btn danger" onclick="clearSavedData()">🗑️ 清除数据</button>
+        </div>
+        
         <div class="basic-info">
             <table>
                 <tr>
                     <td>实验名称</td>
-                    <td><input type="text" class="info-input" placeholder="请输入实验名称" value="气体比热容比的测定"></td>
+                    <td><input type="text" class="info-input" id="expName" placeholder="实验名称" value="气体比热容比的测定"></td>
                     <td>实验时间</td>
-                    <td><input type="text" class="info-input" placeholder="请输入实验时间"></td>
+                    <td><input type="text" class="info-input" id="expDate" placeholder="实验时间"></td>
                 </tr>
                 <tr>
                     <td>专业</td>
-                    <td><input type="text" class="info-input" placeholder="请输入专业"></td>
+                    <td><input type="text" class="info-input" id="major" placeholder="专业"></td>
                     <td>实验地点</td>
-                    <td><input type="text" class="info-input" placeholder="请输入实验地点"></td>
+                    <td><input type="text" class="info-input" id="location" placeholder="实验地点"></td>
                 </tr>
                 <tr>
                     <td>班级</td>
-                    <td><input type="text" class="info-input" placeholder="请输入班级"></td>
+                    <td><input type="text" class="info-input" id="class" placeholder="班级"></td>
                     <td>指导教师</td>
-                    <td><input type="text" class="info-input" placeholder="请输入指导教师" value="马厂"></td>
+                    <td><input type="text" class="info-input" id="instructor" placeholder="指导教师" value="马厂"></td>
                 </tr>
                 <tr>
                     <td>学号</td>
-                    <td><input type="text" class="info-input" placeholder="请输入学号"></td>
+                    <td><input type="text" class="info-input" id="studentId" placeholder="学号"></td>
                     <td>同组人</td>
-                    <td><input type="text" class="info-input" placeholder="请输入同组人"></td>
+                    <td><input type="text" class="info-input" id="partner" placeholder="同组人"></td>
                 </tr>
                 <tr>
                     <td>姓名</td>
-                    <td><input type="text" class="info-input" placeholder="请输入姓名"></td>
+                    <td><input type="text" class="info-input" id="studentName" placeholder="姓名"></td>
                     <td></td>
                     <td></td>
                 </tr>
@@ -503,42 +590,42 @@
 
         <h2>一、实验目的</h2>
         <div class="question-item">
-            1. 了解<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="振动法" placeholder="请填写"><span class="answer-status"></span></span>测量气体比热容比的原理；
+            1. 了解<span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose1" data-answer="振动法" placeholder="请填写"><span class="answer-status"></span></span>测量气体比热容比的原理；
         </div>
         <div class="question-item">
-            2. 掌握<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="计时仪" placeholder="请填写"><span class="answer-status"></span></span>的使用方法。
+            2. 掌握<span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose2" data-answer="计时仪" placeholder="请填写"><span class="answer-status"></span></span>的使用方法。
         </div>
 
-       <h2>二、实验仪器</h2>
-<!-- 插入实验仪器图片 -->
-<img src="https://xiaoxinfdfg.github.io/fsadfse2/brrbtu1.png" 
-     alt="实验仪器示意图" 
-     class="apparatus-img"
-     style="max-width: 80%; margin: 20px auto; display: block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <h2>二、实验仪器</h2>
+        <img src="https://xiaoxinfdfg.github.io/fsadfse2/brrbtu1.png" 
+             alt="实验仪器示意图" 
+             class="apparatus-img"
+             style="max-width: 80%; margin: 20px auto; display: block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
         <div class="question-item">
-            1. <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="气泵" placeholder="请填写"><span class="answer-status"></span></span>
+            1. <span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument1" data-answer="气泵" placeholder="请填写"><span class="answer-status"></span></span>
         </div>
         <div class="question-item">
             2. 气量调节旋钮 3. 出气口 4. 橡皮管 5. 调节阀门 6. 储气瓶 I 7. 储气瓶 II 8. 水平调节螺钉
         </div>
         <div class="question-item">
-            9. 地板 10. 水准泡 11. <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="光电门" placeholder="请填写"><span class="answer-status"></span></span> 12. <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="钢球" placeholder="请填写"><span class="answer-status"></span></span> 13. 空芯玻璃管 14. 出气小孔 15. 计时仪
+            9. 地板 10. 水准泡 11. <span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument2" data-answer="光电门" placeholder="请填写"><span class="answer-status"></span></span> 12. <span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument3" data-answer="钢球" placeholder="请填写"><span class="answer-status"></span></span> 13. 空芯玻璃管 14. 出气小孔 15. 计时仪
         </div>
 
         <h2>三、实验原理</h2>
         <div class="experiment-content">
             <p>气体的比热容比<span class="formula">γ = C<sub>p</sub>/C<sub>V</sub></span>，在热力学过程特别是绝热过程中是一个很重要的参数，测定的方法有很多种。</p>
             <p>这里介绍一种通过测定物体在特定容器中的振动周期来计算γ值的方法。</p>
-            <p>振动钢球的直径比<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="玻璃管" placeholder="请填写"><span class="answer-status"></span></span>直径仅小0.01～0.02mm。它能在此精密的玻璃管中上下移动，在瓶子的壁上有一小口，并插入一根<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="细管" placeholder="请填写"><span class="answer-status"></span></span>，通过它各种气体可以注入玻璃瓶中。</p>
+            <p>振动钢球的直径比<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory1" data-answer="玻璃管" placeholder="请填写"><span class="answer-status"></span></span>直径仅小0.01～0.02mm。它能在此精密的玻璃管中上下移动，在瓶子的壁上有一小口，并插入一根<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory2" data-answer="细管" placeholder="请填写"><span class="answer-status"></span></span>，通过它各种气体可以注入玻璃瓶中。</p>
             <p>钢球 A 的质量为 m 、半径为 r （直径为 d ），当瓶子内压力 P 满足下面条件时，钢球处于平衡状态，这时</p>
             <p class="formula">P = P<sub>L</sub> + mg/(πr²)</p>
-            <p>式中P<sub>L</sub>为<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="大气压强" placeholder="请填写"><span class="answer-status"></span></span>。</p>
-            <p>为了补偿由于<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="空气阻尼" placeholder="请填写"><span class="answer-status"></span></span>引起振动钢球振幅的衰减，通过小口持续注入一股小气压的<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="气流" placeholder="请填写"><span class="answer-status"></span></span>，</p>
-            <p>振动钢球向上移动，而当钢球处于小孔上方的半个振动周期时，容器内的气体将通过小孔流出，钢球<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="下沉" placeholder="请填写"><span class="answer-status"></span></span>。</p>
-            <p>以后重复上述过程，只要适当控制注入气体的<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="流量" placeholder="请填写"><span class="answer-status"></span></span>，钢球便能在玻璃管的小孔上下做<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="简谐振动" placeholder="请填写"><span class="answer-status"></span></span>，振动周期可利用计时仪测得。</p>
+            <p>式中P<sub>L</sub>为<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory3" data-answer="大气压强" placeholder="请填写"><span class="answer-status"></span></span>。</p>
+            <p>为了补偿由于<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory4" data-answer="空气阻尼" placeholder="请填写"><span class="answer-status"></span></span>引起振动钢球振幅的衰减，通过小口持续注入一股小气压的<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory5" data-answer="气流" placeholder="请填写"><span class="answer-status"></span></span>，</p>
+            <p>振动钢球向上移动，而当钢球处于小孔上方的半个振动周期时，容器内的气体将通过小孔流出，钢球<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory6" data-answer="下沉" placeholder="请填写"><span class="answer-status"></span></span>。</p>
+            <p>以后重复上述过程，只要适当控制注入气体的<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory7" data-answer="流量" placeholder="请填写"><span class="answer-status"></span></span>，钢球便能在玻璃管的小孔上下做<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory8" data-answer="简谐振动" placeholder="请填写"><span class="answer-status"></span></span>，振动周期可利用计时仪测得。</p>
             <p>若钢球偏离平衡位置一个较小距离x，则容器内的压强变化为 ΔP，钢球的运动方程为：</p>
             <p class="formula">m d²x/dt² = πr²ΔP (1)</p>
-            <p>因为钢球振动过程相当快，所以可以视为<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="绝热过程" placeholder="请填写"><span class="answer-status"></span></span>，于是有：</p>
+            <p>因为钢球振动过程相当快，所以可以视为<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory9" data-answer="绝热过程" placeholder="请填写"><span class="answer-status"></span></span>，于是有：</p>
             <p class="formula">PV<sup>γ</sup> = 常数 (2)</p>
             <p>将（2）式求导，并将微分符号d换成改变量符号Δ得出：</p>
             <p class="formula">ΔP = -PγΔV/V, ΔV = πr²x (3)</p>
@@ -547,7 +634,7 @@
             <p>此式即为熟知的简谐振动方程，它的解为：</p>
             <p class="formula">ω = [π²r⁴Pγ/(mV)]<sup>1/2</sup>, γ = 64mV/(T²Pd⁴) (5)</p>
             <p>式中，各量均可方便测得，因而可算出γ值。由气体动理论可以知道，γ值与气体分子的自由度 f 有关。</p>
-            <p>单原子气体（如氩）只有 3 个平动自由度，双原子气体（如氢）除上述<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="3个" placeholder="请填写"><span class="answer-status"></span></span>平动自由度外还有<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="2个" placeholder="请填写"><span class="answer-status"></span></span>转动自由度。</p>
+            <p>单原子气体（如氩）只有 3 个平动自由度，双原子气体（如氢）除上述<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory10" data-answer="3个" placeholder="请填写"><span class="answer-status"></span></span>平动自由度外还有<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory11" data-answer="2个" placeholder="请填写"><span class="answer-status"></span></span>转动自由度。</p>
             <p>多原子气体，则具有 3 个平动自由度和 3 个转动自由度，比热容比γ与自由度 f 的关系为 <span class="formula">γ = (f+2)/f</span>。</p>
             <p>理论上得出：</p>
             <p>单原子气体（Ar、He）&nbsp;&nbsp; f = 3 &nbsp;&nbsp; γ = 1.67</p>
@@ -557,12 +644,12 @@
 
         <h2>四、实验内容</h2>
         <div class="experiment-content">
-            <p>1．将气泵、储气瓶用橡皮管连接好，装有钢球的玻璃管插入<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="球形储气瓶" placeholder="请填写"><span class="answer-status"></span></span>。将光电接收装置利用方形连接块固定在立杆上，固定位置于玻璃管的小孔附近。</p>
-            <p>2．调节底板上三个水平调节螺钉，使底板处于<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="水平" placeholder="请填写"><span class="answer-status"></span></span>状态。</p>
-            <p>3．接通气泵电源，缓慢调节气泵上的调节旋钮，数分钟后，待储气瓶内注入一定压强的气体后，玻璃管中的钢球离开<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="弹簧" placeholder="请填写"><span class="answer-status"></span></span>，向管的上方移动，此时应调节好进气的大小，使钢球在玻璃管中以小孔为中心上下振动。</p>
-            <p>4．接通计时仪的电源，并连接好光电接收装置与计时仪接口。打开计时仪，预置测量次数为 50 次。如需设置其他次数，可按"置数"键后，再按"上调"或"下调"键，调至所需次数，再按"置数"键确定。然后按"<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="执行" placeholder="请填写"><span class="answer-status"></span></span>"键，即开始计数（状态显示灯闪烁）。待状态显示灯停止闪烁，显示屏上显示的数字即为振动 50 次所需的时间。重复测量 5 次。</p>
-            <p>5．用螺旋测微计和物理天平分别测出钢球的直径 d 和质量 m ，其中直径重复测量<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="5" placeholder="请填写"><span class="answer-status"></span></span>次。相应结果记录表中。</p>
-            <p>6．实验结束后，应先<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="关闭" placeholder="请填写"><span class="answer-status"></span></span>气泵电源，再拆除连接管路。</p>
+            <p>1．将气泵、储气瓶用橡皮管连接好，装有钢球的玻璃管插入<span class="fill-blank-container"><input type="text" class="fill-blank" id="content1" data-answer="球形储气瓶" placeholder="请填写"><span class="answer-status"></span></span>。将光电接收装置利用方形连接块固定在立杆上，固定位置于玻璃管的小孔附近。</p>
+            <p>2．调节底板上三个水平调节螺钉，使底板处于<span class="fill-blank-container"><input type="text" class="fill-blank" id="content2" data-answer="水平" placeholder="请填写"><span class="answer-status"></span></span>状态。</p>
+            <p>3．接通气泵电源，缓慢调节气泵上的调节旋钮，数分钟后，待储气瓶内注入一定压强的气体后，玻璃管中的钢球离开<span class="fill-blank-container"><input type="text" class="fill-blank" id="content3" data-answer="弹簧" placeholder="请填写"><span class="answer-status"></span></span>，向管的上方移动，此时应调节好进气的大小，使钢球在玻璃管中以小孔为中心上下振动。</p>
+            <p>4．接通计时仪的电源，并连接好光电接收装置与计时仪接口。打开计时仪，预置测量次数为 50 次。如需设置其他次数，可按"置数"键后，再按"上调"或"下调"键，调至所需次数，再按"置数"键确定。然后按"<span class="fill-blank-container"><input type="text" class="fill-blank" id="content4" data-answer="执行" placeholder="请填写"><span class="answer-status"></span></span>"键，即开始计数（状态显示灯闪烁）。待状态显示灯停止闪烁，显示屏上显示的数字即为振动 50 次所需的时间。重复测量 5 次。</p>
+            <p>5．用螺旋测微计和物理天平分别测出钢球的直径 d 和质量 m ，其中直径重复测量<span class="fill-blank-container"><input type="text" class="fill-blank" id="content5" data-answer="5" placeholder="请填写"><span class="answer-status"></span></span>次。相应结果记录表中。</p>
+            <p>6．实验结束后，应先<span class="fill-blank-container"><input type="text" class="fill-blank" id="content6" data-answer="关闭" placeholder="请填写"><span class="answer-status"></span></span>气泵电源，再拆除连接管路。</p>
         </div>
 
         <h2>五、实验数据记录</h2>
@@ -576,7 +663,7 @@
         
         <div class="section-title">表1 振动周期测量 (N=50次)</div>
         <div class="scrollable-table">
-            <table>
+            <table id="table1">
                 <thead>
                     <tr>
                         <th>次数N</th>
@@ -610,7 +697,7 @@
         
         <div class="section-title">表2 钢球质量测量</div>
         <div class="scrollable-table">
-            <table>
+            <table id="table2">
                 <thead>
                     <tr>
                         <th>测量项</th>
@@ -642,7 +729,7 @@
         
         <div class="section-title">表3 钢球直径测量</div>
         <div class="scrollable-table">
-            <table>
+            <table id="table3">
                 <thead>
                     <tr>
                         <th>测量项</th>
@@ -673,7 +760,7 @@
         </div>
         
         <div class="section-title">表4 其他参数</div>
-        <table>
+        <table id="table4">
             <tr>
                 <th>参数</th>
                 <th>值</th>
@@ -754,11 +841,37 @@
             <div class="score-display" id="scoreDisplay"></div>
         </div>
 
-        <h2>十、自动评分并生成评语（温馨提醒：保存报告时，确保手机处于横屏状态）</h2>
+        <h2>十、自动评分并生成评语</h2>
         <div class="comment-section" id="commentSection">
             <div class="comment-title">实验评语</div>
             <div class="comment-content" id="commentContent">
                 <p style="text-align: center; color: #999;">点击"自动评分并生成评语"按钮生成实验评语和报告得分</p>
+            </div>
+            <div id="scoreDetails" class="score-details" style="display: none;">
+                <div class="score-item">
+                    <span class="score-item-name">预习填空（25%）</span>
+                    <span class="score-item-value" id="detailPreScore">0/25</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-item-name">数据记录（30%）</span>
+                    <span class="score-item-value" id="detailDataScore">0/30</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-item-name">数据处理与误差分析（20%）</span>
+                    <span class="score-item-value" id="detailCalcScore">0/20</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-item-name">思考题（15%）</span>
+                    <span class="score-item-value" id="detailThoughtScore">0/15</span>
+                </div>
+                <div class="score-item">
+                    <span class="score-item-name">实验小结（10%）</span>
+                    <span class="score-item-value" id="detailSummaryScore">0/10</span>
+                </div>
+                <div class="score-item" style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #3498db; font-size: 1.1em;">
+                    <span class="score-item-name" style="font-weight: bold;">总分</span>
+                    <span class="score-item-value" id="detailTotalScore" style="font-size: 1.2em; color: #2e7d32;">0/100</span>
+                </div>
             </div>
             <div class="comment-footer" id="commentFooter" style="display: none;">
                 <div>指导教师：<span id="teacherName"></span></div>
@@ -797,6 +910,229 @@
             "关闭": ["关闭", "切断", "断开"]
         };
 
+        // 自动保存定时器
+        let autoSaveTimer = null;
+        let lastSaveTime = null;
+
+        // ========== 保存功能 ==========
+        
+        // 加载所有保存的数据
+        function loadAllSavedData() {
+            try {
+                // 加载基本信息
+                document.querySelectorAll('.info-input').forEach(input => {
+                    const savedValue = localStorage.getItem(input.id);
+                    if (savedValue !== null) input.value = savedValue;
+                });
+                
+                // 加载填空题
+                document.querySelectorAll('.fill-blank').forEach(input => {
+                    const savedValue = localStorage.getItem(input.id);
+                    if (savedValue !== null) input.value = savedValue;
+                });
+                
+                // 加载数据表格输入框
+                document.querySelectorAll('.data-input').forEach(input => {
+                    const savedValue = localStorage.getItem(input.id);
+                    if (savedValue !== null) input.value = savedValue;
+                });
+                
+                // 加载思考题
+                document.querySelectorAll('.thought-input').forEach(input => {
+                    const savedValue = localStorage.getItem(input.id);
+                    if (savedValue !== null) input.value = savedValue;
+                });
+                
+                // 加载实验小结
+                const savedSummary = localStorage.getItem('summary');
+                if (savedSummary !== null) document.getElementById('summary').value = savedSummary;
+                
+                // 更新上次保存时间显示
+                const savedTime = localStorage.getItem('lastSaveTime');
+                if (savedTime) {
+                    lastSaveTime = new Date(parseInt(savedTime));
+                    updateLastSaveTime();
+                }
+                
+                console.log('数据加载完成');
+            } catch (e) {
+                console.error('加载数据失败:', e);
+            }
+        }
+
+        // 保存所有数据到localStorage
+        function saveAllData() {
+            try {
+                // 保存基本信息
+                document.querySelectorAll('.info-input').forEach(input => {
+                    localStorage.setItem(input.id, input.value);
+                });
+                
+                // 保存填空题
+                document.querySelectorAll('.fill-blank').forEach(input => {
+                    localStorage.setItem(input.id, input.value);
+                });
+                
+                // 保存数据表格
+                document.querySelectorAll('.data-input').forEach(input => {
+                    localStorage.setItem(input.id, input.value);
+                });
+                
+                // 保存思考题
+                document.querySelectorAll('.thought-input').forEach(input => {
+                    localStorage.setItem(input.id, input.value);
+                });
+                
+                // 保存实验小结
+                localStorage.setItem('summary', document.getElementById('summary').value);
+                
+                // 保存时间戳
+                lastSaveTime = new Date();
+                localStorage.setItem('lastSaveTime', lastSaveTime.getTime().toString());
+                updateLastSaveTime();
+                
+                console.log('数据保存成功');
+                return true;
+            } catch (e) {
+                console.error('保存数据失败:', e);
+                return false;
+            }
+        }
+
+        // 更新上次保存时间显示
+        function updateLastSaveTime() {
+            if (lastSaveTime) {
+                const timeStr = lastSaveTime.toLocaleTimeString();
+                document.getElementById('lastSaveTime').textContent = `上次保存：${timeStr}`;
+            }
+        }
+
+        // 手动保存
+        function manualSave() {
+            if (saveAllData()) {
+                alert('✅ 数据已成功保存到本地！');
+            } else {
+                alert('❌ 保存失败，请重试');
+            }
+        }
+
+        // 手动加载
+        function manualLoad() {
+            loadAllSavedData();
+            // 重新计算
+            calculateData();
+            calculateGamma();
+            updateAllAnswerStatusIcons();
+            alert('📂 已加载上次保存的数据！');
+        }
+
+        // 清除保存的数据
+        function clearSavedData() {
+            if (confirm('⚠️ 确定要清除所有已保存的数据吗？\n\n这将删除所有本地存储的实验数据，但不会清空当前页面填写的内容。')) {
+                localStorage.clear();
+                lastSaveTime = null;
+                document.getElementById('lastSaveTime').textContent = '上次保存：未保存';
+                alert('🗑️ 已清除所有保存的数据');
+            }
+        }
+
+        // 导出数据为JSON文件
+        function exportData() {
+            const data = {
+                info: {},
+                fillBlanks: {},
+                dataInputs: {},
+                thoughts: {},
+                summary: document.getElementById('summary').value,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            // 收集所有输入数据
+            document.querySelectorAll('.info-input').forEach(input => {
+                data.info[input.id] = input.value;
+            });
+            
+            document.querySelectorAll('.fill-blank').forEach(input => {
+                data.fillBlanks[input.id] = input.value;
+            });
+            
+            document.querySelectorAll('.data-input').forEach(input => {
+                data.dataInputs[input.id] = input.value;
+            });
+            
+            document.querySelectorAll('.thought-input').forEach(input => {
+                data.thoughts[input.id] = input.value;
+            });
+            
+            // 创建下载链接
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const dateStr = new Date().toLocaleDateString().replace(/\//g, '-');
+            a.download = `比热容比实验_${dateStr}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('📥 数据已导出为JSON文件');
+        }
+
+        // 导入数据
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        // 恢复基本信息
+                        Object.entries(data.info || {}).forEach(([id, value]) => {
+                            const inputEl = document.getElementById(id);
+                            if (inputEl) inputEl.value = value;
+                        });
+                        
+                        // 恢复填空题
+                        Object.entries(data.fillBlanks || {}).forEach(([id, value]) => {
+                            const inputEl = document.getElementById(id);
+                            if (inputEl) inputEl.value = value;
+                        });
+                        
+                        // 恢复数据表格
+                        Object.entries(data.dataInputs || {}).forEach(([id, value]) => {
+                            const inputEl = document.getElementById(id);
+                            if (inputEl) inputEl.value = value;
+                        });
+                        
+                        // 恢复思考题
+                        Object.entries(data.thoughts || {}).forEach(([id, value]) => {
+                            const inputEl = document.getElementById(id);
+                            if (inputEl) inputEl.value = value;
+                        });
+                        
+                        // 恢复实验小结
+                        if (data.summary) document.getElementById('summary').value = data.summary;
+                        
+                        // 重新计算
+                        calculateData();
+                        calculateGamma();
+                        updateAllAnswerStatusIcons();
+                        
+                        alert('✅ 数据导入成功！');
+                    } catch (error) {
+                        console.error(error);
+                        alert('❌ 文件格式错误，导入失败');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
         // 思考题参考答案显示/隐藏
         function toggleAnswer(questionNum) {
             const answerDiv = document.getElementById(`answer${questionNum}`);
@@ -815,10 +1151,8 @@
         function updateAnswerStatusIcon(inputElement, status) {
             const statusIcon = inputElement.nextElementSibling;
             if (statusIcon && statusIcon.classList.contains('answer-status')) {
-                // 清除之前的样式
                 statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
                 
-                // 设置新样式和图标
                 if (status === 'correct') {
                     statusIcon.textContent = '✓';
                     statusIcon.classList.add('correct-icon');
@@ -844,20 +1178,9 @@
                 if (userAnswer === '') {
                     updateAnswerStatusIcon(input, 'empty');
                 } else if (correctAnswers && correctAnswers.some(ans => {
-                    // 处理特殊符号和大小写
-                    const userAns = userAnswer.toLowerCase()
-                        .replace(/×/g, '*')
-                        .replace(/÷/g, '/')
-                        .replace(/\s+/g, '');
-                    const correctAns = ans.toLowerCase()
-                        .replace(/×/g, '*')
-                        .replace(/÷/g, '/')
-                        .replace(/\s+/g, '');
-                    
-                    // 允许部分匹配
-                    return userAns === correctAns || 
-                           userAns.includes(correctAns) || 
-                           correctAns.includes(userAns);
+                    const userAns = userAnswer.toLowerCase().replace(/\s+/g, '');
+                    const correctAns = ans.toLowerCase().replace(/\s+/g, '');
+                    return userAns === correctAns || userAns.includes(correctAns) || correctAns.includes(userAns);
                 })) {
                     updateAnswerStatusIcon(input, 'correct');
                 } else {
@@ -886,14 +1209,16 @@
             document.getElementById('T_avg').textContent = T_avg.toFixed(4);
             
             // 计算UA(T) - A类不确定度
-            const T_variance = TValues.reduce((sum, val) => sum + Math.pow(val - T_avg, 2), 0) / (TValues.length - 1);
-            const UA_T = Math.sqrt(T_variance) / Math.sqrt(TValues.length);
-            document.getElementById('UA_T').textContent = UA_T.toFixed(6);
-            
-            // 计算U(T) - B类不确定度固定为0.00577
-            const UB_T = 0.00577;
-            const U_T = Math.sqrt(UA_T * UA_T + UB_T * UB_T);
-            document.getElementById('U_T').textContent = U_T.toFixed(6);
+            if (t1 > 0 && t2 > 0 && t3 > 0 && t4 > 0 && t5 > 0) {
+                const T_variance = TValues.reduce((sum, val) => sum + Math.pow(val - T_avg, 2), 0) / (TValues.length - 1);
+                const UA_T = Math.sqrt(T_variance) / Math.sqrt(TValues.length);
+                document.getElementById('UA_T').textContent = UA_T.toFixed(6);
+                
+                // 计算U(T) - B类不确定度固定为0.00577
+                const UB_T = 0.00577;
+                const U_T = Math.sqrt(UA_T * UA_T + UB_T * UB_T);
+                document.getElementById('U_T').textContent = U_T.toFixed(6);
+            }
             
             // 获取钢球质量数据
             const m1 = parseFloat(document.getElementById('m1').value) || 0;
@@ -909,14 +1234,16 @@
             document.getElementById('m_avg').textContent = m_avg.toFixed(3);
             
             // 计算UA(m)
-            const m_variance = mValues.reduce((sum, val) => sum + Math.pow(val - m_avg, 2), 0) / (mValues.length - 1);
-            const UA_m = Math.sqrt(m_variance) / Math.sqrt(mValues.length);
-            document.getElementById('UA_m').textContent = UA_m.toFixed(6);
-            
-            // 计算U(m) - B类不确定度固定为0.000577
-            const UB_m = 0.000577;
-            const U_m = Math.sqrt(UA_m * UA_m + UB_m * UB_m);
-            document.getElementById('U_m').textContent = U_m.toFixed(6);
+            if (m1 > 0 && m2 > 0 && m3 > 0 && m4 > 0 && m5 > 0) {
+                const m_variance = mValues.reduce((sum, val) => sum + Math.pow(val - m_avg, 2), 0) / (mValues.length - 1);
+                const UA_m = Math.sqrt(m_variance) / Math.sqrt(mValues.length);
+                document.getElementById('UA_m').textContent = UA_m.toFixed(6);
+                
+                // 计算U(m) - B类不确定度固定为0.000577
+                const UB_m = 0.000577;
+                const U_m = Math.sqrt(UA_m * UA_m + UB_m * UB_m);
+                document.getElementById('U_m').textContent = U_m.toFixed(6);
+            }
             
             // 获取钢球直径数据
             const d1 = parseFloat(document.getElementById('d1').value) || 0;
@@ -932,26 +1259,30 @@
             document.getElementById('d_avg').textContent = d_avg_mm.toFixed(3);
             
             // 计算UA(d)
-            const d_variance = dValues.reduce((sum, val) => sum + Math.pow(val - d_avg_mm, 2), 0) / (dValues.length - 1);
-            const UA_d = Math.sqrt(d_variance) / Math.sqrt(dValues.length);
-            document.getElementById('UA_d').textContent = UA_d.toFixed(6);
-            
-            // 计算U(d) - B类不确定度固定为0.00577
-            const UB_d = 0.00577;
-            const U_d = Math.sqrt(UA_d * UA_d + UB_d * UB_d);
-            document.getElementById('U_d').textContent = U_d.toFixed(6);
+            if (d1 > 0 && d2 > 0 && d3 > 0 && d4 > 0 && d5 > 0) {
+                const d_variance = dValues.reduce((sum, val) => sum + Math.pow(val - d_avg_mm, 2), 0) / (dValues.length - 1);
+                const UA_d = Math.sqrt(d_variance) / Math.sqrt(dValues.length);
+                document.getElementById('UA_d').textContent = UA_d.toFixed(6);
+                
+                // 计算U(d) - B类不确定度固定为0.00577
+                const UB_d = 0.00577;
+                const U_d = Math.sqrt(UA_d * UA_d + UB_d * UB_d);
+                document.getElementById('U_d').textContent = U_d.toFixed(6);
+            }
             
             // 获取其他参数
             const V = parseFloat(document.getElementById('V').value) || 0;
             const PL = parseFloat(document.getElementById('PL').value) || 0;
             
             // 计算瓶内气压P = PL + mg/(πr²)
-            const m = m_avg / 1000; // 转换为kg
-            const d = d_avg_mm / 1000; // 转换为m
-            const r = d / 2;
-            const g = 9.8;
-            const P = PL + (m * g) / (Math.PI * r * r);
-            document.getElementById('P').textContent = P.toFixed(2);
+            if (m_avg > 0 && d_avg_mm > 0 && PL > 0) {
+                const m = m_avg / 1000; // 转换为kg
+                const d = d_avg_mm / 1000; // 转换为m
+                const r = d / 2;
+                const g = 9.8;
+                const P = PL + (m * g) / (Math.PI * r * r);
+                document.getElementById('P').textContent = P.toFixed(2);
+            }
             
             alert("实验数据计算完成！包含不确定度计算。");
         }
@@ -983,16 +1314,18 @@
             const U_d = parseFloat(document.getElementById('U_d').textContent) / 1000 || 0; // m
             
             // 计算相对不确定度
-            // u(γ)/γ = sqrt((u(m)/m)² + 4*(u(T)/T)² + 16*(u(d)/d)²)
-            const relative_m = U_m / m;
-            const relative_T = U_T / T_avg;
-            const relative_d = U_d / d;
-            
-            const gamma_relative_uncertainty = Math.sqrt(
-                relative_m * relative_m + 
-                4 * relative_T * relative_T + 
-                16 * relative_d * relative_d
-            );
+            let gamma_relative_uncertainty = 0;
+            if (m > 0 && T_avg > 0 && d > 0) {
+                const relative_m = U_m / m;
+                const relative_T = U_T / T_avg;
+                const relative_d = U_d / d;
+                
+                gamma_relative_uncertainty = Math.sqrt(
+                    relative_m * relative_m + 
+                    4 * relative_T * relative_T + 
+                    16 * relative_d * relative_d
+                );
+            }
             
             // 计算不确定度 u(γ) = γ * (u(γ)/γ)
             const gamma_uncertainty = gamma * gamma_relative_uncertainty;
@@ -1011,7 +1344,7 @@
             alert("比热容比计算完成！包含不确定度和相对误差计算。");
         }
 
-        // 计算预习分数（包含图标更新）
+        // 计算预习分数
         function calculatePreScore() {
             const inputs = document.querySelectorAll('.fill-blank');
             let correct = 0;
@@ -1022,45 +1355,28 @@
                 const userAnswer = input.value.trim();
                 const correctAnswers = answers[input.dataset.answer];
                 
-                // 清除之前的样式
                 input.classList.remove('correct', 'incorrect', 'empty');
                 
                 if (userAnswer === '') {
-                    // 未填写的情况
                     emptyCount++;
                     input.classList.add('empty');
                     updateAnswerStatusIcon(input, 'empty');
                 } else if (correctAnswers && correctAnswers.some(ans => {
-                    // 处理特殊符号和大小写
-                    const userAns = userAnswer.toLowerCase()
-                        .replace(/×/g, '*')
-                        .replace(/÷/g, '/')
-                        .replace(/\s+/g, '');
-                    const correctAns = ans.toLowerCase()
-                        .replace(/×/g, '*')
-                        .replace(/÷/g, '/')
-                        .replace(/\s+/g, '');
-                    
-                    // 允许部分匹配
-                    return userAns === correctAns || 
-                           userAns.includes(correctAns) || 
-                           correctAns.includes(userAns);
+                    const userAns = userAnswer.toLowerCase().replace(/\s+/g, '');
+                    const correctAns = ans.toLowerCase().replace(/\s+/g, '');
+                    return userAns === correctAns || userAns.includes(correctAns) || correctAns.includes(userAns);
                 })) {
-                    // 回答正确
                     correct++;
                     input.classList.add('correct');
                     updateAnswerStatusIcon(input, 'correct');
                 } else {
-                    // 回答错误
                     input.classList.add('incorrect');
                     updateAnswerStatusIcon(input, 'incorrect');
                 }
             });
 
-            // 计算分数，未答题不计入正确
             const score = Math.round((correct / total) * 100);
             
-            // 显示结果
             let scoreText = `预习分数：${score}分（答对${correct}/${total}题）`;
             if (emptyCount > 0) {
                 scoreText += `，未答：${emptyCount}题`;
@@ -1075,7 +1391,7 @@
             return {score, correct, total, emptyCount};
         }
 
-        // 自动评分并生成评语 - 根据新的评分标准（包含相对误差）
+        // 自动评分并生成评语
         function autoGrade() {
             const preScoreResult = calculatePreScore();
             const preScore = preScoreResult.score;
@@ -1088,26 +1404,22 @@
             const gammaValue = parseFloat(document.getElementById('gamma_avg').textContent) || 0;
             const relativeError = parseFloat(document.getElementById('relative_error').textContent) || 100;
             
-            // 计算综合分数（根据新的评分标准）
+            // 计算综合分数
             let totalScore = 0;
-            let scoreBreakdown = [];
             
             // 1. 预习填空（25%）
             const preScoreWeighted = Math.round(preScore * 0.25);
             totalScore += preScoreWeighted;
-            scoreBreakdown.push(`预习填空：${preScore}×25%=${preScoreWeighted}`);
+            document.getElementById('detailPreScore').textContent = `${preScoreWeighted}/25`;
             
-            // 2. 数据记录与不确定度计算（30%）
+            // 2. 数据记录（30%）
             let dataScore = 0;
-            
-            // 计算数据完整性分数
-            let dataCompleteness = 0;
             const dataInputs = document.querySelectorAll('.data-input');
             let filledCount = 0;
             dataInputs.forEach(input => {
                 if (input.value.trim() !== '') filledCount++;
             });
-            dataCompleteness = Math.round((filledCount / dataInputs.length) * 100);
+            const dataCompleteness = Math.round((filledCount / dataInputs.length) * 100);
             
             // 检查不确定度计算是否完成
             let uncertaintyQuality = 0;
@@ -1126,14 +1438,35 @@
             
             dataScore = Math.round((dataCompleteness * 0.6 + uncertaintyQuality * 0.4) * 0.30);
             totalScore += dataScore;
-            scoreBreakdown.push(`数据完整性与合理性：(${dataCompleteness}×60%+${uncertaintyQuality}×40%) × 0.30=${dataScore}`);
+            document.getElementById('detailDataScore').textContent = `${dataScore}/30`;
             
-            // 3. 思考题（15%）
+            // 3. 数据处理与误差分析（20%）
+            let calculationScore = 0;
+            const gammaAvg = document.getElementById('gamma_avg').textContent;
+            const gammaResult = document.getElementById('gamma_result').textContent;
+            const relativeErrorElem = document.getElementById('relative_error').textContent;
+            
+            if (gammaAvg !== "-" && gammaResult !== "-" && relativeErrorElem !== "-") {
+                if (relativeError < 5) calculationScore = 100;
+                else if (relativeError < 10) calculationScore = 90;
+                else if (relativeError < 15) calculationScore = 80;
+                else if (relativeError < 20) calculationScore = 70;
+                else if (relativeError < 30) calculationScore = 60;
+                else calculationScore = 40;
+            } else if (gammaAvg !== "-" || gammaResult !== "-") {
+                calculationScore = 30;
+            }
+            
+            const calculationScoreWeighted = Math.round(calculationScore * 0.20);
+            totalScore += calculationScoreWeighted;
+            document.getElementById('detailCalcScore').textContent = `${calculationScoreWeighted}/20`;
+            
+            // 4. 思考题（15%）
             let thoughtScore = 0;
+            const thoughtAnswers = [thought1, thought2, thought3];
             let thoughtFilled = 0;
             let thoughtTotalLength = 0;
             
-            const thoughtAnswers = [thought1, thought2, thought3];
             thoughtAnswers.forEach(answer => {
                 if (answer !== '') {
                     thoughtFilled++;
@@ -1141,7 +1474,6 @@
                 }
             });
             
-            // 根据填写情况和内容质量评分
             const fillRate = thoughtFilled / thoughtAnswers.length;
             const avgLength = thoughtFilled > 0 ? thoughtTotalLength / thoughtFilled : 0;
             
@@ -1154,38 +1486,12 @@
             
             const thoughtScoreWeighted = Math.round(thoughtScore * 0.15);
             totalScore += thoughtScoreWeighted;
-            scoreBreakdown.push(`思考题：${thoughtScore}×15%=${thoughtScoreWeighted}`);
-            
-            // 4. 数据处理与相对误差（20%）
-            let calculationScore = 0;
-            const gammaAvg = document.getElementById('gamma_avg').textContent;
-            const gammaResult = document.getElementById('gamma_result').textContent;
-            const relativeErrorElem = document.getElementById('relative_error').textContent;
-            
-            if (gammaAvg !== "-" && gammaResult !== "-" && relativeErrorElem !== "-") {
-                // 基础分
-                calculationScore = 60;
-                
-                // 根据相对误差加分
-                if (relativeError < 5) calculationScore = 100;
-                else if (relativeError < 10) calculationScore = 90;
-                else if (relativeError < 15) calculationScore = 80;
-                else if (relativeError < 20) calculationScore = 70;
-                else if (relativeError < 30) calculationScore = 60;
-                else calculationScore = 40;
-            } else if (gammaAvg !== "-" || gammaResult !== "-") {
-                calculationScore = 30; // 部分完成
-            }
-            
-            const calculationScoreWeighted = Math.round(calculationScore * 0.20);
-            totalScore += calculationScoreWeighted;
-            scoreBreakdown.push(`数据处理：${calculationScore}×20%=${calculationScoreWeighted}`);
+            document.getElementById('detailThoughtScore').textContent = `${thoughtScoreWeighted}/15`;
             
             // 5. 实验小结（10%）
             let summaryScore = 0;
             const summaryLength = summary.length;
-            // 检查关键词数量
-            const keywords = ['实验', '收获', '问题', '解决', '改进', '建议', '理解', '掌握', '学会', '操作', '误差', '分析', '不确定度'];
+            const keywords = ['实验', '收获', '问题', '解决', '改进', '建议', '理解', '掌握', '学会', '操作', '误差', '分析', '不确定度', '比热容比'];
             let keywordCount = 0;
             keywords.forEach(keyword => {
                 if (summary.includes(keyword)) keywordCount++;
@@ -1200,14 +1506,16 @@
             
             const summaryScoreWeighted = Math.round(summaryScore * 0.10);
             totalScore += summaryScoreWeighted;
-            scoreBreakdown.push(`实验小结：${summaryScore}×10%=${summaryScoreWeighted}`);
+            document.getElementById('detailSummaryScore').textContent = `${summaryScoreWeighted}/10`;
+            
+            document.getElementById('detailTotalScore').textContent = `${totalScore}/100`;
+            document.getElementById('scoreDetails').style.display = 'block';
             
             // 生成评语
             let comment = "";
             let grade = "不及格";
             let gradeColor = "#c62828";
             
-            // 检查相对误差
             let errorComment = "";
             if (relativeErrorElem !== "-") {
                 const errorValue = parseFloat(relativeErrorElem);
@@ -1240,7 +1548,6 @@
                 comment = `❌ 实验报告未达到基本要求！报告得分${totalScore}分。请重新认真学习实验原理，补充完整实验记录！${errorComment}`;
             }
             
-            // 具体建议
             let suggestions = [];
             if (preScore < 70) suggestions.push("预习部分需要加强，请认真阅读实验原理");
             if (dataScore < 20) suggestions.push("数据记录需要更加完整准确，不确定度计算需完善");
@@ -1252,25 +1559,21 @@
                 comment += ` 改进建议：${suggestions.join('；')}。`;
             }
             
-            // 显示详细分数分解
-            comment += ` 评分详情：${scoreBreakdown.join('，')}，总评：${grade}（${totalScore}分）。`;
+            comment += ` 总评：${grade}（${totalScore}分）。`;
             
-            // 获取指导教师姓名和当前日期
-            const teacherName = document.querySelector('.info-input[placeholder="请输入指导教师"]').value || '未填写';
+            const teacherName = document.getElementById('instructor').value || '马厂';
             const currentDate = new Date().toLocaleDateString('zh-CN', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
             
-            // 更新评语内容
             document.getElementById('commentContent').innerHTML = comment;
             document.getElementById('commentContent').style.color = gradeColor;
             document.getElementById('teacherName').textContent = teacherName;
             document.getElementById('currentDate').textContent = currentDate;
             document.getElementById('commentFooter').style.display = 'block';
             
-            // 使用MathJax重新渲染公式
             if (window.MathJax) {
                 MathJax.typesetPromise();
             }
@@ -1278,22 +1581,35 @@
 
         // 初始化页面
         window.onload = function() {
-            // 添加输入框变化监听
-            const dataInputs = document.querySelectorAll('.data-input');
-            dataInputs.forEach(input => {
+            // 加载保存的数据
+            loadAllSavedData();
+            
+            // 添加输入监听，实时保存
+            document.addEventListener('input', function(e) {
+                if (e.target.matches('.info-input, .fill-blank, .data-input, .thought-input, #summary')) {
+                    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+                    autoSaveTimer = setTimeout(() => {
+                        saveAllData();
+                    }, 1000);
+                }
+            });
+            
+            // 定时自动保存（每60秒）
+            setInterval(() => {
+                saveAllData();
+            }, 60000);
+            
+            // 表格输入监听
+            document.querySelectorAll('.data-input').forEach(input => {
                 input.addEventListener('change', function() {
-                    calculateData();
+                    setTimeout(calculateData, 100);
                 });
             });
             
-            // 添加填空框变化监听
-            const fillBlanks = document.querySelectorAll('.fill-blank');
-            fillBlanks.forEach(input => {
+            // 填空框监听
+            document.querySelectorAll('.fill-blank').forEach(input => {
                 input.addEventListener('change', function() {
-                    // 移除之前的样式
                     this.classList.remove('correct', 'incorrect', 'empty');
-                    
-                    // 清空状态图标
                     const statusIcon = this.nextElementSibling;
                     if (statusIcon && statusIcon.classList.contains('answer-status')) {
                         statusIcon.textContent = '';
@@ -1302,19 +1618,17 @@
                 });
             });
             
-            // 初始化MathJax
-            if (window.MathJax) {
-                MathJax.typesetPromise();
-            }
-            
-            // 设置当前日期
+            // 设置默认日期
             const today = new Date();
-            const dateInput = document.querySelector('.info-input[placeholder="请输入实验时间"]');
+            const dateInput = document.getElementById('expDate');
             if (dateInput && !dateInput.value) {
                 dateInput.value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            }
+            
+            if (window.MathJax) {
+                MathJax.typesetPromise();
             }
         };
     </script>
 </body>
-
 </html>
