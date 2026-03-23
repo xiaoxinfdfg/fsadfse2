@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>冷却法测金属的比热容实验报告</title>
+    <title>冷却法测金属的比热容实验报告（带保存功能）</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -379,7 +379,6 @@
             border-radius: 4px;
             font-size: 14px;
             color: #2e7d32;
-            /* 防止文本选择和复制 */
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -400,7 +399,6 @@
         .thought-answer-btn:hover {
             transform: translateY(-1px);
         }
-        /* 新增样式：思考题回答框 */
         .thought-input {
             width: 100%;
             min-height: 80px;
@@ -419,7 +417,6 @@
             border-color: #3498db;
             box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
         }
-        /* 新增样式：填空题答案状态图标 */
         .answer-status {
             display: inline-block;
             margin-left: 8px;
@@ -437,12 +434,10 @@
         .answer-status.empty-icon {
             color: #9e9e9e;
         }
-        /* 填空题容器 */
         .fill-blank-container {
             position: relative;
             display: inline-block;
         }
-        /* 新增样式：温度曲线图表容器 */
         .temperature-chart-container {
             width: 90%;
             margin: 30px auto;
@@ -451,7 +446,6 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
-        /* 新增样式：结果对比表格 */
         .result-comparison {
             width: 100%;
             margin: 20px 0;
@@ -469,7 +463,6 @@
         .result-comparison .highlight {
             background-color: rgba(52, 152, 219, 0.1);
         }
-        /* 新增：评分详情样式 */
         .score-details {
             margin-top: 15px;
             padding: 10px;
@@ -495,41 +488,104 @@
             color: #2e7d32;
             font-weight: bold;
         }
+        
+        /* 新增：保存工具栏样式 */
+        .save-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .save-btn {
+            background: linear-gradient(to bottom, #6c5ce7, #5649c0);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .save-btn.danger {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+        }
+        .save-btn.success {
+            background: linear-gradient(to bottom, #27ae60, #229954);
+        }
+        .save-time {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-right: auto;
+            align-self: center;
+        }
+        .auto-save-indicator {
+            font-size: 12px;
+            color: #27ae60;
+            margin-right: 15px;
+            align-self: center;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>冷却法测金属的比热容实验报告</h1>
         
+        <!-- 新增：保存工具栏 -->
+        <div class="save-toolbar">
+            <div class="auto-save-indicator" id="autoSaveIndicator">⚡ 自动保存已开启</div>
+            <div class="save-time" id="lastSaveTime">上次保存：未保存</div>
+            <button class="save-btn" onclick="manualSave()">💾 手动保存</button>
+            <button class="save-btn" onclick="manualLoad()">📂 加载上次保存</button>
+            <button class="save-btn success" onclick="exportData()">📥 导出备份</button>
+            <button class="save-btn" onclick="importData()">📤 导入备份</button>
+            <button class="save-btn danger" onclick="clearSavedData()">🗑️ 清除数据</button>
+        </div>
+        
         <div class="basic-info">
             <table>
                 <tr>
                     <td>实验名称</td>
-                    <td><input type="text" class="info-input" placeholder="请输入实验名称" value="冷却法测金属的比热容"></td>
+                    <td><input type="text" class="info-input" id="experimentName" placeholder="实验名称" value="冷却法测金属的比热容"></td>
                     <td>实验时间</td>
-                    <td><input type="text" class="info-input" placeholder="请输入实验时间"></td>
+                    <td><input type="text" class="info-input" id="experimentDate" placeholder="实验时间"></td>
                 </tr>
                 <tr>
                     <td>专业</td>
-                    <td><input type="text" class="info-input" placeholder="请输入专业"></td>
+                    <td><input type="text" class="info-input" id="major" placeholder="专业"></td>
                     <td>实验地点</td>
-                    <td><input type="text" class="info-input" placeholder="请输入实验地点"></td>
+                    <td><input type="text" class="info-input" id="location" placeholder="实验地点"></td>
                 </tr>
                 <tr>
                     <td>班级</td>
-                    <td><input type="text" class="info-input" placeholder="请输入班级"></td>
+                    <td><input type="text" class="info-input" id="class" placeholder="班级"></td>
                     <td>指导教师</td>
-                    <td><input type="text" class="info-input" placeholder="请输入指导教师" value="马厂"></td>
+                    <td><input type="text" class="info-input" id="instructor" placeholder="指导教师" value="马厂"></td>
                 </tr>
                 <tr>
                     <td>学号</td>
-                    <td><input type="text" class="info-input" placeholder="请输入学号"></td>
+                    <td><input type="text" class="info-input" id="studentId" placeholder="学号"></td>
                     <td>同组人</td>
-                    <td><input type="text" class="info-input" placeholder="请输入同组人"></td>
+                    <td><input type="text" class="info-input" id="partner" placeholder="同组人"></td>
                 </tr>
                 <tr>
                     <td>姓名</td>
-                    <td><input type="text" class="info-input" placeholder="请输入姓名"></td>
+                    <td><input type="text" class="info-input" id="studentName" placeholder="姓名"></td>
                     <td></td>
                     <td></td>
                 </tr>
@@ -538,23 +594,18 @@
 
         <h2>一、实验目的</h2>
         <div class="question-item">
-            1．学会使用 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="PT100铂电阻" placeholder="请填写"><span class="answer-status"></span></span> 测量物体的温度；
+            1．学会使用 <span class="fill-blank-container"><input type="text" class="fill-blank" id="aim1" data-answer="PT100铂电阻" placeholder="请填写"><span class="answer-status"></span></span> 测量物体的温度；
         </div>
         <div class="question-item">
-            2．在 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="强制对流冷却" placeholder="请填写"><span class="answer-status"></span></span> 的环境下测量铁、铝样品在 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="100" placeholder="请填写"><span class="answer-status"></span></span>℃时的比热容；
+            2．在 <span class="fill-blank-container"><input type="text" class="fill-blank" id="aim2" data-answer="强制对流冷却" placeholder="请填写"><span class="answer-status"></span></span> 的环境下测量铁、铝样品在 <span class="fill-blank-container"><input type="text" class="fill-blank" id="aim3" data-answer="100" placeholder="请填写"><span class="answer-status"></span></span>℃时的比热容；
         </div>
         <div class="question-item">
-            3．在 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="自然冷却" placeholder="请填写"><span class="answer-status"></span></span> 的环境下测量铁、铝样品在 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="100" placeholder="请填写"><span class="answer-status"></span></span>℃时的比热容。
+            3．在 <span class="fill-blank-container"><input type="text" class="fill-blank" id="aim4" data-answer="自然冷却" placeholder="请填写"><span class="answer-status"></span></span> 的环境下测量铁、铝样品在 <span class="fill-blank-container"><input type="text" class="fill-blank" id="aim5" data-answer="100" placeholder="请填写"><span class="answer-status"></span></span>℃时的比热容。
         </div>
 
         <h2>二、实验仪器</h2>
-<!-- 插入实验仪器图片 -->
-<img src="https://xiaoxinfdfg.github.io/fsadfse2/jsrrtu1.png" 
-     alt="实验仪器示意图" 
-     class="apparatus-img"
-     style="max-width: 80%; margin: 20px auto; display: block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
         <div class="question-item">
-            本实验仪主要由实验主机、<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="加热器" placeholder="请填写"><span class="answer-status"></span></span>、样品室、<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="风扇" placeholder="请填写"><span class="answer-status"></span></span>、PT100 铂电阻等组成。
+            本实验仪主要由实验主机、<span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument1" data-answer="加热器" placeholder="请填写"><span class="answer-status"></span></span>、样品室、<span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument2" data-answer="风扇" placeholder="请填写"><span class="answer-status"></span></span>、PT100 铂电阻等组成。
         </div>
 
         <h2>三、实验原理</h2>
@@ -562,57 +613,57 @@
             1．PT100 铂电阻
         </div>
         <div class="question-item">
-            导体的电阻值随温度变化而变化，通过测量其电阻值可推算出被测物体的温度。PT100 铂电阻就是利用铂电阻的阻值随温度变化而变化这一特性来进行测温的。在 0℃时，PT100 铂电阻的阻值为 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="100" placeholder="请填写"><span class="answer-status"></span></span>Ω，它的阻值会随着温度上升而呈近似匀速增长，但它们之间的关系并不是简单的线性关系，而更趋近于一条 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="抛物线" placeholder="请填写"><span class="answer-status"></span></span>。
+            导体的电阻值随温度变化而变化，通过测量其电阻值可推算出被测物体的温度。PT100 铂电阻就是利用铂电阻的阻值随温度变化而变化这一特性来进行测温的。在 0℃时，PT100 铂电阻的阻值为 <span class="fill-blank-container"><input type="text" class="fill-blank" id="principle1" data-answer="100" placeholder="请填写"><span class="answer-status"></span></span>Ω，它的阻值会随着温度上升而呈近似匀速增长，但它们之间的关系并不是简单的线性关系，而更趋近于一条 <span class="fill-blank-container"><input type="text" class="fill-blank" id="principle2" data-answer="抛物线" placeholder="请填写"><span class="answer-status"></span></span>。
         </div>
         
         <div class="question-item">
             2．冷却法测量金属比热容的原理
         </div>
         <div class="question-item">
-            本实验以 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="铜" placeholder="请填写"><span class="answer-status"></span></span> 为标准样品，测定铁、铝样品在 100℃的比热容。通过实验了解金属的冷却速率和金属与环境之间的温差关系以及进行实验测量的环境条件。将质量为 M₁ 的金属样品加热后，放到较低温度的介质（如室温的空气）中，金属样品将会逐渐冷却。其单位时间的热量损失（ΔQ/Δt）与温度下降的速率成正比，于是得到下述关系式：
+            本实验以 <span class="fill-blank-container"><input type="text" class="fill-blank" id="principle3" data-answer="铜" placeholder="请填写"><span class="answer-status"></span></span> 为标准样品，测定铁、铝样品在 100℃的比热容。通过实验了解金属的冷却速率和金属与环境之间的温差关系以及进行实验测量的环境条件。将质量为 M₁ 的金属样品加热后，放到较低温度的介质（如室温的空气）中，金属样品将会逐渐冷却。其单位时间的热量损失（ΔQ/Δt）与温度下降的速率成正比，于是得到下述关系式：
         </div>
         <div class="formula">
-            ΔQ/Δt = C₁M₁Δθ₁/Δt      （1）
+            ΔQ/Δt = C₁M₁Δθ₁/Δt
         </div>
         <div class="question-item">
             式（1）中，C₁ 为该金属样品在温度θ₁ 时的比热容，Δθ₁/Δt 为金属样品在θ₁ 时的温度下降速率。根据冷却定律有：
         </div>
         <div class="formula">
-            ΔQ/Δt = α₁S₁(θ₁-θ₀)^m     （2）
+            ΔQ/Δt = α₁S₁(θ₁-θ₀)^m
         </div>
         <div class="question-item">
             式（2）中，α₁ 为热交换系数，S₁为该金属样品外表面的面积，m 为常数，θ₁ 为金属样品的温度，θ₀ 为周围介质的温度。由式（1）和式（2），可得：
         </div>
         <div class="formula">
-            C₁M₁Δθ₁/Δt = α₁S₁ (θ₁-θ₀)^m    （3）
+            C₁M₁Δθ₁/Δt = α₁S₁ (θ₁-θ₀)^m
         </div>
         <div class="question-item">
-            如果两金属样品的形状尺寸都相同，即 S₁＝S₂；两金属样品的表面状况也相同（如涂层、色泽等），而且周围介质（空气）的性质保持不变，则有α₁＝α₂。于是当周围介质温度不变（即样品室内温度恒定）而金属样品又处于相同温度 θ₁＝θ₂＝θ 时，式（3）可以简化为：
+            如果两金属样品的形状尺寸都相同，即 S₁＝S₂；两金属样品的表面状况也相同（如涂层、色泽等），而且周围介质（空气）的性质保持不变，则有α₁＝α₂。于是当周围介质温度不变（即样品室内温度恒定）而金属样品又处于相同温度 θ₁＝θ₂＝θ 时，上式可以简化为：
         </div>
         <div class="formula">
-            C₂ = C₁ [M₁(Δθ/Δt)₁] / [M₂(Δθ/Δt)₂]    （4）
+            C₂ = C₁ [M₁(Δθ/Δt)₁] / [M₂(Δθ/Δt)₂]
         </div>
         <div class="question-item">
-            若使两样品的温度下降范围 Δθ 相同，式（4）可进一步简化为：
+            若使两样品的温度下降范围 Δθ 相同，式（7）可进一步简化为：
         </div>
         <div class="formula">
-            C₂ = C₁ [M₁(Δt)₂] / [M₂(Δt)₁]       （5）
+            C₂ = C₁ [M₁(Δt)₂] / [M₂(Δt)₁]
         </div>
         <div class="question-item">
-            如果已知标准金属样品的比热容C₁ 和质量M₁ ，待测金属样品的质量M₂ 及两金属样品下降相同温度所用的时间Δt₁和Δt₂，就可以求出待测的金属样品的比热容C₂。几种常见金属的比热容公认值为：铜：C<sub>Cu</sub>＝<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="0.39" placeholder="请填写"><span class="answer-status"></span></span>J/(g·℃)，铁：C<sub>Fe</sub>＝ <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="0.46" placeholder="请填写"><span class="answer-status"></span></span>J/(g·℃)，铝：C<sub>Al</sub>＝ <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="0.88" placeholder="请填写"><span class="answer-status"></span></span>J/(g·℃)。
+            如果已知标准金属样品的比热容C₁ 和质量M₁ ，待测金属样品的质量M₂ 及两金属样品下降相同温度所用的时间Δt₁和Δt₂，就可以求出待测的金属样品的比热容C₂。几种常见金属的比热容公认值为：铜：C<sub>Cu</sub>＝<span class="fill-blank-container"><input type="text" class="fill-blank" id="principle4" data-answer="0.39" placeholder="请填写"><span class="answer-status"></span></span>J/(g·℃)，铁：C<sub>Fe</sub>＝ <span class="fill-blank-container"><input type="text" class="fill-blank" id="principle5" data-answer="0.46" placeholder="请填写"><span class="answer-status"></span></span>J/(g·℃)，铝：C<sub>Al</sub>＝ <span class="fill-blank-container"><input type="text" class="fill-blank" id="principle6" data-answer="0.88" placeholder="请填写"><span class="answer-status"></span></span>J/(g·℃)。
         </div>
 
         <h2>四、实验内容</h2>
         <div class="experiment-content">
             <h3>实验步骤</h3>
             <div class="experiment-step">
-                1．将实验装置上的加热器与风扇通过电缆线分别连接至实验主机面板上的相应位置，位于滑杆末端的两根引线为 PT100 铂电阻的两端，与实验主机面板上的 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="欧姆表" placeholder="请填写"><span class="answer-status"></span></span> 相连。
+                1．将实验装置上的加热器与风扇通过电缆线分别连接至实验主机面板上的相应位置，位于滑杆末端的两根引线为 PT100 铂电阻的两端，与实验主机面板上的 <span class="fill-blank-container"><input type="text" class="fill-blank" id="content1" data-answer="欧姆表" placeholder="请填写"><span class="answer-status"></span></span> 相连。
             </div>
             <div class="experiment-step">
-                2．开启实验主机，将滑杆拉到底，然后开启加热器电源，预热 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="20min" placeholder="请填写"><span class="answer-status"></span></span> 左右。
+                2．开启实验主机，将滑杆拉到底，然后开启加热器电源，预热 <span class="fill-blank-container"><input type="text" class="fill-blank" id="content2" data-answer="20min" placeholder="请填写"><span class="answer-status"></span></span> 左右。
             </div>
             <div class="experiment-step">
-                3．用 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="物理天平" placeholder="请填写"><span class="answer-status"></span></span> 或 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="电子天平" placeholder="请填写"><span class="answer-status"></span></span> 分别称量铜、铁、铝三个金属样品的质量，并记录下来（可根据相同体积下M<sub>Cu</sub>＞M<sub>Fe</sub>＞M<sub>Al</sub>这一特点来区分这三种金属样品）。
+                3．用 <span class="fill-blank-container"><input type="text" class="fill-blank" id="content3" data-answer="物理天平" placeholder="请填写"><span class="answer-status"></span></span> 或 <span class="fill-blank-container"><input type="text" class="fill-blank" id="content4" data-answer="电子天平" placeholder="请填写"><span class="answer-status"></span></span> 分别称量铜、铁、铝三个金属样品的质量，并记录下来（可根据相同体积下M<sub>Cu</sub>＞M<sub>Fe</sub>＞M<sub>Al</sub>这一特点来区分这三种金属样品）。
             </div>
             <div class="experiment-step">
                 4．在强制对流冷却的环境下测量铁、铝样品在 100℃时的比热容。
@@ -621,10 +672,10 @@
                 （1）开启风扇电源，打开样品室上盖，将铜样品套在封装有 PT100 铂电阻的不锈钢圆柱上，并手动旋紧样品底部的螺纹（注意不必旋得太紧），盖回样品室上盖。
             </div>
             <div class="experiment-step">
-                （2）将滑杆推到底部使样品进入加热器，注意观察 PT100 铂电阻的阻值。当 PT100 铂电阻温度超过某一定值（如 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="120" placeholder="请填写"><span class="answer-status"></span></span>℃，即 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="146.07" placeholder="请填写"><span class="answer-status"></span></span>Ω）时，立即拉出滑杆，此时风扇刚好正对样品进行强制对流冷却。因热传导产生的延时性，PT100 铂电阻所测得的温度会上升一段时间後才开始下降。当温度降低到 105℃（即 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="140.40" placeholder="请填写"><span class="answer-status"></span></span>Ω）时按下秒表开始计时（由于欧姆表显示值并不连续，因此当其显示值降到小于或等于 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="140.40" placeholder="请填写"><span class="answer-status"></span></span>Ω 时就可立即按下秒表），待温度降低到 95℃（即 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="136.61" placeholder="请填写"><span class="answer-status"></span></span>Ω）时，再次按下秒表停止计时，记录所需时间Δt，并重复测量 5 次，数据记录于表1。
+                （2）将滑杆推到底部使样品进入加热器，注意观察 PT100 铂电阻的阻值。当 PT100 铂电阻温度超过某一定值（如 <span class="fill-blank-container"><input type="text" class="fill-blank" id="content5" data-answer="120" placeholder="请填写"><span class="answer-status"></span></span>℃，即 <span class="fill-blank-container"><input type="text" class="fill-blank" id="content6" data-answer="146.07" placeholder="请填写"><span class="answer-status"></span></span>Ω）时，立即拉出滑杆，此时风扇刚好正对样品进行强制对流冷却。因热传导产生的延时性，PT100 铂电阻所测得的温度会上升一段时间後才开始下降。当温度降低到 105℃（即 <span class="fill-blank-container"><input type="text" class="fill-blank" id="content7" data-answer="140.40" placeholder="请填写"><span class="answer-status"></span></span>Ω）时按下秒表开始计时（由于欧姆表显示值并不连续，因此当其显示值降到小于或等于 <span class="fill-blank-container"><input type="text" class="fill-blank" id="content8" data-answer="140.40" placeholder="请填写"><span class="answer-status"></span></span>Ω 时就可立即按下秒表），待温度降低到 95℃（即 <span class="fill-blank-container"><input type="text" class="fill-blank" id="content9" data-answer="136.61" placeholder="请填写"><span class="answer-status"></span></span>Ω）时，再次按下秒表停止计时，记录所需时间Δt，并重复测量 5 次，数据记录于表1。
             </div>
             <div class="experiment-step">
-                （3）待样品温度降至 50℃（即 <span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="119.40" placeholder="请填写"><span class="answer-status"></span></span>Ω）以下，更换样品，重复上述实验操作，测量铁、铝样品的 Δt，数据记录于表1，并利用式（8）计算铁、铝样品的比热容。
+                （3）待样品温度降至 50℃（即 <span class="fill-blank-container"><input type="text" class="fill-blank" id="content10" data-answer="119.40" placeholder="请填写"><span class="answer-status"></span></span>Ω）以下，更换样品，重复上述实验操作，测量铁、铝样品的 Δt，数据记录于表1，并利用式（8）计算铁、铝样品的比热容。
             </div>
             <div class="experiment-step">
                 5．在自然冷却的环境下测量铁、铝样品在 100℃时的比热容。
@@ -823,7 +874,6 @@
             <canvas id="comparisonChart"></canvas>
         </div>
 
-        <!-- 新增：思考题部分 -->
         <h2>七、思考题</h2>
         <div class="question-item">
             1．为什么在实验过程中要使用铜作为标准样品？选择标准样品时需要考虑哪些因素？
@@ -835,7 +885,6 @@
         </div>
         <div class="question-item">
             2．强制对流冷却和自然冷却两种环境下测得的比热容值有何差异？分析产生差异的原因。
-            <!-- 修复：添加了思考题2的答题框 -->
             <textarea class="thought-input" id="thought2" placeholder="请简要回答"></textarea>
             <button class="thought-answer-btn" onclick="toggleAnswer(2)">显示参考答案</button>
             <div id="answer2" class="thought-answer">
@@ -861,13 +910,12 @@
             <div class="score-display" id="scoreDisplay"></div>
         </div>
 
-        <h2>十、自动评分并生成评语（温馨提醒：保存报告时，确保手机处于横屏状态）</h2>
+        <h2>十、自动评分并生成评语</h2>
         <div class="comment-section" id="commentSection">
             <div class="comment-title">实验评语</div>
             <div class="comment-content" id="commentContent">
                 <p style="text-align: center; color: #999;">点击"自动评分并生成评语"按钮生成实验评语和报告得分</p>
             </div>
-            <!-- 新增：评分详情显示区域 -->
             <div id="scoreDetails" class="score-details" style="display: none;">
                 <div class="score-item">
                     <span class="score-item-name">预习填空（25%）</span>
@@ -938,27 +986,249 @@
 
         // 参考数据（用于演示评分逻辑）
         const referenceData = {
-            // 样品质量数据
-            mass: { 
-                Cu: 25.2, 
-                Fe: 22.8, 
-                Al: 16.5 
-            },
-            
-            // 表1 强制对流冷却环境下，由105℃降至95℃所需时间
+            mass: { Cu: 25.2, Fe: 22.8, Al: 16.5 },
             forced: {
-                Cu: [12.3, 12.5, 12.7, 12.4, 12.6],  // 铜样品5次测量值
-                Fe: [10.6, 10.8, 10.9, 10.7, 10.5],  // 铁样品5次测量值
-                Al: [8.0, 8.2, 8.1, 8.3, 8.2]       // 铝样品5次测量值
+                Cu: [12.3, 12.5, 12.7, 12.4, 12.6],
+                Fe: [10.6, 10.8, 10.9, 10.7, 10.5],
+                Al: [8.0, 8.2, 8.1, 8.3, 8.2]
             },
-            
-            // 表2 自然冷却环境下，由105℃降至95℃所需时间
             natural: {
-                Cu: [28.1, 28.3, 28.5, 28.2, 28.4],  // 铜样品5次测量值
-                Fe: [24.5, 24.7, 24.9, 24.6, 24.8],  // 铁样品5次测量值
-                Al: [18.3, 18.5, 18.4, 18.6, 18.5]   // 铝样品5次测量值
+                Cu: [28.1, 28.3, 28.5, 28.2, 28.4],
+                Fe: [24.5, 24.7, 24.9, 24.6, 24.8],
+                Al: [18.3, 18.5, 18.4, 18.6, 18.5]
             }
         };
+
+        // 图表实例
+        let temperatureChartInstance = null;
+        let comparisonChartInstance = null;
+
+        // ========== 保存功能相关代码 ==========
+        
+        // 自动保存定时器
+        let autoSaveTimer = null;
+        
+        // 上次保存时间
+        let lastSaveTime = null;
+
+        // 加载所有保存的数据
+        function loadAllSavedData() {
+            try {
+                // 加载基本信息
+                document.querySelectorAll('.info-input').forEach(input => {
+                    const savedValue = localStorage.getItem(input.id);
+                    if (savedValue !== null) input.value = savedValue;
+                });
+                
+                // 加载填空题
+                document.querySelectorAll('.fill-blank').forEach(input => {
+                    const savedValue = localStorage.getItem(input.id);
+                    if (savedValue !== null) input.value = savedValue;
+                });
+                
+                // 加载数据表格
+                document.querySelectorAll('.data-input').forEach(input => {
+                    const savedValue = localStorage.getItem(input.id);
+                    if (savedValue !== null) input.value = savedValue;
+                });
+                
+                // 加载思考题
+                document.querySelectorAll('.thought-input').forEach(input => {
+                    const savedValue = localStorage.getItem(input.id);
+                    if (savedValue !== null) input.value = savedValue;
+                });
+                
+                // 加载实验小结
+                const savedSummary = localStorage.getItem('experiment-summary');
+                if (savedSummary !== null) document.getElementById('experiment-summary').value = savedSummary;
+                
+                // 更新上次保存时间显示
+                const savedTime = localStorage.getItem('lastSaveTime');
+                if (savedTime) {
+                    lastSaveTime = new Date(parseInt(savedTime));
+                    updateLastSaveTime();
+                }
+                
+                console.log('数据加载完成');
+            } catch (e) {
+                console.error('加载数据失败:', e);
+            }
+        }
+
+        // 保存所有数据到localStorage
+        function saveAllData() {
+            try {
+                // 保存基本信息
+                document.querySelectorAll('.info-input').forEach(input => {
+                    localStorage.setItem(input.id, input.value);
+                });
+                
+                // 保存填空题
+                document.querySelectorAll('.fill-blank').forEach(input => {
+                    localStorage.setItem(input.id, input.value);
+                });
+                
+                // 保存数据表格
+                document.querySelectorAll('.data-input').forEach(input => {
+                    localStorage.setItem(input.id, input.value);
+                });
+                
+                // 保存思考题
+                document.querySelectorAll('.thought-input').forEach(input => {
+                    localStorage.setItem(input.id, input.value);
+                });
+                
+                // 保存实验小结
+                localStorage.setItem('experiment-summary', document.getElementById('experiment-summary').value);
+                
+                // 保存时间戳
+                lastSaveTime = new Date();
+                localStorage.setItem('lastSaveTime', lastSaveTime.getTime().toString());
+                updateLastSaveTime();
+                
+                console.log('数据保存成功');
+                return true;
+            } catch (e) {
+                console.error('保存数据失败:', e);
+                return false;
+            }
+        }
+
+        // 更新上次保存时间显示
+        function updateLastSaveTime() {
+            if (lastSaveTime) {
+                const timeStr = lastSaveTime.toLocaleTimeString();
+                document.getElementById('lastSaveTime').textContent = `上次保存：${timeStr}`;
+            }
+        }
+
+        // 手动保存
+        function manualSave() {
+            if (saveAllData()) {
+                alert('✅ 数据已成功保存到本地！');
+            } else {
+                alert('❌ 保存失败，请重试');
+            }
+        }
+
+        // 手动加载
+        function manualLoad() {
+            loadAllSavedData();
+            // 重新计算
+            calculateAverages();
+            calculateSpecificHeat();
+            calculateError();
+            updateAllAnswerStatusIcons();
+            alert('📂 已加载上次保存的数据！');
+        }
+
+        // 清除保存的数据
+        function clearSavedData() {
+            if (confirm('⚠️ 确定要清除所有已保存的数据吗？\n\n这将删除所有本地存储的实验数据，但不会清空当前页面填写的内容。')) {
+                localStorage.clear();
+                lastSaveTime = null;
+                document.getElementById('lastSaveTime').textContent = '上次保存：未保存';
+                alert('🗑️ 已清除所有保存的数据');
+            }
+        }
+
+        // 导出数据为JSON文件
+        function exportData() {
+            const data = {
+                info: {},
+                fillBlanks: {},
+                dataInputs: {},
+                thoughts: {},
+                summary: document.getElementById('experiment-summary').value,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            // 收集所有输入数据
+            document.querySelectorAll('.info-input').forEach(input => {
+                data.info[input.id] = input.value;
+            });
+            
+            document.querySelectorAll('.fill-blank').forEach(input => {
+                data.fillBlanks[input.id] = input.value;
+            });
+            
+            document.querySelectorAll('.data-input').forEach(input => {
+                data.dataInputs[input.id] = input.value;
+            });
+            
+            document.querySelectorAll('.thought-input').forEach(input => {
+                data.thoughts[input.id] = input.value;
+            });
+            
+            // 创建下载链接
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const dateStr = new Date().toLocaleDateString().replace(/\//g, '-');
+            a.download = `比热容实验_${dateStr}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('📥 数据已导出为JSON文件');
+        }
+
+        // 导入数据
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        // 恢复基本信息
+                        Object.entries(data.info || {}).forEach(([id, value]) => {
+                            const input = document.getElementById(id);
+                            if (input) input.value = value;
+                        });
+                        
+                        // 恢复填空题
+                        Object.entries(data.fillBlanks || {}).forEach(([id, value]) => {
+                            const input = document.getElementById(id);
+                            if (input) input.value = value;
+                        });
+                        
+                        // 恢复数据表格
+                        Object.entries(data.dataInputs || {}).forEach(([id, value]) => {
+                            const input = document.getElementById(id);
+                            if (input) input.value = value;
+                        });
+                        
+                        // 恢复思考题
+                        Object.entries(data.thoughts || {}).forEach(([id, value]) => {
+                            const input = document.getElementById(id);
+                            if (input) input.value = value;
+                        });
+                        
+                        // 恢复实验小结
+                        if (data.summary) document.getElementById('experiment-summary').value = data.summary;
+                        
+                        // 重新计算
+                        calculateAverages();
+                        calculateSpecificHeat();
+                        calculateError();
+                        updateAllAnswerStatusIcons();
+                        
+                        alert('✅ 数据导入成功！');
+                    } catch (error) {
+                        console.error(error);
+                        alert('❌ 文件格式错误，导入失败');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
 
         // 思考题参考答案显示/隐藏
         function toggleAnswer(questionNum) {
@@ -978,10 +1248,8 @@
         function updateAnswerStatusIcon(inputElement, status) {
             const statusIcon = inputElement.nextElementSibling;
             if (statusIcon && statusIcon.classList.contains('answer-status')) {
-                // 清除之前的样式
                 statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
                 
-                // 设置新样式和图标
                 if (status === 'correct') {
                     statusIcon.textContent = '✓';
                     statusIcon.classList.add('correct-icon');
@@ -1007,20 +1275,9 @@
                 if (userAnswer === '') {
                     updateAnswerStatusIcon(input, 'empty');
                 } else if (correctAnswers && correctAnswers.some(ans => {
-                    // 处理特殊符号和大小写
-                    const userAns = userAnswer.toLowerCase()
-                        .replace(/×/g, '*')
-                        .replace(/÷/g, '/')
-                        .replace(/\s+/g, '');
-                    const correctAns = ans.toLowerCase()
-                        .replace(/×/g, '*')
-                        .replace(/÷/g, '/')
-                        .replace(/\s+/g, '');
-                    
-                    // 允许部分匹配
-                    return userAns === correctAns || 
-                           userAns.includes(correctAns) || 
-                           correctAns.includes(userAns);
+                    const userAns = userAnswer.toLowerCase().replace(/\s+/g, '');
+                    const correctAns = ans.toLowerCase().replace(/\s+/g, '');
+                    return userAns === correctAns || userAns.includes(correctAns) || correctAns.includes(userAns);
                 })) {
                     updateAnswerStatusIcon(input, 'correct');
                 } else {
@@ -1032,71 +1289,58 @@
         // 填入参考数据
         function fillReferenceData() {
             if (confirm("警告：参考数据仅供演示使用！若直接搬用参考数据，数据部分将计0分！\n\n是否继续填入参考数据？")) {
-                // 填入样品质量数据
                 document.getElementById('massCu').value = referenceData.mass.Cu;
                 document.getElementById('massFe').value = referenceData.mass.Fe;
                 document.getElementById('massAl').value = referenceData.mass.Al;
                 
-                // 填入表1数据（强制对流冷却）
-                // 铜样品数据
+                // 表1数据
                 document.getElementById('t1_cu').value = referenceData.forced.Cu[0];
                 document.getElementById('t2_cu').value = referenceData.forced.Cu[1];
                 document.getElementById('t3_cu').value = referenceData.forced.Cu[2];
                 document.getElementById('t4_cu').value = referenceData.forced.Cu[3];
                 document.getElementById('t5_cu').value = referenceData.forced.Cu[4];
                 
-                // 铁样品数据
                 document.getElementById('t1_fe').value = referenceData.forced.Fe[0];
                 document.getElementById('t2_fe').value = referenceData.forced.Fe[1];
                 document.getElementById('t3_fe').value = referenceData.forced.Fe[2];
                 document.getElementById('t4_fe').value = referenceData.forced.Fe[3];
                 document.getElementById('t5_fe').value = referenceData.forced.Fe[4];
                 
-                // 铝样品数据
                 document.getElementById('t1_al').value = referenceData.forced.Al[0];
                 document.getElementById('t2_al').value = referenceData.forced.Al[1];
                 document.getElementById('t3_al').value = referenceData.forced.Al[2];
                 document.getElementById('t4_al').value = referenceData.forced.Al[3];
                 document.getElementById('t5_al').value = referenceData.forced.Al[4];
                 
-                // 填入表2数据（自然冷却）
-                // 铜样品数据
+                // 表2数据
                 document.getElementById('t1_cu_natural').value = referenceData.natural.Cu[0];
                 document.getElementById('t2_cu_natural').value = referenceData.natural.Cu[1];
                 document.getElementById('t3_cu_natural').value = referenceData.natural.Cu[2];
                 document.getElementById('t4_cu_natural').value = referenceData.natural.Cu[3];
                 document.getElementById('t5_cu_natural').value = referenceData.natural.Cu[4];
                 
-                // 铁样品数据
                 document.getElementById('t1_fe_natural').value = referenceData.natural.Fe[0];
                 document.getElementById('t2_fe_natural').value = referenceData.natural.Fe[1];
                 document.getElementById('t3_fe_natural').value = referenceData.natural.Fe[2];
                 document.getElementById('t4_fe_natural').value = referenceData.natural.Fe[3];
                 document.getElementById('t5_fe_natural').value = referenceData.natural.Fe[4];
                 
-                // 铝样品数据
                 document.getElementById('t1_al_natural').value = referenceData.natural.Al[0];
                 document.getElementById('t2_al_natural').value = referenceData.natural.Al[1];
                 document.getElementById('t3_al_natural').value = referenceData.natural.Al[2];
                 document.getElementById('t4_al_natural').value = referenceData.natural.Al[3];
                 document.getElementById('t5_al_natural').value = referenceData.natural.Al[4];
                 
-                // 自动计算平均值、比热容和相对误差
                 calculateAverages();
                 calculateSpecificHeat();
                 calculateError();
                 
-                alert('参考数据已填入！\n1. 样品质量数据已填入\n2. 表1（强制对流冷却）数据已填入\n3. 表2（自然冷却）数据已填入\n4. 已自动完成所有计算\n\n⚠️ 请注意：直接使用参考数据将导致数据合理性项计0分！');
+                alert('参考数据已填入！\n\n⚠️ 请注意：直接使用参考数据将导致数据合理性项计0分！');
             }
         }
 
-        // 图表实例
-        let temperatureChartInstance = null;
-        let comparisonChartInstance = null;
-
         // 计算平均值
         function calculateAverages() {
-            // 强制对流冷却数据
             const forcedData = ['cu', 'fe', 'al'];
             forcedData.forEach(material => {
                 const times = [];
@@ -1110,7 +1354,6 @@
                 }
             });
             
-            // 自然冷却数据
             const naturalData = ['cu_natural', 'fe_natural', 'al_natural'];
             naturalData.forEach(material => {
                 const times = [];
@@ -1173,7 +1416,6 @@
         function calculateError() {
             calculateSpecificHeat();
             
-            // 强制对流冷却误差
             const cFeForced = parseFloat(document.getElementById('c_fe_forced').textContent);
             const cAlForced = parseFloat(document.getElementById('c_al_forced').textContent);
             
@@ -1187,7 +1429,6 @@
                 document.getElementById('error_al_forced').textContent = errorAlForced.toFixed(2);
             }
             
-            // 自然冷却误差
             const cFeNatural = parseFloat(document.getElementById('c_fe_natural').textContent);
             const cAlNatural = parseFloat(document.getElementById('c_al_natural').textContent);
             
@@ -1201,7 +1442,6 @@
                 document.getElementById('error_al_natural').textContent = errorAlNatural.toFixed(2);
             }
             
-            // 更新实验结果分析
             updateAnalysisResult();
         }
 
@@ -1233,7 +1473,6 @@
                 analysis += "实验误差较大，需要检查实验操作和数据记录。";
             }
             
-            // 比较强制对流和自然冷却的误差
             const forcedErrors = [
                 parseFloat(document.getElementById('error_fe_forced').textContent),
                 parseFloat(document.getElementById('error_al_forced').textContent)
@@ -1268,7 +1507,6 @@
                 temperatureChartInstance.destroy();
             }
             
-            // 模拟温度变化数据
             const timePoints = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
             const forcedCoolingTemp = [105, 103, 101, 99, 97, 95, 93, 91, 89, 87, 85];
             const naturalCoolingTemp = [105, 104, 103, 102, 101, 100, 99, 98, 97, 96, 95];
@@ -1311,20 +1549,8 @@
                         }
                     },
                     scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: '时间 (秒)'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '温度 (°C)'
-                            },
-                            beginAtZero: false,
-                            min: 80
-                        }
+                        x: { title: { display: true, text: '时间 (秒)' } },
+                        y: { title: { display: true, text: '温度 (°C)' }, beginAtZero: false, min: 80 }
                     }
                 }
             });
@@ -1338,13 +1564,11 @@
                 comparisonChartInstance.destroy();
             }
             
-            // 获取计算得到的比热容值
             const cFeForced = parseFloat(document.getElementById('c_fe_forced').textContent) || 0;
             const cAlForced = parseFloat(document.getElementById('c_al_forced').textContent) || 0;
             const cFeNatural = parseFloat(document.getElementById('c_fe_natural').textContent) || 0;
             const cAlNatural = parseFloat(document.getElementById('c_al_natural').textContent) || 0;
             
-            // 如果还没有计算，使用模拟数据
             const labels = ['铁 (强制对流)', '铝 (强制对流)', '铁 (自然冷却)', '铝 (自然冷却)'];
             const measuredValues = [
                 cFeForced || 0.45,
@@ -1353,9 +1577,7 @@
                 cAlNatural || 0.86
             ];
             
-            const standardValuesArray = [
-                0.46, 0.88, 0.46, 0.88
-            ];
+            const standardValuesArray = [0.46, 0.88, 0.46, 0.88];
             
             comparisonChartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -1381,17 +1603,13 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        title: {
-                            display: true,
-                            text: '比热容测量值与公认值对比'
-                        },
+                        title: { display: true, text: '比热容测量值与公认值对比' },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
                                     const value = context.parsed.y;
                                     const datasetLabel = context.dataset.label;
                                     const index = context.dataIndex;
-                                    const material = labels[index];
                                     const standard = standardValuesArray[index];
                                     
                                     if (datasetLabel === '测量值') {
@@ -1404,14 +1622,7 @@
                         }
                     },
                     scales: {
-                        y: {
-                            title: {
-                                display: true,
-                                text: '比热容 J/(g·℃)'
-                            },
-                            beginAtZero: false,
-                            min: 0.3
-                        }
+                        y: { title: { display: true, text: '比热容 J/(g·℃)' }, beginAtZero: false, min: 0.3 }
                     }
                 }
             });
@@ -1422,20 +1633,17 @@
             let referenceCount = 0;
             let totalCount = 0;
             
-            // 检查质量数据
             const massCu = parseFloat(document.getElementById('massCu').value) || 0;
             const massFe = parseFloat(document.getElementById('massFe').value) || 0;
             const massAl = parseFloat(document.getElementById('massAl').value) || 0;
             
             if (massCu > 0 || massFe > 0 || massAl > 0) {
                 totalCount += 3;
-                
                 if (Math.abs(massCu - referenceData.mass.Cu) < 0.1) referenceCount++;
                 if (Math.abs(massFe - referenceData.mass.Fe) < 0.1) referenceCount++;
                 if (Math.abs(massAl - referenceData.mass.Al) < 0.1) referenceCount++;
             }
             
-            // 检查强制对流数据
             for (let i = 1; i <= 5; i++) {
                 const tCu = parseFloat(document.getElementById(`t${i}_cu`).value) || 0;
                 const tFe = parseFloat(document.getElementById(`t${i}_fe`).value) || 0;
@@ -1443,14 +1651,12 @@
                 
                 if (tCu > 0 || tFe > 0 || tAl > 0) {
                     totalCount += 3;
-                    
                     if (Math.abs(tCu - referenceData.forced.Cu[i-1]) < 0.1) referenceCount++;
                     if (Math.abs(tFe - referenceData.forced.Fe[i-1]) < 0.1) referenceCount++;
                     if (Math.abs(tAl - referenceData.forced.Al[i-1]) < 0.1) referenceCount++;
                 }
             }
             
-            // 检查自然冷却数据
             for (let i = 1; i <= 5; i++) {
                 const tCuNat = parseFloat(document.getElementById(`t${i}_cu_natural`).value) || 0;
                 const tFeNat = parseFloat(document.getElementById(`t${i}_fe_natural`).value) || 0;
@@ -1458,21 +1664,19 @@
                 
                 if (tCuNat > 0 || tFeNat > 0 || tAlNat > 0) {
                     totalCount += 3;
-                    
                     if (Math.abs(tCuNat - referenceData.natural.Cu[i-1]) < 0.1) referenceCount++;
                     if (Math.abs(tFeNat - referenceData.natural.Fe[i-1]) < 0.1) referenceCount++;
                     if (Math.abs(tAlNat - referenceData.natural.Al[i-1]) < 0.1) referenceCount++;
                 }
             }
             
-            // 如果超过80%的数据与参考数据完全匹配，判定为直接搬用
             if (totalCount > 0 && (referenceCount / totalCount) > 0.8) {
                 return true;
             }
             return false;
         }
 
-        // 计算预习分数（仅填空题）
+        // 计算预习分数
         function calculatePreScore() {
             const inputs = document.querySelectorAll('.fill-blank');
             let correct = 0;
@@ -1483,70 +1687,46 @@
                 const userAnswer = input.value.trim();
                 const correctAnswers = answers[input.dataset.answer];
                 
-                // 清除之前的样式
                 input.classList.remove('correct', 'incorrect', 'empty');
                 
                 if (userAnswer === '') {
-                    // 未填写的情况
                     emptyCount++;
                     input.classList.add('empty');
                     updateAnswerStatusIcon(input, 'empty');
                 } else if (correctAnswers && correctAnswers.some(ans => {
-                    // 处理特殊符号和大小写
-                    const userAns = userAnswer.toLowerCase()
-                        .replace(/×/g, '*')
-                        .replace(/÷/g, '/')
-                        .replace(/\s+/g, '');
-                    const correctAns = ans.toLowerCase()
-                        .replace(/×/g, '*')
-                        .replace(/÷/g, '/')
-                        .replace(/\s+/g, '');
-                    
-                    // 允许部分匹配
-                    return userAns === correctAns || 
-                           userAns.includes(correctAns) || 
-                           correctAns.includes(userAns);
+                    const userAns = userAnswer.toLowerCase().replace(/\s+/g, '');
+                    const correctAns = ans.toLowerCase().replace(/\s+/g, '');
+                    return userAns === correctAns || userAns.includes(correctAns) || correctAns.includes(userAns);
                 })) {
-                    // 回答正确
                     correct++;
                     input.classList.add('correct');
                     updateAnswerStatusIcon(input, 'correct');
                 } else {
-                    // 回答错误
                     input.classList.add('incorrect');
                     updateAnswerStatusIcon(input, 'incorrect');
                 }
             });
 
-            // 计算分数，未答题不计入正确
             const score = Math.round((correct / total) * 100);
             
-            // 显示结果
             let scoreText = `预习分数：${score}分（答对${correct}/${total}题）`;
             if (emptyCount > 0) {
                 scoreText += `，未答：${emptyCount}题`;
-            }
-            if (correct === total) {
-                scoreText += " 🎉 满分！";
-            } else if (correct === 0) {
-                scoreText += " 😢 请认真预习后再作答！";
             }
             
             document.getElementById('scoreDisplay').innerHTML = scoreText;
             return {score, correct, total, emptyCount};
         }
 
-        // 自动评分并生成评语 - 按照新的评分权重更新
+        // 自动评分并生成评语
         function autoGrade() {
             const preScoreResult = calculatePreScore();
             const preScore = preScoreResult.score;
             calculateError();
             const summary = document.getElementById('experiment-summary').value.trim();
             
-            // 检查是否直接搬用参考数据
             const usedReferenceData = checkReferenceDataUsage();
             
-            // 计算报告得分（按照新的权重：预习填空25%，数据记录25%，数据处理20%，思考题15%，小结15%）
             let totalScore = 0;
             
             // 1. 预习填空（25%）
@@ -1554,13 +1734,11 @@
             totalScore += preScoreWeighted;
             document.getElementById('detailPreScore').textContent = `${preScoreWeighted}/25`;
             
-            // 2. 数据记录（25%）- 直接搬用参考数据计0分
+            // 2. 数据记录（25%）
             let dataScore = 0;
             if (usedReferenceData) {
-                // 如果直接搬用参考数据，数据部分得0分
                 dataScore = 0;
             } else {
-                // 计算数据完整性分数
                 let dataCompleteness = 0;
                 const dataInputs = document.querySelectorAll('.data-input');
                 let filledCount = 0;
@@ -1569,7 +1747,6 @@
                 });
                 dataCompleteness = Math.round((filledCount / dataInputs.length) * 100);
                 
-                // 检查实验结果合理性
                 let experimentQuality = 0;
                 const errors = [
                     parseFloat(document.getElementById('error_fe_forced').textContent),
@@ -1597,7 +1774,6 @@
             
             // 3. 数据处理与误差分析（20%）
             let calculationScore = 0;
-            // 检查是否完成了计算
             const cFeForced = document.getElementById('c_fe_forced').textContent;
             const cAlForced = document.getElementById('c_al_forced').textContent;
             const cFeNatural = document.getElementById('c_fe_natural').textContent;
@@ -1609,7 +1785,6 @@
             const errorAlNatural = parseFloat(document.getElementById('error_al_natural').textContent);
             
             if (cFeForced !== '-' && cAlForced !== '-' && cFeNatural !== '-' && cAlNatural !== '-') {
-                // 所有计算都完成了
                 let errorScore = 0;
                 const errors = [errorFeForced, errorAlForced, errorFeNatural, errorAlNatural].filter(err => !isNaN(err));
                 if (errors.length > 0) {
@@ -1626,10 +1801,8 @@
                 
                 calculationScore = Math.round((100 * 0.5 + errorScore * 0.5) * 0.2);
             } else if (cFeForced !== '-' || cAlForced !== '-' || cFeNatural !== '-' || cAlNatural !== '-') {
-                // 部分计算完成
                 calculationScore = Math.round(60 * 0.2);
             } else {
-                // 没有进行计算
                 calculationScore = Math.round(20 * 0.2);
             }
             
@@ -1650,7 +1823,6 @@
                 }
             });
             
-            // 根据填写情况和内容质量评分
             const fillRate = thoughtFilled / thoughtInputs.length;
             const avgLength = thoughtFilled > 0 ? thoughtTotalLength / thoughtFilled : 0;
             
@@ -1668,7 +1840,6 @@
             // 5. 小结（15%）
             let summaryScore = 0;
             const summaryLength = summary.length;
-            // 检查关键词数量（简单的关键词检查）
             const keywords = ['比热容', '冷却法', '强制对流', '自然冷却', '误差分析', '实验', '收获', '问题', '解决', '改进'];
             let keywordCount = 0;
             keywords.forEach(keyword => {
@@ -1686,11 +1857,9 @@
             totalScore += summaryScoreWeighted;
             document.getElementById('detailSummaryScore').textContent = `${summaryScoreWeighted}/15`;
             
-            // 显示总分
             document.getElementById('detailTotalScore').textContent = `${totalScore}/100`;
             document.getElementById('scoreDetails').style.display = 'block';
             
-            // 生成评语
             let comment = "";
             let grade = "不及格";
             let gradeColor = "#c62828";
@@ -1698,53 +1867,48 @@
             if (usedReferenceData) {
                 grade = "不及格";
                 gradeColor = "#c62828";
-                comment = `❌ 实验报告不合格！检测到直接搬用参考数据，数据部分计0分！报告得分${totalScore}分。必须使用实际实验测量数据完成报告！`;
+                comment = `❌ 实验报告不合格！检测到直接搬用参考数据，数据部分计0分！综合得分${totalScore}分。必须使用实际实验测量数据完成报告！`;
             } else if (totalScore >= 90) {
                 grade = "优秀";
                 gradeColor = "#2e7d32";
-                comment = `🎉 实验报告非常出色！报告得分${totalScore}分。预习扎实（${preScore}分），数据记录完整准确，数据处理正确，思考题回答充分，小结详实。`;
+                comment = `🎉 实验报告非常出色！综合得分${totalScore}分。预习扎实（${preScore}分），数据记录完整准确，数据处理正确，思考题回答充分，小结详实。`;
             } else if (totalScore >= 80) {
                 grade = "良好";
                 gradeColor = "#388e3c";
-                comment = `👍 实验报告质量较高！报告得分${totalScore}分。预习较好（${preScore}分），数据记录较为完整，计算正确，分析较为充分。`;
+                comment = `👍 实验报告质量较高！综合得分${totalScore}分。预习较好（${preScore}分），数据记录较为完整，计算正确，分析较为充分。`;
             } else if (totalScore >= 70) {
                 grade = "中等";
                 gradeColor = "#f57c00";
-                comment = `✊ 实验报告基本合格！报告得分${totalScore}分。预习一般（${preScore}分），数据记录和计算存在一定误差，分析较为简单。`;
+                comment = `✊ 实验报告基本合格！综合得分${totalScore}分。预习一般（${preScore}分），数据记录和计算存在一定误差，分析较为简单。`;
             } else if (totalScore >= 60) {
                 grade = "及格";
                 gradeColor = "#ff9800";
-                comment = `⚠️ 实验报告勉强及格！报告得分${totalScore}分。预习不足（${preScore}分），数据记录或计算存在明显问题，分析不足。`;
+                comment = `⚠️ 实验报告勉强及格！综合得分${totalScore}分。预习不足（${preScore}分），数据记录或计算存在明显问题，分析不足。`;
             } else {
                 grade = "不及格";
                 gradeColor = "#d32f2f";
                 comment = `❌ 实验报告未达到基本要求！报告得分${totalScore}分。请重新认真学习实验原理，补充完整实验记录！`;
             }
             
-            // 具体建议
             let suggestions = [];
-            if (preScoreWeighted < 20) suggestions.push("预习部分需要加强，请认真阅读实验原理");
+            if (preScoreWeighted < 20) suggestions.push("预习部分需要加强");
             if (usedReferenceData) suggestions.push("必须使用实际测量数据");
             else if (dataScore < 15) suggestions.push("数据记录需要更加完整准确");
             if (calculationScore < 15) suggestions.push("数据处理和误差分析需要更加认真仔细");
             if (thoughtScoreWeighted < 10) suggestions.push("思考题回答需要更加充分详细");
-            if (summaryScoreWeighted < 10) suggestions.push("实验小结需要更加详实，应包含实验收获、问题和改进建议");
+            if (summaryScoreWeighted < 10) suggestions.push("实验小结需要更加详实");
             
             if (suggestions.length > 0) {
                 comment += ` 改进建议：${suggestions.join('；')}。`;
             }
             
-            comment += ` 报告得分：${grade}（${totalScore}分）。`;
+            comment += ` 总评：${grade}（${totalScore}分）。`;
             
-            // 获取指导教师姓名和当前日期
-            const teacherName = document.querySelector('.info-input[placeholder="请输入指导教师"]').value || '马厂';
+            const teacherName = document.querySelector('#instructor').value || '马厂';
             const currentDate = new Date().toLocaleDateString('zh-CN', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+                year: 'numeric', month: 'long', day: 'numeric'
             });
             
-            // 更新评语内容
             document.getElementById('commentContent').innerHTML = comment;
             document.getElementById('commentContent').style.color = gradeColor;
             document.getElementById('teacherName').textContent = teacherName;
@@ -1754,22 +1918,36 @@
 
         // 初始化页面
         window.onload = function() {
-            // 添加输入框变化监听
-            const dataInputs = document.querySelectorAll('.data-input');
-            dataInputs.forEach(input => {
+            // 加载保存的数据
+            loadAllSavedData();
+            
+            // 添加输入监听，实时保存
+            document.addEventListener('input', function(e) {
+                if (e.target.matches('.info-input, .fill-blank, .data-input, .thought-input, #experiment-summary')) {
+                    // 防抖保存，避免频繁写入
+                    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+                    autoSaveTimer = setTimeout(() => {
+                        saveAllData();
+                    }, 1000);
+                }
+            });
+            
+            // 设置定时自动保存（每60秒）
+            setInterval(() => {
+                saveAllData();
+            }, 60000);
+            
+            // 添加表格输入监听，自动计算平均值
+            document.querySelectorAll('.data-input').forEach(input => {
                 input.addEventListener('change', function() {
                     calculateAverages();
                 });
             });
             
             // 添加填空框变化监听
-            const fillBlanks = document.querySelectorAll('.fill-blank');
-            fillBlanks.forEach(input => {
+            document.querySelectorAll('.fill-blank').forEach(input => {
                 input.addEventListener('change', function() {
-                    // 移除之前的样式
                     this.classList.remove('correct', 'incorrect', 'empty');
-                    
-                    // 清空状态图标
                     const statusIcon = this.nextElementSibling;
                     if (statusIcon && statusIcon.classList.contains('answer-status')) {
                         statusIcon.textContent = '';
@@ -1780,12 +1958,11 @@
             
             // 设置默认日期
             const today = new Date().toISOString().split('T')[0];
-            const dateInput = document.querySelector('.info-input[placeholder="请输入实验时间"]');
+            const dateInput = document.getElementById('experimentDate');
             if (dateInput && !dateInput.value) {
                 dateInput.value = today;
             }
         };
     </script>
 </body>
-
 </html>
