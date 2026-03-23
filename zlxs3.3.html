@@ -401,83 +401,149 @@
             color: #2c3e50;
             margin-top: 0;
         }
+        /* 保存工具栏样式 */
+        .save-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .save-btn {
+            background: linear-gradient(to bottom, #6c5ce7, #5649c0);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        .save-btn.danger {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+        }
+        .save-btn.success {
+            background: linear-gradient(to bottom, #27ae60, #229954);
+        }
+        .save-time {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-right: auto;
+            align-self: center;
+        }
+        .auto-save-indicator {
+            font-size: 12px;
+            color: #27ae60;
+            margin-right: 15px;
+            align-self: center;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .score-details {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: rgba(52, 152, 219, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #3498db;
+        }
+        .score-details .score-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            padding: 5px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        .score-details .score-item:last-child {
+            border-bottom: none;
+        }
+        .score-details .score-item-name {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        .score-details .score-item-value {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .control-buttons, .save-toolbar {
+                flex-direction: column;
+            }
+            .score-btn, .chart-btn, .auto-grade-btn, .save-btn {
+                width: 100%;
+            }
+            .save-time, .auto-save-indicator {
+                text-align: center;
+                margin-right: 0;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>液体表面张力系数的测定实验报告</h1>
         
+        <!-- 保存工具栏 -->
+        <div class="save-toolbar">
+            <div class="auto-save-indicator" id="autoSaveIndicator">⚡ 自动保存已开启</div>
+            <div class="save-time" id="lastSaveTime">上次保存：未保存</div>
+            <button class="save-btn" onclick="manualSave()">💾 手动保存</button>
+            <button class="save-btn" onclick="manualLoad()">📂 加载上次保存</button>
+            <button class="save-btn success" onclick="exportData()">📥 导出备份</button>
+            <button class="save-btn" onclick="importData()">📤 导入备份</button>
+            <button class="save-btn danger" onclick="clearSavedData()">🗑️ 清除数据</button>
+        </div>
+        
         <div class="basic-info">
             <table>
-                <tr>
-                    <td>专业</td>
-                    <td><input type="text" class="info-input" id="major" placeholder="填写专业"></td>
-                    <td>班级</td>
-                    <td><input type="text" class="info-input" id="class" placeholder="填写班级"></td>
-                </tr>
-                <tr>
-                    <td>学号</td>
-                    <td><input type="text" class="info-input" id="student-id" placeholder="填写学号"></td>
-                    <td>姓名</td>
-                    <td><input type="text" class="info-input" id="name" placeholder="填写姓名"></td>
-                </tr>
-                <tr>
-                    <td>指导教师</td>
-                    <td><input type="text" class="info-input" id="instructor" value="马厂" placeholder="填写指导教师"></td>
-                    <td>同组人</td>
-                    <td><input type="text" class="info-input" id="partner" placeholder="填写同组人"></td>
-                </tr>
-                <tr>
-                    <td>实验时间</td>
-                    <td><input type="date" class="info-input" id="date" value="2023-11-15"></td>
-                    <td>实验地点</td>
-                    <td><input type="text" class="info-input" id="location" placeholder="填写实验地点"></td>
-                </tr>
+                <tr><td>专业</td><td><input type="text" class="info-input" id="major" placeholder="填写专业"></td><td>班级</td><td><input type="text" class="info-input" id="class" placeholder="填写班级"></td></tr>
+                <tr><td>学号</td><td><input type="text" class="info-input" id="student-id" placeholder="填写学号"></td><td>姓名</td><td><input type="text" class="info-input" id="name" placeholder="填写姓名"></td></tr>
+                <tr><td>指导教师</td><td><input type="text" class="info-input" id="instructor" value="马厂" placeholder="填写指导教师"></td><td>同组人</td><td><input type="text" class="info-input" id="partner" placeholder="填写同组人"></td></tr>
+                <tr><td>实验时间</td><td><input type="date" class="info-input" id="date" value="2023-11-15"></td><td>实验地点</td><td><input type="text" class="info-input" id="location" placeholder="填写实验地点"></td></tr>
             </table>
         </div>
 
         <h2>一、实验目的</h2>
-        <div class="question-item">
-            1. 用<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="拉脱法" placeholder="填写方法"><span class="answer-status"></span></span>测量室温下液体表面张力系数；
-        </div>
-        <div class="question-item">
-            2. 学习力敏传感器的<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="定标" placeholder="填写方法"><span class="answer-status"></span></span>方法。
-        </div>
+        <div class="question-item">1. 用<span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose1" data-answer="拉脱法" placeholder="填写方法"><span class="answer-status"></span></span>测量室温下液体表面张力系数；</div>
+        <div class="question-item">2. 学习力敏传感器的<span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose2" data-answer="定标" placeholder="填写方法"><span class="answer-status"></span></span>方法。</div>
 
         <h2>二、实验仪器</h2>
-<!-- 插入实验仪器图片 -->
-<img src="https://xiaoxinfdfg.github.io/fsadfse2/zlxytu1.png" 
-     alt="实验仪器示意图" 
-     class="apparatus-img"
-     style="max-width: 80%; margin: 20px auto; display: block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-        <div class="question-item">
-            液体表面张力系数测定仪包括电源、数字电压表、<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="金属架台" placeholder="填写仪器"><span class="answer-status"></span></span>、<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="微调升降台" placeholder="填写仪器"><span class="answer-status"></span></span>、装有力敏传感器固定杆、<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="盛液体的玻璃皿" placeholder="填写仪器"><span class="answer-status"></span></span>和<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="圆环形吊片" placeholder="填写仪器"><span class="answer-status"></span></span>等。
-        </div>
+        <img src="https://xiaoxinfdfg.github.io/fsadfse2/zlxytu1.png" 
+             alt="实验仪器示意图" 
+             class="apparatus-img"
+             style="max-width: 80%; margin: 20px auto; display: block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <div class="question-item">液体表面张力系数测定仪包括电源、数字电压表、<span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument1" data-answer="金属架台" placeholder="填写仪器"><span class="answer-status"></span></span>、<span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument2" data-answer="微调升降台" placeholder="填写仪器"><span class="answer-status"></span></span>、装有力敏传感器固定杆、<span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument3" data-answer="盛液体的玻璃皿" placeholder="填写仪器"><span class="answer-status"></span></span>和<span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument4" data-answer="圆环形吊片" placeholder="填写仪器"><span class="answer-status"></span></span>等。</div>
 
         <h2>三、实验原理</h2>
-        <div class="question-item">
-            通过测量一个已知周长的圆环形吊片从待测液体表面脱离时需要的力，求得该液体表面张力系数的实验方法称为拉脱法。
+        <div class="question-item">通过测量一个已知周长的圆环形吊片从待测液体表面脱离时需要的力，求得该液体表面张力系数的实验方法称为拉脱法。
             <div class="formula">F = απ(D₁ + D₂)</div>
         </div>
-        <div class="question-item">
-            式中，F为<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="脱离力" placeholder="填写物理量"><span class="answer-status"></span></span>，D₁和D₂分别为圆环的<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="外直径" placeholder="填写参数"><span class="answer-status"></span></span>和<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="内直径" placeholder="填写参数"><span class="answer-status"></span></span>，α为液体的<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="表面张力系数" placeholder="填写物理量"><span class="answer-status"></span></span>。
-        </div>
-        <div class="question-item">
-            硅压阻式力敏传感器由弹性梁和贴在梁上的传感器芯片组成，其中传感器芯片由四个硅扩散电阻集成一个非平衡电桥，当外界压力作用于金属梁时，在压力作用下，电桥失去平衡，此时将有电压信号输出，输出电压大小与所加外力成正比，即：
+        <div class="question-item">式中，F为<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory1" data-answer="脱离力" placeholder="填写物理量"><span class="answer-status"></span></span>，D₁和D₂分别为圆环的<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory2" data-answer="外直径" placeholder="填写参数"><span class="answer-status"></span></span>和<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory3" data-answer="内直径" placeholder="填写参数"><span class="answer-status"></span></span>，α为液体的<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory4" data-answer="表面张力系数" placeholder="填写物理量"><span class="answer-status"></span></span>。</div>
+        <div class="question-item">硅压阻式力敏传感器由弹性梁和贴在梁上的传感器芯片组成，其中传感器芯片由四个硅扩散电阻集成一个非平衡电桥，当外界压力作用于金属梁时，在压力作用下，电桥失去平衡，此时将有电压信号输出，输出电压大小与所加外力成正比，即：
             <div class="formula">ΔU = KF</div>
         </div>
-        <div class="question-item">
-            式中，F为外力的大小，K为硅压阻式力敏传感器的<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="灵敏度" placeholder="填写参数"><span class="answer-status"></span></span>，ΔU为传感器<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="输出电压" placeholder="填写参数"><span class="answer-status"></span></span>的大小。
-        </div>
+        <div class="question-item">式中，F为外力的大小，K为硅压阻式力敏传感器的<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory5" data-answer="灵敏度" placeholder="填写参数"><span class="answer-status"></span></span>，ΔU为传感器<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory6" data-answer="输出电压" placeholder="填写参数"><span class="answer-status"></span></span>的大小。</div>
 
         <h2>四、实验内容</h2>
         <div class="experiment-content">
             <h3>1．力敏传感器的定标。</h3>
             <p>每个力敏传感器的灵敏度都有所不同，在实验前，应先将其定标，定标步骤如下：</p>
             <p>（1）打开仪器的电源开关，将仪器预热；</p>
-            <p>（2）在传感器梁端头的小钩中，挂上砝码盘，调节<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="调零旋钮" placeholder="填写操作"><span class="answer-status"></span></span>，使<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="数字电压表" placeholder="填写仪器"><span class="answer-status"></span></span>显示为零；</p>
+            <p>（2）在传感器梁端头的小钩中，挂上砝码盘，调节<span class="fill-blank-container"><input type="text" class="fill-blank" id="content1" data-answer="调零旋钮" placeholder="填写操作"><span class="answer-status"></span></span>，使<span class="fill-blank-container"><input type="text" class="fill-blank" id="content2" data-answer="数字电压表" placeholder="填写仪器"><span class="answer-status"></span></span>显示为零；</p>
             <p>（3）在砝码盘上分别加上如0.5g、1.0g、1.5g、2.0g、2.5g、3.0g等质量的砝码，记录数字电压表的读数值U，数据记录于表1；</p>
-            <p>（4）用<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="最小二乘法" placeholder="填写方法"><span class="answer-status"></span></span>作直线拟合，求出传感器灵敏度K。</p>
+            <p>（4）用<span class="fill-blank-container"><input type="text" class="fill-blank" id="content3" data-answer="最小二乘法" placeholder="填写方法"><span class="answer-status"></span></span>作直线拟合，求出传感器灵敏度K。</p>
         </div>
         
         <div class="experiment-content">
@@ -488,49 +554,22 @@
         
         <div class="experiment-content">
             <h3>3．计算液体的表面张力系数。</h3>
-            <p>（1）将圆环形吊片挂在传感器的小钩上，调节<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="升降台" placeholder="填写操作"><span class="answer-status"></span></span>，将液体升至靠近圆环形吊片的下沿，观察<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="圆环形吊片" placeholder="填写仪器"><span class="answer-status"></span></span>下沿与待测液面是否平行，若不平行，则将圆环形吊片取下后，调节圆环形吊片上的<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="细丝" placeholder="填写部件"><span class="answer-status"></span></span>，使圆环形吊片与待测液面平行。</p>
-            <p>（2）调节容器下的升降旋钮，使其渐渐上升，将圆环形吊片的下沿部分<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="全部浸没于" placeholder="填写状态"><span class="answer-status"></span></span>待测液体，然后反向调节升降台，使液面逐渐下降，这时，圆环形吊片和液面间形成一<span class="fill-blank-container"><input type="text" class="fill-blank" data-answer="环形液膜" placeholder="填写现象"><span class="answer-status"></span></span>，继续下降液面，测出环形液膜即将拉断前一瞬间数字电压表读数值U₁和液膜拉断后一瞬间数字电压表读数值U₂，则ΔU=U₁−U₂，将实验数据记录于表2重复操作5次。</p>
+            <p>（1）将圆环形吊片挂在传感器的小钩上，调节<span class="fill-blank-container"><input type="text" class="fill-blank" id="content4" data-answer="升降台" placeholder="填写操作"><span class="answer-status"></span></span>，将液体升至靠近圆环形吊片的下沿，观察<span class="fill-blank-container"><input type="text" class="fill-blank" id="content5" data-answer="圆环形吊片" placeholder="填写仪器"><span class="answer-status"></span></span>下沿与待测液面是否平行，若不平行，则将圆环形吊片取下后，调节圆环形吊片上的<span class="fill-blank-container"><input type="text" class="fill-blank" id="content6" data-answer="细丝" placeholder="填写部件"><span class="answer-status"></span></span>，使圆环形吊片与待测液面平行。</p>
+            <p>（2）调节容器下的升降旋钮，使其渐渐上升，将圆环形吊片的下沿部分<span class="fill-blank-container"><input type="text" class="fill-blank" id="content7" data-answer="全部浸没于" placeholder="填写状态"><span class="answer-status"></span></span>待测液体，然后反向调节升降台，使液面逐渐下降，这时，圆环形吊片和液面间形成一<span class="fill-blank-container"><input type="text" class="fill-blank" id="content8" data-answer="环形液膜" placeholder="填写现象"><span class="answer-status"></span></span>，继续下降液面，测出环形液膜即将拉断前一瞬间数字电压表读数值U₁和液膜拉断后一瞬间数字电压表读数值U₂，则ΔU=U₁−U₂，将实验数据记录于表2重复操作5次。</p>
             <p>（3）将实验数据代入公式，求出液体的表面张力系数，并与标准值进行比较，计算相对误差。</p>
         </div>
 
         <h2>五、实验数据记录与处理</h2>
         
         <div class="section-title">表1 传感器灵敏度测量数据</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>砝码质量/g</th>
-                    <th>0.5</th>
-                    <th>1.0</th>
-                    <th>1.5</th>
-                    <th>2.0</th>
-                    <th>2.5</th>
-                    <th>3.0</th>
-                </tr>
-            </thead>
+        <table id="table1">
+            <thead><tr><th>砝码质量/g</th><th>0.5</th><th>1.0</th><th>1.5</th><th>2.0</th><th>2.5</th><th>3.0</th></tr></thead>
             <tbody>
-                <tr>
-                    <td>砝码重力/N</td>
-                    <td id="f1">0.0049</td>
-                    <td id="f2">0.0098</td>
-                    <td id="f3">0.0147</td>
-                    <td id="f4">0.0196</td>
-                    <td id="f5">0.0245</td>
-                    <td id="f6">0.0294</td>
-                </tr>
-                <tr>
-                    <td>电压/mV</td>
-                    <td><input type="number" class="data-input" id="u1" step="0.1" placeholder="mV"></td>
-                    <td><input type="number" class="data-input" id="u2" step="0.1" placeholder="mV"></td>
-                    <td><input type="number" class="data-input" id="u3" step="0.1" placeholder="mV"></td>
-                    <td><input type="number" class="data-input" id="u4" step="0.1" placeholder="mV"></td>
-                    <td><input type="number" class="data-input" id="u5" step="0.1" placeholder="mV"></td>
-                    <td><input type="number" class="data-input" id="u6" step="0.1" placeholder="mV"></td>
-                </tr>
+                <tr><td>砝码重力/N</td><td id="f1">0.0049</td><td id="f2">0.0098</td><td id="f3">0.0147</td><td id="f4">0.0196</td><td id="f5">0.0245</td><td id="f6">0.0294</td></tr>
+                <tr><td>电压/mV</td><td><input type="number" class="data-input" id="u1" step="0.1" placeholder="mV"></td><td><input type="number" class="data-input" id="u2" step="0.1" placeholder="mV"></td><td><input type="number" class="data-input" id="u3" step="0.1" placeholder="mV"></td><td><input type="number" class="data-input" id="u4" step="0.1" placeholder="mV"></td><td><input type="number" class="data-input" id="u5" step="0.1" placeholder="mV"></td><td><input type="number" class="data-input" id="u6" step="0.1" placeholder="mV"></td></tr>
             </tbody>
         </table>
         
-        <!-- 保留文件1的校准曲线布局 -->
         <div class="control-buttons">
             <button class="chart-btn" onclick="calculateSensitivity()">计算灵敏度K</button>
             <button class="chart-btn" onclick="drawCalibrationChart()">绘制校准曲线</button>
@@ -543,58 +582,14 @@
         </div>
         
         <div class="section-title">表2 表面张力系数测量数据</div>
-        <table>
-            <thead>
-                <tr>
-                    <th>编号</th>
-                    <th>U₁/mV</th>
-                    <th>U₂/mV</th>
-                    <th>ΔU/mV</th>
-                    <th>F/N</th>
-                    <th>α/N·m⁻¹</th>
-                </tr>
-            </thead>
+        <table id="table2">
+            <thead><tr><th>编号</th><th>U₁/mV</th><th>U₂/mV</th><th>ΔU/mV</th><th>F/N</th><th>α/N·m⁻¹</th></tr></thead>
             <tbody>
-                <tr>
-                    <td>1</td>
-                    <td><input type="number" class="data-input" id="u1_1" step="0.01" placeholder="mV"></td>
-                    <td><input type="number" class="data-input" id="u2_1" step="0.01" placeholder="mV"></td>
-                    <td id="deltaU1">-</td>
-                    <td id="F1">-</td>
-                    <td id="alpha1">-</td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td><input type="number" class="data-input" id="u1_2" step="0.01" placeholder="mV"></td>
-                    <td><input type="number" class="data-input" id="u2_2" step="0.01" placeholder="mV"></td>
-                    <td id="deltaU2">-</td>
-                    <td id="F2">-</td>
-                    <td id="alpha2">-</td>
-                </tr>
-                <tr>
-                    <td>3</td>
-                    <td><input type="number" class="data-input" id="u1_3" step="0.01" placeholder="mV"></td>
-                    <td><input type="number" class="data-input" id="u2_3" step="0.01" placeholder="mV"></td>
-                    <td id="deltaU3">-</td>
-                    <td id="F3">-</td>
-                    <td id="alpha3">-</td>
-                </tr>
-                <tr>
-                    <td>4</td>
-                    <td><input type="number" class="data-input" id="u1_4" step="0.01" placeholder="mV"></td>
-                    <td><input type="number" class="data-input" id="u2_4" step="0.01" placeholder="mV"></td>
-                    <td id="deltaU4">-</td>
-                    <td id="F4">-</td>
-                    <td id="alpha4">-</td>
-                </tr>
-                <tr>
-                    <td>5</td>
-                    <td><input type="number" class="data-input" id="u1_5" step="0.01" placeholder="mV"></td>
-                    <td><input type="number" class="data-input" id="u2_5" step="0.01" placeholder="mV"></td>
-                    <td id="deltaU5">-</td>
-                    <td id="F5">-</td>
-                    <td id="alpha5">-</td>
-                </tr>
+                <tr><td>1</td><td><input type="number" class="data-input" id="u1_1" step="0.01" placeholder="mV"></td><td><input type="number" class="data-input" id="u2_1" step="0.01" placeholder="mV"></td><td id="deltaU1">-</td><td id="F1">-</td><td id="alpha1">-</td></tr>
+                <tr><td>2</td><td><input type="number" class="data-input" id="u1_2" step="0.01" placeholder="mV"></td><td><input type="number" class="data-input" id="u2_2" step="0.01" placeholder="mV"></td><td id="deltaU2">-</td><td id="F2">-</td><td id="alpha2">-</td></tr>
+                <tr><td>3</td><td><input type="number" class="data-input" id="u1_3" step="0.01" placeholder="mV"></td><td><input type="number" class="data-input" id="u2_3" step="0.01" placeholder="mV"></td><td id="deltaU3">-</td><td id="F3">-</td><td id="alpha3">-</td></tr>
+                <tr><td>4</td><td><input type="number" class="data-input" id="u1_4" step="0.01" placeholder="mV"></td><td><input type="number" class="data-input" id="u2_4" step="0.01" placeholder="mV"></td><td id="deltaU4">-</td><td id="F4">-</td><td id="alpha4">-</td></tr>
+                <tr><td>5</td><td><input type="number" class="data-input" id="u1_5" step="0.01" placeholder="mV"></td><td><input type="number" class="data-input" id="u2_5" step="0.01" placeholder="mV"></td><td id="deltaU5">-</td><td id="F5">-</td><td id="alpha5">-</td></tr>
             </tbody>
         </table>
         
@@ -613,698 +608,166 @@
             <h3 class="result-title">表面张力系数计算结果</h3>
             <p>α的平均值 = <span id="alpha-avg" class="score-display"></span> N·m⁻¹</p>
             <p>相对误差 = <span id="relative-error" class="score-display"></span></p>
-            
-            <div class="summary-area">
-                <h4>误差分析</h4>
-                <textarea class="summary-box" id="error-analysis" placeholder="请分析实验误差的来源，如测量误差、环境因素、仪器精度、操作误差等。"></textarea>
-            </div>
-            
+            <div class="summary-area"><h4>误差分析</h4><textarea class="summary-box" id="error-analysis" placeholder="请分析实验误差的来源，如测量误差、环境因素、仪器精度、操作误差等。"></textarea></div>
             <h4 style="margin-top: 15px;">附表：水的表面张力系数的标准值</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>水温 t/℃</th>
-                        <th>10</th>
-                        <th>15</th>
-                        <th>20</th>
-                        <th>25</th>
-                        <th>30</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>α/N·m⁻¹</td>
-                        <td>0.07422</td>
-                        <td>0.07322</td>
-                        <td>0.07275</td>
-                        <td>0.07197</td>
-                        <td>0.07118</td>
-                    </tr>
-                </tbody>
+            <table><thead><tr><th>水温 t/℃</th><th>10</th><th>15</th><th>20</th><th>25</th><th>30</th></thead>
+                <tbody><tr><td>α/N·m⁻¹</td><td>0.07422</td><td>0.07322</td><td>0.07275</td><td>0.07197</td><td>0.07118</td></tbody>
             </table>
         </div>
         
-        <!-- 保留文件1的图表容器布局 -->
-        <div class="chart-container">
-            <canvas id="calibrationChart"></canvas>
-        </div>
+        <div class="chart-container"><canvas id="calibrationChart"></canvas></div>
 
         <h2>六、思考题</h2>
-        <div class="question-item">
-            1．实验中为什么需要先对力敏传感器进行定标？不定标直接测量可以吗？
-            <textarea class="thought-input" placeholder="请简要回答"></textarea>
-            <button class="thought-answer-btn" onclick="toggleAnswer(1)">显示参考答案</button>
-            <div id="answer1" class="thought-answer">
-                答：必须进行定标。因为每个力敏传感器的灵敏度K不同，且K值会随时间、温度等因素变化。不定标就无法建立电压ΔU与力F之间的准确换算关系，导致测量结果不准确。定标可以消除传感器个体差异和系统误差。
-            </div>
-        </div>
-        <div class="question-item">
-            2．圆环形吊片为什么要在NaOH溶液中浸泡？如果表面有油污会对实验结果产生什么影响？
-            <textarea class="thought-input" placeholder="请简要回答"></textarea>
-            <button class="thought-answer-btn" onclick="toggleAnswer(2)">显示参考答案</button>
-            <div id="answer2" class="thought-answer">
-                答：NaOH溶液可以去除吊片表面的油污和有机物污染，确保吊片表面完全亲水。如果表面有油污，会改变液体的接触角，导致表面张力测量值偏小，甚至无法形成完整的液膜，严重影响实验结果的准确性。
-            </div>
-        </div>
-        <div class="question-item">
-            3．实验中为什么要测量圆环形吊片的内外直径？如果只测量外直径或内直径，会对结果产生什么影响？
-            <textarea class="thought-input" placeholder="请简要回答"></textarea>
-            <button class="thought-answer-btn" onclick="toggleAnswer(3)">显示参考答案</button>
-            <div id="answer3" class="thought-answer">
-                答：拉脱法公式F=απ(D₁+D₂)中，需要的是圆环的平均周长，即π(D₁+D₂)。如果只测外直径或内直径，会引入系统误差。实际液膜破裂时，破裂面位于圆环内外直径之间的某个位置，因此使用内外直径的平均值最为合理。
-            </div>
-        </div>
+        <div class="question-item">1．实验中为什么需要先对力敏传感器进行定标？不定标直接测量可以吗？<textarea class="thought-input" id="thought1" placeholder="请简要回答"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(1)">显示参考答案</button><div id="answer1" class="thought-answer">答：必须进行定标。因为每个力敏传感器的灵敏度K不同，且K值会随时间、温度等因素变化。不定标就无法建立电压ΔU与力F之间的准确换算关系，导致测量结果不准确。定标可以消除传感器个体差异和系统误差。</div></div>
+        <div class="question-item">2．圆环形吊片为什么要在NaOH溶液中浸泡？如果表面有油污会对实验结果产生什么影响？<textarea class="thought-input" id="thought2" placeholder="请简要回答"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(2)">显示参考答案</button><div id="answer2" class="thought-answer">答：NaOH溶液可以去除吊片表面的油污和有机物污染，确保吊片表面完全亲水。如果表面有油污，会改变液体的接触角，导致表面张力测量值偏小，甚至无法形成完整的液膜，严重影响实验结果的准确性。</div></div>
+        <div class="question-item">3．实验中为什么要测量圆环形吊片的内外直径？如果只测量外直径或内直径，会对结果产生什么影响？<textarea class="thought-input" id="thought3" placeholder="请简要回答"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(3)">显示参考答案</button><div id="answer3" class="thought-answer">答：拉脱法公式F=απ(D₁+D₂)中，需要的是圆环的平均周长，即π(D₁+D₂)。如果只测外直径或内直径，会引入系统误差。实际液膜破裂时，破裂面位于圆环内外直径之间的某个位置，因此使用内外直径的平均值最为合理。</div></div>
 
         <h2>七、实验小结</h2>
         <textarea class="summary-box" id="experiment-summary" placeholder="请在此处填写实验小结，包括实验收获、遇到的问题及解决方案、改进建议等..."></textarea>
 
-        <div class="warning-box">
-            ⚠️ 温馨提示：请认真填写所有数据，完成实验报告后进行计算和评分
-        </div>
+        <div class="warning-box">⚠️ 温馨提示：请认真填写所有数据，完成实验报告后进行计算和评分</div>
 
         <h2>八、计算预习分数</h2>
-        <div class="score-section">
-            <p>请填写所有填空题后，点击计算分数</p>
-            <button class="score-btn" onclick="calculatePreScore()">计算预习分数</button>
-            <div class="score-display" id="scoreDisplay"></div>
-        </div>
+        <div class="score-section"><p>请填写所有填空题后，点击计算分数</p><button class="score-btn" onclick="calculatePreScore()">计算预习分数</button><div class="score-display" id="scoreDisplay"></div></div>
 
-        <h2>九、自动评分并生成评语(温馨提醒：保存报告时，确保手机处于横屏状态)</h2>
+        <h2>九、自动评分并生成评语</h2>
         <div class="comment-section" id="commentSection">
             <div class="comment-title">实验评语</div>
-            <div class="comment-content" id="commentContent">
-                <p style="text-align: center; color: #999;">点击"自动评分并生成评语"按钮生成实验评语和报告得分</p>
+            <div class="comment-content" id="commentContent"><p style="text-align: center; color: #999;">点击"自动评分并生成评语"按钮生成实验评语和报告得分</p></div>
+            <div id="scoreDetails" class="score-details" style="display: none;">
+                <div class="score-item"><span class="score-item-name">预习填空（25%）</span><span class="score-item-value" id="detailPreScore">0/25</span></div>
+                <div class="score-item"><span class="score-item-name">数据记录（25%）</span><span class="score-item-value" id="detailDataScore">0/25</span></div>
+                <div class="score-item"><span class="score-item-name">数据误差（10%）</span><span class="score-item-value" id="detailErrorScore">0/10</span></div>
+                <div class="score-item"><span class="score-item-name">图表绘制（10%）</span><span class="score-item-value" id="detailChartScore">0/10</span></div>
+                <div class="score-item"><span class="score-item-name">思考题（15%）</span><span class="score-item-value" id="detailThoughtScore">0/15</span></div>
+                <div class="score-item"><span class="score-item-name">实验小结与误差分析（15%）</span><span class="score-item-value" id="detailSummaryScore">0/15</span></div>
+                <div class="score-item" style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #3498db;"><span class="score-item-name" style="font-weight: bold;">总分</span><span class="score-item-value" id="detailTotalScore">0/100</span></div>
             </div>
-            <div class="comment-footer" id="commentFooter" style="display: none;">
-                <div>指导教师：<span id="teacherName"></span></div>
-                <div>评语日期：<span id="currentDate"></span></div>
-            </div>
-            <div class="control-buttons">
-                <button class="auto-grade-btn" onclick="autoGrade()">自动评分并生成评语</button>
-            </div>
+            <div class="comment-footer" id="commentFooter" style="display: none;"><div>指导教师：<span id="teacherName"></span></div><div>评语日期：<span id="currentDate"></span></div></div>
+            <div class="control-buttons"><button class="auto-grade-btn" onclick="autoGrade()">自动评分并生成评语</button></div>
         </div>
     </div>
 
     <script>
         // 正确答案
         const answers = {
-            "拉脱法": ["拉脱法"],
-            "定标": ["定标"],
-            "金属架台": ["金属架台"],
-            "微调升降台": ["微调升降台"],
-            "盛液体的玻璃皿": ["盛液体的玻璃皿"],
-            "圆环形吊片": ["圆环形吊片"],
-            "脱离力": ["脱离力"],
-            "外直径": ["外直径"],
-            "内直径": ["内直径"],
-            "表面张力系数": ["表面张力系数"],
-            "灵敏度": ["灵敏度"],
-            "输出电压": ["输出电压"],
-            "调零旋钮": ["调零旋钮"],
-            "数字电压表": ["数字电压表"],
-            "最小二乘法": ["最小二乘法"],
-            "升降台": ["升降台"],
-            "圆环形吊片": ["圆环形吊片"],
-            "细丝": ["细丝"],
-            "全部浸没于": ["全部浸没于"],
-            "环形液膜": ["环形液膜"]
+            "拉脱法": ["拉脱法"], "定标": ["定标"], "金属架台": ["金属架台"], "微调升降台": ["微调升降台"],
+            "盛液体的玻璃皿": ["盛液体的玻璃皿"], "圆环形吊片": ["圆环形吊片"], "脱离力": ["脱离力"],
+            "外直径": ["外直径"], "内直径": ["内直径"], "表面张力系数": ["表面张力系数"], "灵敏度": ["灵敏度"],
+            "输出电压": ["输出电压"], "调零旋钮": ["调零旋钮"], "数字电压表": ["数字电压表"], "最小二乘法": ["最小二乘法"],
+            "升降台": ["升降台"], "细丝": ["细丝"], "全部浸没于": ["全部浸没于"], "环形液膜": ["环形液膜"]
         };
         
-        // 水的表面张力系数标准值
-        const alphaStandard = {
-            10: 0.07422,
-            15: 0.07322,
-            20: 0.07275,
-            25: 0.07197,
-            30: 0.07118
-        };
-        
-        // 图表实例
+        const alphaStandard = {10:0.07422,15:0.07322,20:0.07275,25:0.07197,30:0.07118};
         let calibrationChart = null;
-        
-        // 思考题参考答案显示/隐藏
-        function toggleAnswer(questionNum) {
-            const answerDiv = document.getElementById(`answer${questionNum}`);
-            const button = event.target;
-            
-            if (answerDiv.style.display === 'block') {
-                answerDiv.style.display = 'none';
-                button.textContent = '显示参考答案';
-            } else {
-                answerDiv.style.display = 'block';
-                button.textContent = '隐藏参考答案';
-            }
-        }
-        
-        // 更新单个填空题的状态图标
-        function updateAnswerStatusIcon(inputElement, status) {
-            const statusIcon = inputElement.nextElementSibling;
-            if (statusIcon && statusIcon.classList.contains('answer-status')) {
-                statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
-                
-                if (status === 'correct') {
-                    statusIcon.textContent = '✓';
-                    statusIcon.classList.add('correct-icon');
-                } else if (status === 'incorrect') {
-                    statusIcon.textContent = '✗';
-                    statusIcon.classList.add('incorrect-icon');
-                } else if (status === 'empty') {
-                    statusIcon.textContent = '○';
-                    statusIcon.classList.add('empty-icon');
-                } else {
-                    statusIcon.textContent = '';
-                }
-            }
-        }
-        
-        // 更新所有填空题的状态图标
-        function updateAllAnswerStatusIcons() {
-            const inputs = document.querySelectorAll('.fill-blank');
-            inputs.forEach(input => {
-                const userAnswer = input.value.trim();
-                const correctAnswers = answers[input.dataset.answer];
-                
-                if (userAnswer === '') {
-                    updateAnswerStatusIcon(input, 'empty');
-                } else if (correctAnswers && correctAnswers.includes(userAnswer)) {
-                    updateAnswerStatusIcon(input, 'correct');
-                } else {
-                    updateAnswerStatusIcon(input, 'incorrect');
-                }
-            });
-        }
-        
-        // 计算预习分数（仅填空题）
-        function calculatePreScore() {
-            const inputs = document.querySelectorAll('.fill-blank');
-            let correct = 0;
-            let total = inputs.length;
-            let emptyCount = 0;
+        let autoSaveTimer = null;
+        let lastSaveTime = null;
 
-            inputs.forEach(input => {
-                const userAnswer = input.value.trim();
-                const correctAnswers = answers[input.dataset.answer];
-                
-                // 清除之前的样式
-                input.classList.remove('correct', 'incorrect', 'empty');
-                
-                if (userAnswer === '') {
-                    emptyCount++;
-                    input.classList.add('empty');
-                    updateAnswerStatusIcon(input, 'empty');
-                } else if (correctAnswers && correctAnswers.includes(userAnswer)) {
-                    correct++;
-                    input.classList.add('correct');
-                    updateAnswerStatusIcon(input, 'correct');
-                } else {
-                    input.classList.add('incorrect');
-                    updateAnswerStatusIcon(input, 'incorrect');
+        // ========== 保存功能 ==========
+        function loadAllSavedData() {
+            try {
+                document.querySelectorAll('.info-input').forEach(i => { const v = localStorage.getItem(i.id); if(v!==null) i.value=v; });
+                document.querySelectorAll('.fill-blank').forEach(i => { const v = localStorage.getItem(i.id); if(v!==null) i.value=v; });
+                const dataIds = ['u1','u2','u3','u4','u5','u6','D1','D2','temp'];
+                dataIds.forEach(id => { const v = localStorage.getItem(id); if(v!==null) document.getElementById(id).value=v; });
+                for(let i=1;i<=5;i++) {
+                    const v1 = localStorage.getItem(`u1_${i}`); if(v1!==null) document.getElementById(`u1_${i}`).value=v1;
+                    const v2 = localStorage.getItem(`u2_${i}`); if(v2!==null) document.getElementById(`u2_${i}`).value=v2;
                 }
-            });
+                const thoughtIds = ['thought1','thought2','thought3'];
+                thoughtIds.forEach(id => { const v = localStorage.getItem(id); if(v!==null) document.getElementById(id).value=v; });
+                const summary = localStorage.getItem('experiment-summary'); if(summary!==null) document.getElementById('experiment-summary').value=summary;
+                const errorAnalysis = localStorage.getItem('error-analysis'); if(errorAnalysis!==null) document.getElementById('error-analysis').value=errorAnalysis;
+                const savedTime = localStorage.getItem('lastSaveTime'); if(savedTime) { lastSaveTime = new Date(parseInt(savedTime)); updateLastSaveTime(); }
+                calculateSensitivity(); console.log('数据加载完成');
+            } catch(e) { console.error('加载数据失败:', e); }
+        }
 
-            // 计算分数，未答题不计入正确
-            const score = Math.round((correct / total) * 100);
-            
-            // 显示结果
-            let scoreText = `预习分数：${score}分（答对${correct}/${total}题）`;
-            if (emptyCount > 0) {
-                scoreText += `，未答：${emptyCount}题`;
-            }
-            if (correct === total) {
-                scoreText += " 🎉 满分！";
-            } else if (correct === 0) {
-                scoreText += " 😢 请认真预习后再作答！";
-            }
-            
-            document.getElementById('scoreDisplay').innerHTML = scoreText;
-            return {score, correct, total, emptyCount};
-        }
-        
-        // 计算传感器灵敏度K
-        function calculateSensitivity() {
-            // 获取电压数据
-            const voltages = [];
-            for (let i = 1; i <= 6; i++) {
-                const voltage = parseFloat(document.getElementById(`u${i}`).value);
-                if (!isNaN(voltage)) {
-                    voltages.push(voltage);
+        function saveAllData() {
+            try {
+                document.querySelectorAll('.info-input').forEach(i => localStorage.setItem(i.id, i.value));
+                document.querySelectorAll('.fill-blank').forEach(i => localStorage.setItem(i.id, i.value));
+                const dataIds = ['u1','u2','u3','u4','u5','u6','D1','D2','temp'];
+                dataIds.forEach(id => { const i = document.getElementById(id); if(i) localStorage.setItem(id, i.value); });
+                for(let i=1;i<=5;i++) {
+                    const i1 = document.getElementById(`u1_${i}`); if(i1) localStorage.setItem(`u1_${i}`, i1.value);
+                    const i2 = document.getElementById(`u2_${i}`); if(i2) localStorage.setItem(`u2_${i}`, i2.value);
                 }
-            }
-            
-            if (voltages.length < 3) {
-                alert("请至少填写3个电压数据");
-                return;
-            }
-            
-            // 计算重力数据
-            const forces = [0.0049, 0.0098, 0.0147, 0.0196, 0.0245, 0.0294].slice(0, voltages.length);
-            
-            // 线性回归计算斜率和相关系数
-            const result = linearRegression(forces, voltages);
-            
-            document.getElementById('K-value').textContent = result.slope.toFixed(2);
-            document.getElementById('r-value').textContent = result.r.toFixed(4);
-            document.getElementById('sensitivity-result').style.display = 'block';
-            
-            // 保存K值供后续计算使用
-            window.sensorSensitivity = result.slope;
+                const thoughtIds = ['thought1','thought2','thought3'];
+                thoughtIds.forEach(id => { const i = document.getElementById(id); if(i) localStorage.setItem(id, i.value); });
+                localStorage.setItem('experiment-summary', document.getElementById('experiment-summary').value);
+                localStorage.setItem('error-analysis', document.getElementById('error-analysis').value);
+                lastSaveTime = new Date(); localStorage.setItem('lastSaveTime', lastSaveTime.getTime().toString()); updateLastSaveTime();
+                return true;
+            } catch(e) { console.error('保存失败:', e); return false; }
         }
-        
-        // 绘制校准曲线 - 保留文件1的布局
-        function drawCalibrationChart() {
-            const forces = [];
-            const voltages = [];
-            
-            for (let i = 1; i <= 6; i++) {
-                const force = parseFloat(document.getElementById(`f${i}`).textContent);
-                const voltage = parseFloat(document.getElementById(`u${i}`).value);
-                
-                if (!isNaN(voltage)) {
-                    forces.push(force);
-                    voltages.push(voltage);
-                }
-            }
-            
-            if (forces.length < 2) {
-                alert("请至少填写2个电压数据");
-                return;
-            }
-            
-            // 计算线性回归
-            const result = linearRegression(forces, voltages);
-            
-            // 生成拟合数据点
-            const fitForces = [0, Math.max(...forces) * 1.1];
-            const fitVoltages = fitForces.map(f => result.slope * f + result.intercept);
-            
-            const ctx = document.getElementById('calibrationChart').getContext('2d');
-            
-            // 如果图表已存在，销毁它
-            if (calibrationChart) {
-                calibrationChart.destroy();
-            }
-            
-            calibrationChart = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [
-                        {
-                            label: '实验数据',
-                            data: forces.map((f, i) => ({x: f, y: voltages[i]})),
-                            backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            pointRadius: 8,
-                            pointHoverRadius: 10
-                        },
-                        {
-                            label: '拟合直线',
-                            data: fitForces.map((f, i) => ({x: f, y: fitVoltages[i]})),
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 2,
-                            pointRadius: 0,
-                            fill: false,
-                            showLine: true,
-                            lineTension: 0
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: '砝码重力 F (N)',
-                                font: {
-                                    size: 14
-                                }
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: '输出电压 U (mV)',
-                                font: {
-                                    size: 14
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: '力敏传感器校准曲线',
-                            font: {
-                                size: 18
-                            }
-                        },
-                        legend: {
-                            position: 'top',
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    label += `(${context.parsed.x.toFixed(4)} N, ${context.parsed.y.toFixed(2)} mV)`;
-                                    return label;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            
-            // 标记已绘制图表
-            window.chartDrawn = true;
+
+        function updateLastSaveTime() { if(lastSaveTime) document.getElementById('lastSaveTime').textContent = `上次保存：${lastSaveTime.toLocaleTimeString()}`; }
+        function manualSave() { if(saveAllData()) alert('✅ 数据已成功保存到本地！'); else alert('❌ 保存失败'); }
+        function manualLoad() { loadAllSavedData(); alert('📂 已加载上次保存的数据！'); }
+        function clearSavedData() { if(confirm('⚠️ 确定要清除所有已保存的数据吗？')) { localStorage.clear(); lastSaveTime=null; document.getElementById('lastSaveTime').textContent='上次保存：未保存'; alert('🗑️ 已清除所有保存的数据'); } }
+
+        function exportData() {
+            const data = { info:{}, fillBlanks:{}, dataInputs:{}, table2:{}, thoughts:{}, summary:'', errorAnalysis:'', timestamp:new Date().toISOString() };
+            document.querySelectorAll('.info-input').forEach(i => data.info[i.id]=i.value);
+            document.querySelectorAll('.fill-blank').forEach(i => data.fillBlanks[i.id]=i.value);
+            const ids = ['u1','u2','u3','u4','u5','u6','D1','D2','temp'];
+            ids.forEach(id => { const i=document.getElementById(id); if(i) data.dataInputs[id]=i.value; });
+            for(let i=1;i<=5;i++) { const i1=document.getElementById(`u1_${i}`); if(i1) data.table2[`u1_${i}`]=i1.value; const i2=document.getElementById(`u2_${i}`); if(i2) data.table2[`u2_${i}`]=i2.value; }
+            const thoughtIds=['thought1','thought2','thought3']; thoughtIds.forEach(id=>{ const i=document.getElementById(id); if(i) data.thoughts[id]=i.value; });
+            data.summary = document.getElementById('experiment-summary').value;
+            data.errorAnalysis = document.getElementById('error-analysis').value;
+            const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+            const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`表面张力实验_${new Date().toLocaleDateString().replace(/\//g,'-')}.json`; a.click(); URL.revokeObjectURL(blob.url);
+            alert('📥 数据已导出为JSON文件');
         }
-        
-        // 计算表面张力系数
-        function calculateAlpha() {
-            // 检查是否已计算灵敏度
-            if (!window.sensorSensitivity) {
-                alert("请先计算传感器灵敏度K");
-                return;
-            }
-            
-            const D1 = parseFloat(document.getElementById('D1').value);
-            const D2 = parseFloat(document.getElementById('D2').value);
-            
-            if (isNaN(D1) || isNaN(D2)) {
-                alert("请填写圆环形吊片的直径");
-                return;
-            }
-            
-            const K = window.sensorSensitivity;
-            const alphas = [];
-            
-            // 计算每次测量的α值
-            for (let i = 1; i <= 5; i++) {
-                const U1 = parseFloat(document.getElementById(`u1_${i}`).value);
-                const U2 = parseFloat(document.getElementById(`u2_${i}`).value);
-                
-                if (!isNaN(U1) && !isNaN(U2)) {
-                    const deltaU = Math.abs(U1 - U2);
-                    const F = deltaU / K;
-                    const alpha = F / (Math.PI * (D1/100 + D2/100)); // 转换为米
-                    
-                    // 更新表格 - ΔU保留4位小数
-                    document.getElementById(`deltaU${i}`).textContent = deltaU.toFixed(4);
-                    document.getElementById(`F${i}`).textContent = F.toFixed(6);
-                    document.getElementById(`alpha${i}`).textContent = alpha.toFixed(6);
-                    
-                    alphas.push(alpha);
-                }
-            }
-            
-            if (alphas.length === 0) {
-                alert("请至少填写一组U₁和U₂数据");
-                return;
-            }
-            
-            // 计算平均值
-            const avgAlpha = alphas.reduce((sum, val) => sum + val, 0) / alphas.length;
-            document.getElementById('alpha-avg').textContent = avgAlpha.toFixed(6);
-            document.getElementById('alpha-result').style.display = 'block';
-            
-            // 保存平均值供后续使用
-            window.alphaAverage = avgAlpha;
+
+        function importData() {
+            const input=document.createElement('input'); input.type='file'; input.accept='.json';
+            input.onchange=function(e){ const file=e.target.files[0]; const reader=new FileReader();
+            reader.onload=function(e){ try{ const data=JSON.parse(e.target.result);
+                Object.entries(data.info||{}).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val; });
+                Object.entries(data.fillBlanks||{}).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val; });
+                Object.entries(data.dataInputs||{}).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val; });
+                Object.entries(data.table2||{}).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val; });
+                Object.entries(data.thoughts||{}).forEach(([id,val])=>{ const el=document.getElementById(id); if(el) el.value=val; });
+                if(data.summary) document.getElementById('experiment-summary').value=data.summary;
+                if(data.errorAnalysis) document.getElementById('error-analysis').value=data.errorAnalysis;
+                calculateSensitivity(); alert('✅ 数据导入成功！');
+            } catch(error){ alert('❌ 文件格式错误'); } }; reader.readAsText(file); }; input.click();
         }
-        
-        // 计算相对误差
-        function calculateError() {
-            const temp = parseFloat(document.getElementById('temp').value);
-            
-            if (isNaN(temp)) {
-                alert("请填写水的温度");
-                return;
-            }
-            
-            if (!window.alphaAverage) {
-                alert("请先计算表面张力系数α");
-                return;
-            }
-            
-            // 查找最接近的温度对应的标准值
-            const temps = Object.keys(alphaStandard).map(Number);
-            const closestTemp = temps.reduce((prev, curr) => {
-                return Math.abs(curr - temp) < Math.abs(prev - temp) ? curr : prev;
-            });
-            
-            const standardAlpha = alphaStandard[closestTemp];
-            const relativeError = Math.abs((window.alphaAverage - standardAlpha) / standardAlpha) * 100;
-            
-            document.getElementById('relative-error').textContent = relativeError.toFixed(2) + "%";
-            document.getElementById('alpha-result').style.display = 'block';
-            
-            // 保存相对误差
-            window.relativeError = relativeError;
-        }
-        
-        // 自动评分并生成评语 - 根据新的评分标准
-        function autoGrade() {
-            const preScoreResult = calculatePreScore();
-            const preScore = preScoreResult.score;
-            const summary = document.getElementById('experiment-summary').value.trim();
-            const errorAnalysis = document.getElementById('error-analysis').value.trim();
-            const chartDrawn = calibrationChart !== null;
-            
-            // 检查数据填写完整性
-            let dataCompleteness = 0;
-            const dataInputs = document.querySelectorAll('.data-input');
-            let filledCount = 0;
-            dataInputs.forEach(input => {
-                if (input.value.trim() !== '') filledCount++;
-            });
-            dataCompleteness = Math.round((filledCount / dataInputs.length) * 100);
-            
-            // 检查实验结果合理性
-            let experimentQuality = 0;
-            if (window.relativeError !== undefined) {
-                const error = window.relativeError;
-                if (error < 5) experimentQuality = 100;
-                else if (error < 10) experimentQuality = 80;
-                else if (error < 15) experimentQuality = 60;
-                else if (error < 20) experimentQuality = 40;
-                else experimentQuality = 20;
-            }
-            
-            // 检查思考题填写情况
-            let thoughtScore = 0;
-            const thoughtInputs = document.querySelectorAll('.thought-input');
-            let thoughtFilled = 0;
-            let thoughtTotalLength = 0;
-            
-            thoughtInputs.forEach(input => {
-                const answer = input.value.trim();
-                if (answer !== '') {
-                    thoughtFilled++;
-                    thoughtTotalLength += answer.length;
-                }
-            });
-            
-            // 根据填写情况和内容质量评分
-            const fillRate = thoughtFilled / thoughtInputs.length;
-            const avgLength = thoughtFilled > 0 ? thoughtTotalLength / thoughtFilled : 0;
-            
-            if (fillRate === 1 && avgLength > 50) thoughtScore = 100;
-            else if (fillRate >= 0.8 && avgLength > 40) thoughtScore = 80;
-            else if (fillRate >= 0.6 && avgLength > 30) thoughtScore = 60;
-            else if (fillRate >= 0.4 && avgLength > 20) thoughtScore = 40;
-            else if (fillRate >= 0.2) thoughtScore = 20;
-            else thoughtScore = 0;
-            
-            // 检查小结质量
-            let summaryScore = 0;
-            const summaryLength = summary.length;
-            // 检查关键词数量
-            const keywords = ['实验', '收获', '问题', '解决', '改进', '建议', '理解', '掌握', '学会', '操作', '表面张力', '误差'];
-            let keywordCount = 0;
-            keywords.forEach(keyword => {
-                if (summary.includes(keyword)) keywordCount++;
-            });
-            
-            if (summaryLength > 50 && keywordCount >= 5) summaryScore = 100;
-            else if (summaryLength > 40 && keywordCount >= 4) summaryScore = 80;
-            else if (summaryLength > 30 && keywordCount >= 3) summaryScore = 60;
-            else if (summaryLength > 20 && keywordCount >= 2) summaryScore = 40;
-            else if (summaryLength > 10) summaryScore = 20;
-            else summaryScore = 0;
-            
-            // 检查误差分析质量
-            let errorAnalysisScore = 0;
-            const errorAnalysisLength = errorAnalysis.length;
-            const errorKeywords = ['误差', '测量', '环境', '仪器', '操作', '精度', '温度', '湿度', '人为', '系统'];
-            let errorKeywordCount = 0;
-            errorKeywords.forEach(keyword => {
-                if (errorAnalysis.includes(keyword)) errorKeywordCount++;
-            });
-            
-            if (errorAnalysisLength > 30 && errorKeywordCount >= 3) errorAnalysisScore = 100;
-            else if (errorAnalysisLength > 20 && errorKeywordCount >= 2) errorAnalysisScore = 80;
-            else if (errorAnalysisLength > 10) errorAnalysisScore = 60;
-            else if (errorAnalysisLength > 0) errorAnalysisScore = 40;
-            else errorAnalysisScore = 0;
-            
-            // 计算综合分数（根据新的评分标准）
-            let totalScore = 0;
-            let scoreBreakdown = [];
-            
-            // 1. 预习填空（25%）
-            const preScoreWeighted = Math.round(preScore * 0.25);
-            totalScore += preScoreWeighted;
-            scoreBreakdown.push(`预习填空：${preScore}×25%=${preScoreWeighted}`);
-            
-            // 2. 数据完整性与合理性（25%）
-            const dataQuality = Math.round((dataCompleteness * 0.6 + experimentQuality * 0.4));
-            const dataScore = Math.round(dataQuality * 0.25);
-            totalScore += dataScore;
-            scoreBreakdown.push(`数据完整性与合理性：(${dataCompleteness}×60%+${experimentQuality}×40%)×25%=${dataScore}`);
-            
-            // 3. 数据误差（10%）
-            const errorScore = window.relativeError !== undefined ? Math.round(experimentQuality * 0.1) : 0;
-            totalScore += errorScore;
-            scoreBreakdown.push(`数据误差：${experimentQuality}×10%=${errorScore}`);
-            
-            // 4. 图表绘制（10%）
-            const chartScore = chartDrawn ? 100 : 0;
-            const chartScoreWeighted = Math.round(chartScore * 0.1);
-            totalScore += chartScoreWeighted;
-            scoreBreakdown.push(`图表绘制：${chartScore}×10%=${chartScoreWeighted}`);
-            
-            // 5. 思考题（15%）
-            const thoughtScoreWeighted = Math.round(thoughtScore * 0.15);
-            totalScore += thoughtScoreWeighted;
-            scoreBreakdown.push(`思考题：${thoughtScore}×15%=${thoughtScoreWeighted}`);
-            
-            // 6. 实验小结（15%）
-            const summaryAndErrorScore = Math.round((summaryScore * 0.7 + errorAnalysisScore * 0.3));
-            const summaryScoreWeighted = Math.round(summaryAndErrorScore * 0.15);
-            totalScore += summaryScoreWeighted;
-            scoreBreakdown.push(`实验小结与误差分析：(${summaryScore}×70%+${errorAnalysisScore}×30%)×15%=${summaryScoreWeighted}`);
-            
-            // 生成评语
-            let comment = "";
-            let grade = "不及格";
-            let gradeColor = "#c62828";
-            
-            if (totalScore >= 90) {
-                grade = "优秀";
-                gradeColor = "#2e7d32";
-                comment = `🎉 实验报告非常出色！综合得分${totalScore}分。预习扎实（${preScore}分），数据记录完整准确，图表绘制规范，思考题回答充分，小结详实。`;
-            } else if (totalScore >= 80) {
-                grade = "良好";
-                gradeColor = "#388e3c";
-                comment = `👍 实验报告质量较高！综合得分${totalScore}分。预习较好（${preScore}分），数据记录较为完整，图表绘制正确，分析较为充分。`;
-            } else if (totalScore >= 70) {
-                grade = "中等";
-                gradeColor = "#f57c00";
-                comment = `✊ 实验报告基本合格！综合得分${totalScore}分。预习一般（${preScore}分），数据记录和计算存在一定误差，分析较为简单。`;
-            } else if (totalScore >= 60) {
-                grade = "及格";
-                gradeColor = "#ff9800";
-                comment = `⚠️ 实验报告勉强及格！综合得分${totalScore}分。预习不足（${preScore}分），数据记录或计算存在明显问题，分析不足。`;
-            } else {
-                grade = "不及格";
-                gradeColor = "#d32f2f";
-                comment = `❌ 实验报告未达到基本要求！报告得分${totalScore}分。请重新认真学习实验原理，补充完整实验记录！`;
-            }
-            
-            // 具体建议
-            let suggestions = [];
-            if (preScore < 70) suggestions.push("预习部分需要加强，请认真阅读实验原理");
-            if (dataCompleteness < 80) suggestions.push("数据记录需要更加完整");
-            if (experimentQuality < 60) suggestions.push("实验误差较大，请检查操作和计算");
-            if (!chartDrawn) suggestions.push("请完成图表的绘制");
-            if (thoughtScore < 60) suggestions.push("思考题回答需要更加充分详细");
-            if (summaryScore < 60) suggestions.push("实验小结需要更加详实，应包含实验收获、问题和改进建议");
-            if (errorAnalysisScore < 60) suggestions.push("误差分析需要更加深入");
-            
-            if (suggestions.length > 0) {
-                comment += ` 改进建议：${suggestions.join('；')}。`;
-            }
-            
-            // 显示详细分数分解
-            comment += ` 评分详情：${scoreBreakdown.join('，')}，总评：${grade}（${totalScore}分）。`;
-            
-            // 获取指导教师姓名和当前日期
-            const teacherName = document.getElementById('instructor').value || '未填写';
-            const currentDate = new Date().toLocaleDateString('zh-CN', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            
-            // 更新评语内容
-            document.getElementById('commentContent').innerHTML = comment;
-            document.getElementById('commentContent').style.color = gradeColor;
-            document.getElementById('teacherName').textContent = teacherName;
-            document.getElementById('currentDate').textContent = currentDate;
-            document.getElementById('commentFooter').style.display = 'block';
-        }
-        
-        // 线性回归函数
-        function linearRegression(x, y) {
-            const n = x.length;
-            
-            // 计算均值
-            const xMean = x.reduce((sum, val) => sum + val, 0) / n;
-            const yMean = y.reduce((sum, val) => sum + val, 0) / n;
-            
-            // 计算斜率和截距
-            let numerator = 0;
-            let denominator = 0;
-            
-            for (let i = 0; i < n; i++) {
-                numerator += (x[i] - xMean) * (y[i] - yMean);
-                denominator += (x[i] - xMean) ** 2;
-            }
-            
-            const slope = numerator / denominator;
-            const intercept = yMean - slope * xMean;
-            
-            // 计算相关系数
-            let sumXY = 0, sumX2 = 0, sumY2 = 0;
-            for (let i = 0; i < n; i++) {
-                sumXY += x[i] * y[i];
-                sumX2 += x[i] ** 2;
-                sumY2 += y[i] ** 2;
-            }
-            
-            const r = (n * sumXY - x.reduce((s, v) => s + v, 0) * y.reduce((s, v) => s + v, 0)) /
-                     Math.sqrt((n * sumX2 - (x.reduce((s, v) => s + v, 0) ** 2)) *
-                              (n * sumY2 - (y.reduce((s, v) => s + v, 0) ** 2)));
-            
-            return { slope, intercept, r };
-        }
-        
-        // 初始化页面
+
+        function toggleAnswer(qn){ const d=document.getElementById(`answer${qn}`); const btn=event.target; if(d.style.display==='block'){ d.style.display='none'; btn.textContent='显示参考答案'; }else{ d.style.display='block'; btn.textContent='隐藏参考答案'; } }
+        function updateAnswerStatusIcon(i,s){ const ic=i.nextElementSibling; if(ic&&ic.classList.contains('answer-status')){ ic.classList.remove('correct-icon','incorrect-icon','empty-icon'); if(s==='correct'){ ic.textContent='✓'; ic.classList.add('correct-icon'); }else if(s==='incorrect'){ ic.textContent='✗'; ic.classList.add('incorrect-icon'); }else if(s==='empty'){ ic.textContent='○'; ic.classList.add('empty-icon'); }else{ ic.textContent=''; } } }
+        function updateAllAnswerStatusIcons(){ document.querySelectorAll('.fill-blank').forEach(i=>{ const u=i.value.trim(), ca=answers[i.dataset.answer]; if(u==='') updateAnswerStatusIcon(i,'empty'); else if(ca&&ca.includes(u)) updateAnswerStatusIcon(i,'correct'); else updateAnswerStatusIcon(i,'incorrect'); }); }
+
+        function calculatePreScore(){ const inputs=document.querySelectorAll('.fill-blank'); let c=0,t=inputs.length,e=0; inputs.forEach(i=>{ const u=i.value.trim(), ca=answers[i.dataset.answer]; i.classList.remove('correct','incorrect','empty'); if(u===''){ e++; i.classList.add('empty'); updateAnswerStatusIcon(i,'empty'); }else if(ca&&ca.includes(u)){ c++; i.classList.add('correct'); updateAnswerStatusIcon(i,'correct'); }else{ i.classList.add('incorrect'); updateAnswerStatusIcon(i,'incorrect'); } }); const score=Math.round((c/t)*100); let txt=`预习分数：${score}分（答对${c}/${t}题）`; if(e>0) txt+=`，未答：${e}题`; if(c===t) txt+=" 🎉 满分！"; else if(c===0) txt+=" 😢 请认真预习后再作答！"; document.getElementById('scoreDisplay').innerHTML=txt; return {score,c,t,e}; }
+
+        function linearRegression(x,y){ const n=x.length; let sx=0,sy=0,sxy=0,sx2=0,sy2=0; for(let i=0;i<n;i++){ sx+=x[i]; sy+=y[i]; sxy+=x[i]*y[i]; sx2+=x[i]*x[i]; sy2+=y[i]*y[i]; } const slope=(n*sxy-sx*sy)/(n*sx2-sx*sx); const intercept=(sy-slope*sx)/n; const r=(n*sxy-sx*sy)/Math.sqrt((n*sx2-sx*sx)*(n*sy2-sy*sy)); return {slope,intercept,r}; }
+
+        function calculateSensitivity(){ const voltages=[]; for(let i=1;i<=6;i++){ const v=parseFloat(document.getElementById(`u${i}`).value); if(!isNaN(v)) voltages.push(v); } if(voltages.length<3){ alert("请至少填写3个电压数据"); return; } const forces=[0.0049,0.0098,0.0147,0.0196,0.0245,0.0294].slice(0,voltages.length); const res=linearRegression(forces,voltages); document.getElementById('K-value').textContent=res.slope.toFixed(2); document.getElementById('r-value').textContent=res.r.toFixed(4); document.getElementById('sensitivity-result').style.display='block'; window.sensorSensitivity=res.slope; }
+
+        function drawCalibrationChart(){ const forces=[], voltages=[]; for(let i=1;i<=6;i++){ const f=parseFloat(document.getElementById(`f${i}`).textContent); const v=parseFloat(document.getElementById(`u${i}`).value); if(!isNaN(v)){ forces.push(f); voltages.push(v); } } if(forces.length<2){ alert("请至少填写2个电压数据"); return; } const res=linearRegression(forces,voltages); const fitForces=[0,Math.max(...forces)*1.1]; const fitVoltages=fitForces.map(f=>res.slope*f+res.intercept); const ctx=document.getElementById('calibrationChart').getContext('2d'); if(calibrationChart) calibrationChart.destroy(); calibrationChart=new Chart(ctx,{type:'scatter',data:{datasets:[{label:'实验数据',data:forces.map((f,i)=>({x:f,y:voltages[i]})),backgroundColor:'rgba(54,162,235,0.8)',borderColor:'rgba(54,162,235,1)',pointRadius:8},{label:'拟合直线',data:fitForces.map((f,i)=>({x:f,y:fitVoltages[i]})),borderColor:'rgba(255,99,132,1)',borderWidth:2,pointRadius:0,type:'line',fill:false}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{title:{display:true,text:'砝码重力 F (N)'}},y:{title:{display:true,text:'输出电压 U (mV)'}}},plugins:{title:{display:true,text:'力敏传感器校准曲线'}}}}); window.chartDrawn=true; }
+
+        function calculateAlpha(){ if(!window.sensorSensitivity){ alert("请先计算传感器灵敏度K"); return; } const D1=parseFloat(document.getElementById('D1').value), D2=parseFloat(document.getElementById('D2').value); if(isNaN(D1)||isNaN(D2)){ alert("请填写圆环形吊片的直径"); return; } const K=window.sensorSensitivity; const alphas=[]; for(let i=1;i<=5;i++){ const U1=parseFloat(document.getElementById(`u1_${i}`).value), U2=parseFloat(document.getElementById(`u2_${i}`).value); if(!isNaN(U1)&&!isNaN(U2)){ const deltaU=Math.abs(U1-U2); const F=deltaU/K; const alpha=F/(Math.PI*(D1/100+D2/100)); document.getElementById(`deltaU${i}`).textContent=deltaU.toFixed(4); document.getElementById(`F${i}`).textContent=F.toFixed(6); document.getElementById(`alpha${i}`).textContent=alpha.toFixed(6); alphas.push(alpha); } } if(alphas.length===0){ alert("请至少填写一组U₁和U₂数据"); return; } const avgAlpha=alphas.reduce((s,v)=>s+v,0)/alphas.length; document.getElementById('alpha-avg').textContent=avgAlpha.toFixed(6); document.getElementById('alpha-result').style.display='block'; window.alphaAverage=avgAlpha; }
+
+        function calculateError(){ const temp=parseFloat(document.getElementById('temp').value); if(isNaN(temp)){ alert("请填写水的温度"); return; } if(!window.alphaAverage){ alert("请先计算表面张力系数α"); return; } const temps=Object.keys(alphaStandard).map(Number); const closestTemp=temps.reduce((p,c)=>Math.abs(c-temp)<Math.abs(p-temp)?c:p); const standardAlpha=alphaStandard[closestTemp]; const relativeError=Math.abs((window.alphaAverage-standardAlpha)/standardAlpha)*100; document.getElementById('relative-error').textContent=relativeError.toFixed(2)+"%"; document.getElementById('alpha-result').style.display='block'; window.relativeError=relativeError; }
+
+        function autoGrade(){ const pre=calculatePreScore().score; const summary=document.getElementById('experiment-summary').value.trim(); const errorAnalysis=document.getElementById('error-analysis').value.trim(); const chartDrawn=calibrationChart!==null; let dataCompleteness=0; const dataInputs=document.querySelectorAll('.data-input'); let filledCount=0; dataInputs.forEach(i=>{ if(i.value.trim()!=='') filledCount++; }); dataCompleteness=Math.round((filledCount/dataInputs.length)*100); let experimentQuality=0; if(window.relativeError!==undefined){ const err=window.relativeError; if(err<5) experimentQuality=100; else if(err<10) experimentQuality=80; else if(err<15) experimentQuality=60; else if(err<20) experimentQuality=40; else experimentQuality=20; } let thoughtScore=0; const thoughtInputs=document.querySelectorAll('.thought-input'); let thoughtFilled=0,thoughtTotalLength=0; thoughtInputs.forEach(i=>{ const a=i.value.trim(); if(a!==''){ thoughtFilled++; thoughtTotalLength+=a.length; } }); const fillRate=thoughtFilled/thoughtInputs.length; const avgLength=thoughtFilled>0?thoughtTotalLength/thoughtFilled:0; if(fillRate===1&&avgLength>50) thoughtScore=100; else if(fillRate>=0.8&&avgLength>40) thoughtScore=80; else if(fillRate>=0.6&&avgLength>30) thoughtScore=60; else if(fillRate>=0.4&&avgLength>20) thoughtScore=40; else if(fillRate>=0.2) thoughtScore=20; else thoughtScore=0; let summaryScore=0; const summaryLength=summary.length; const keywords=['实验','收获','问题','解决','改进','建议','理解','掌握','学会','操作','表面张力','误差']; let kwc=0; keywords.forEach(k=>{ if(summary.includes(k)) kwc++; }); if(summaryLength>50&&kwc>=5) summaryScore=100; else if(summaryLength>40&&kwc>=4) summaryScore=80; else if(summaryLength>30&&kwc>=3) summaryScore=60; else if(summaryLength>20&&kwc>=2) summaryScore=40; else if(summaryLength>10) summaryScore=20; else summaryScore=0; let errorAnalysisScore=0; const errorAnalysisLength=errorAnalysis.length; const errorKeywords=['误差','测量','环境','仪器','操作','精度','温度','湿度','人为','系统']; let eKwc=0; errorKeywords.forEach(k=>{ if(errorAnalysis.includes(k)) eKwc++; }); if(errorAnalysisLength>30&&eKwc>=3) errorAnalysisScore=100; else if(errorAnalysisLength>20&&eKwc>=2) errorAnalysisScore=80; else if(errorAnalysisLength>10) errorAnalysisScore=60; else if(errorAnalysisLength>0) errorAnalysisScore=40; else errorAnalysisScore=0; let totalScore=0; const preW=Math.round(pre*0.25); totalScore+=preW; document.getElementById('detailPreScore').textContent=`${preW}/25`; const dataQuality=Math.round((dataCompleteness*0.6+experimentQuality*0.4)); const dataScore=Math.round(dataQuality*0.25); totalScore+=dataScore; document.getElementById('detailDataScore').textContent=`${dataScore}/25`; const errorScore=window.relativeError!==undefined?Math.round(experimentQuality*0.1):0; totalScore+=errorScore; document.getElementById('detailErrorScore').textContent=`${errorScore}/10`; const chartScore=chartDrawn?100:0; const chartW=Math.round(chartScore*0.1); totalScore+=chartW; document.getElementById('detailChartScore').textContent=`${chartW}/10`; const thoughtW=Math.round(thoughtScore*0.15); totalScore+=thoughtW; document.getElementById('detailThoughtScore').textContent=`${thoughtW}/15`; const summaryAndErrorScore=Math.round((summaryScore*0.7+errorAnalysisScore*0.3)); const summaryW=Math.round(summaryAndErrorScore*0.15); totalScore+=summaryW; document.getElementById('detailSummaryScore').textContent=`${summaryW}/15`; document.getElementById('detailTotalScore').textContent=`${totalScore}/100`; document.getElementById('scoreDetails').style.display='block'; let comment="",grade="不及格",gradeColor="#c62828"; if(totalScore>=90){ grade="优秀"; gradeColor="#2e7d32"; comment=`🎉 实验报告非常出色！综合得分${totalScore}分。预习扎实（${pre}分），数据记录完整准确，图表绘制规范，思考题回答充分，小结详实。`; }else if(totalScore>=80){ grade="良好"; gradeColor="#388e3c"; comment=`👍 实验报告质量较高！综合得分${totalScore}分。预习较好（${pre}分），数据记录较为完整，分析较为充分。`; }else if(totalScore>=70){ grade="中等"; gradeColor="#f57c00"; comment=`✊ 实验报告基本合格！综合得分${totalScore}分。预习一般（${pre}分），数据记录和计算存在一定误差。`; }else if(totalScore>=60){ grade="及格"; gradeColor="#ff9800"; comment=`⚠️ 实验报告勉强及格！综合得分${totalScore}分。预习不足（${pre}分），数据记录或计算存在明显问题。`; }else{ grade="不及格"; gradeColor="#d32f2f"; comment=`❌ 实验报告未达到基本要求！报告得分${totalScore}分。请重新认真学习实验原理，补充完整实验记录！`; } const teacherName=document.getElementById('instructor').value||'马厂'; const currentDate=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'}); document.getElementById('commentContent').innerHTML=comment; document.getElementById('commentContent').style.color=gradeColor; document.getElementById('teacherName').textContent=teacherName; document.getElementById('currentDate').textContent=currentDate; document.getElementById('commentFooter').style.display='block'; }
+
         window.onload = function() {
-            // 添加填空框变化监听
-            const fillBlanks = document.querySelectorAll('.fill-blank');
-            fillBlanks.forEach(input => {
-                input.addEventListener('change', function() {
-                    // 移除之前的样式
-                    this.classList.remove('correct', 'incorrect', 'empty');
-                    
-                    // 清空状态图标
-                    const statusIcon = this.nextElementSibling;
-                    if (statusIcon && statusIcon.classList.contains('answer-status')) {
-                        statusIcon.textContent = '';
-                        statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
-                    }
-                });
+            loadAllSavedData();
+            document.addEventListener('input', function(e) {
+                if(e.target.matches('.info-input, .fill-blank, .data-input, .thought-input, #experiment-summary, #error-analysis')) {
+                    if(autoSaveTimer) clearTimeout(autoSaveTimer);
+                    autoSaveTimer = setTimeout(() => saveAllData(), 1000);
+                }
             });
-            
-            // 设置默认日期
+            setInterval(() => saveAllData(), 60000);
+            document.querySelectorAll('.fill-blank').forEach(i => { i.addEventListener('change', function(){ this.classList.remove('correct','incorrect','empty'); const ic=this.nextElementSibling; if(ic&&ic.classList.contains('answer-status')){ ic.textContent=''; ic.classList.remove('correct-icon','incorrect-icon','empty-icon'); } }); });
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('date').value = today;
         };
     </script>
 </body>
-
 </html>
