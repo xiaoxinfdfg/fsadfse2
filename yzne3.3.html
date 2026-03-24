@@ -548,6 +548,13 @@
             50% { opacity: 0.5; }
             100% { opacity: 1; }
         }
+        .force-label {
+            font-weight: bold;
+            background: rgba(76, 175, 80, 0.2);
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
     </style>
 </head>
 <body>
@@ -746,7 +753,7 @@
                     <th rowspan="2" class="col-12">v̄₂ = ΔL/t̄₂<br>/ m·s⁻¹</th>
                     <th rowspan="2" class="col-13">a = (v̄₂²–v̄₁²)/(2S)<br>/ m·s⁻²</th>
                     <th rowspan="2" class="col-13">F/a<br>/ kg</th>
-                </tr>
+                 </tr>
                 <tr class="table-subheader-row">
                     <th class="col-3">1</th>
                     <th class="col-4">2</th>
@@ -754,13 +761,13 @@
                     <th class="col-8">1</th>
                     <th class="col-9">2</th>
                     <th class="col-10">3</th>
-                </tr>
+                 </tr>
             </thead>
             <tbody>
                 <tr class="table-data-row">
                     <td class="col-1">1</td>
                     <td class="col-2"><input type="text" class="mass-input" id="mass1" placeholder="kg" value="0.155"></td>
-                    <td class="col-2">0.049</td>
+                    <td class="col-2"><span class="force-label">0.098</span></td>
                     <td class="col-3"><input type="text" class="data-input t1-11" id="t1_11" placeholder="ms"></td>
                     <td class="col-4"><input type="text" class="data-input t1-12" id="t1_12" placeholder="ms"></td>
                     <td class="col-5"><input type="text" class="data-input t1-13" id="t1_13" placeholder="ms"></td>
@@ -777,7 +784,7 @@
                 <tr class="table-data-row">
                     <td class="col-1">2</td>
                     <td class="col-2"><input type="text" class="mass-input" id="mass2" placeholder="kg" value="0.155"></td>
-                    <td class="col-2">0.098</td>
+                    <td class="col-2"><span class="force-label">0.147</span></td>
                     <td class="col-3"><input type="text" class="data-input t1-21" id="t1_21" placeholder="ms"></td>
                     <td class="col-4"><input type="text" class="data-input t1-22" id="t1_22" placeholder="ms"></td>
                     <td class="col-5"><input type="text" class="data-input t1-23" id="t1_23" placeholder="ms"></td>
@@ -809,7 +816,7 @@
                     <th rowspan="2" class="col-12">v̄₂ = ΔL/t̄₂<br>/ m·s⁻¹</th>
                     <th rowspan="2" class="col-13">a = (v̄₂²–v̄₁²)/(2S)<br>/ m·s⁻²</th>
                     <th rowspan="2" class="col-13">Ma<br>/ N</th>
-                </tr>
+                 </tr>
                 <tr class="table-subheader-row">
                     <th class="col-3">1</th>
                     <th class="col-4">2</th>
@@ -817,7 +824,7 @@
                     <th class="col-8">1</th>
                     <th class="col-9">2</th>
                     <th class="col-10">3</th>
-                </tr>
+                 </tr>
             </thead>
             <tbody>
                 <tr class="table-data-row">
@@ -1040,92 +1047,62 @@
 
         // ========== 保存功能 ==========
         
-        // 加载所有保存的数据
         function loadAllSavedData() {
             try {
-                // 加载基本信息
                 document.querySelectorAll('.info-input').forEach(input => {
                     const savedValue = localStorage.getItem(input.id);
                     if (savedValue !== null) input.value = savedValue;
                 });
-                
-                // 加载填空题
                 document.querySelectorAll('.fill-blank').forEach(input => {
                     const savedValue = localStorage.getItem(input.id);
                     if (savedValue !== null) input.value = savedValue;
                 });
-                
-                // 加载质量输入框
                 document.querySelectorAll('.mass-input').forEach(input => {
                     const savedValue = localStorage.getItem(input.id);
                     if (savedValue !== null) input.value = savedValue;
                 });
-                
-                // 加载数据表格输入框
                 document.querySelectorAll('.data-input').forEach(input => {
                     const savedValue = localStorage.getItem(input.id);
                     if (savedValue !== null) input.value = savedValue;
                 });
-                
-                // 加载思考题
                 document.querySelectorAll('.thought-input').forEach(input => {
                     const savedValue = localStorage.getItem(input.id);
                     if (savedValue !== null) input.value = savedValue;
                 });
-                
-                // 加载实验小结
                 const savedSummary = localStorage.getItem('summary');
                 if (savedSummary !== null) document.getElementById('summary').value = savedSummary;
-                
-                // 更新上次保存时间显示
                 const savedTime = localStorage.getItem('lastSaveTime');
                 if (savedTime) {
                     lastSaveTime = new Date(parseInt(savedTime));
                     updateLastSaveTime();
                 }
-                
                 console.log('数据加载完成');
             } catch (e) {
                 console.error('加载数据失败:', e);
             }
         }
 
-        // 保存所有数据到localStorage
         function saveAllData() {
             try {
-                // 保存基本信息
                 document.querySelectorAll('.info-input').forEach(input => {
                     localStorage.setItem(input.id, input.value);
                 });
-                
-                // 保存填空题
                 document.querySelectorAll('.fill-blank').forEach(input => {
                     localStorage.setItem(input.id, input.value);
                 });
-                
-                // 保存质量输入框
                 document.querySelectorAll('.mass-input').forEach(input => {
                     localStorage.setItem(input.id, input.value);
                 });
-                
-                // 保存数据表格
                 document.querySelectorAll('.data-input').forEach(input => {
                     localStorage.setItem(input.id, input.value);
                 });
-                
-                // 保存思考题
                 document.querySelectorAll('.thought-input').forEach(input => {
                     localStorage.setItem(input.id, input.value);
                 });
-                
-                // 保存实验小结
                 localStorage.setItem('summary', document.getElementById('summary').value);
-                
-                // 保存时间戳
                 lastSaveTime = new Date();
                 localStorage.setItem('lastSaveTime', lastSaveTime.getTime().toString());
                 updateLastSaveTime();
-                
                 console.log('数据保存成功');
                 return true;
             } catch (e) {
@@ -1134,7 +1111,6 @@
             }
         }
 
-        // 更新上次保存时间显示
         function updateLastSaveTime() {
             if (lastSaveTime) {
                 const timeStr = lastSaveTime.toLocaleTimeString();
@@ -1142,70 +1118,16 @@
             }
         }
 
-        // 手动保存
-        function manualSave() {
-            if (saveAllData()) {
-                alert('✅ 数据已成功保存到本地！');
-            } else {
-                alert('❌ 保存失败，请重试');
-            }
-        }
-
-        // 手动加载
-        function manualLoad() {
-            loadAllSavedData();
-            // 重新计算
-            calculateData();
-            calculateErrors();
-            updateAllAnswerStatusIcons();
-            alert('📂 已加载上次保存的数据！');
-        }
-
-        // 清除保存的数据
-        function clearSavedData() {
-            if (confirm('⚠️ 确定要清除所有已保存的数据吗？\n\n这将删除所有本地存储的实验数据，但不会清空当前页面填写的内容。')) {
-                localStorage.clear();
-                lastSaveTime = null;
-                document.getElementById('lastSaveTime').textContent = '上次保存：未保存';
-                alert('🗑️ 已清除所有保存的数据');
-            }
-        }
-
-        // 导出数据为JSON文件
+        function manualSave() { if (saveAllData()) alert('✅ 数据已成功保存到本地！'); else alert('❌ 保存失败，请重试'); }
+        function manualLoad() { loadAllSavedData(); calculateData(); calculateErrors(); updateAllAnswerStatusIcons(); alert('📂 已加载上次保存的数据！'); }
+        function clearSavedData() { if (confirm('⚠️ 确定要清除所有已保存的数据吗？')) { localStorage.clear(); lastSaveTime = null; document.getElementById('lastSaveTime').textContent = '上次保存：未保存'; alert('🗑️ 已清除所有保存的数据'); } }
         function exportData() {
-            const data = {
-                info: {},
-                fillBlanks: {},
-                massInputs: {},
-                dataInputs: {},
-                thoughts: {},
-                summary: document.getElementById('summary').value,
-                timestamp: new Date().toISOString(),
-                version: '1.0'
-            };
-            
-            // 收集所有输入数据
-            document.querySelectorAll('.info-input').forEach(input => {
-                data.info[input.id] = input.value;
-            });
-            
-            document.querySelectorAll('.fill-blank').forEach(input => {
-                data.fillBlanks[input.id] = input.value;
-            });
-            
-            document.querySelectorAll('.mass-input').forEach(input => {
-                data.massInputs[input.id] = input.value;
-            });
-            
-            document.querySelectorAll('.data-input').forEach(input => {
-                data.dataInputs[input.id] = input.value;
-            });
-            
-            document.querySelectorAll('.thought-input').forEach(input => {
-                data.thoughts[input.id] = input.value;
-            });
-            
-            // 创建下载链接
+            const data = { info: {}, fillBlanks: {}, massInputs: {}, dataInputs: {}, thoughts: {}, summary: document.getElementById('summary').value, timestamp: new Date().toISOString(), version: '1.0' };
+            document.querySelectorAll('.info-input').forEach(input => { data.info[input.id] = input.value; });
+            document.querySelectorAll('.fill-blank').forEach(input => { data.fillBlanks[input.id] = input.value; });
+            document.querySelectorAll('.mass-input').forEach(input => { data.massInputs[input.id] = input.value; });
+            document.querySelectorAll('.data-input').forEach(input => { data.dataInputs[input.id] = input.value; });
+            document.querySelectorAll('.thought-input').forEach(input => { data.thoughts[input.id] = input.value; });
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1214,11 +1136,8 @@
             a.download = `牛顿第二定律实验_${dateStr}.json`;
             a.click();
             URL.revokeObjectURL(url);
-            
             alert('📥 数据已导出为JSON文件');
         }
-
-        // 导入数据
         function importData() {
             const input = document.createElement('input');
             input.type = 'file';
@@ -1229,157 +1148,89 @@
                 reader.onload = function(e) {
                     try {
                         const data = JSON.parse(e.target.result);
-                        
-                        // 恢复基本信息
-                        Object.entries(data.info || {}).forEach(([id, value]) => {
-                            const inputEl = document.getElementById(id);
-                            if (inputEl) inputEl.value = value;
-                        });
-                        
-                        // 恢复填空题
-                        Object.entries(data.fillBlanks || {}).forEach(([id, value]) => {
-                            const inputEl = document.getElementById(id);
-                            if (inputEl) inputEl.value = value;
-                        });
-                        
-                        // 恢复质量数据
-                        Object.entries(data.massInputs || {}).forEach(([id, value]) => {
-                            const inputEl = document.getElementById(id);
-                            if (inputEl) inputEl.value = value;
-                        });
-                        
-                        // 恢复数据表格
-                        Object.entries(data.dataInputs || {}).forEach(([id, value]) => {
-                            const inputEl = document.getElementById(id);
-                            if (inputEl) inputEl.value = value;
-                        });
-                        
-                        // 恢复思考题
-                        Object.entries(data.thoughts || {}).forEach(([id, value]) => {
-                            const inputEl = document.getElementById(id);
-                            if (inputEl) inputEl.value = value;
-                        });
-                        
-                        // 恢复实验小结
+                        Object.entries(data.info || {}).forEach(([id, value]) => { const inputEl = document.getElementById(id); if (inputEl) inputEl.value = value; });
+                        Object.entries(data.fillBlanks || {}).forEach(([id, value]) => { const inputEl = document.getElementById(id); if (inputEl) inputEl.value = value; });
+                        Object.entries(data.massInputs || {}).forEach(([id, value]) => { const inputEl = document.getElementById(id); if (inputEl) inputEl.value = value; });
+                        Object.entries(data.dataInputs || {}).forEach(([id, value]) => { const inputEl = document.getElementById(id); if (inputEl) inputEl.value = value; });
+                        Object.entries(data.thoughts || {}).forEach(([id, value]) => { const inputEl = document.getElementById(id); if (inputEl) inputEl.value = value; });
                         if (data.summary) document.getElementById('summary').value = data.summary;
-                        
-                        // 重新计算
-                        calculateData();
-                        calculateErrors();
-                        updateAllAnswerStatusIcons();
-                        
+                        calculateData(); calculateErrors(); updateAllAnswerStatusIcons();
                         alert('✅ 数据导入成功！');
-                    } catch (error) {
-                        console.error(error);
-                        alert('❌ 文件格式错误，导入失败');
-                    }
+                    } catch (error) { console.error(error); alert('❌ 文件格式错误，导入失败'); }
                 };
                 reader.readAsText(file);
             };
             input.click();
         }
 
-        // 思考题参考答案显示/隐藏
         function toggleAnswer(questionNum) {
             const answerDiv = document.getElementById(`answer${questionNum}`);
             const button = event.target;
-            
-            if (answerDiv.style.display === 'block') {
-                answerDiv.style.display = 'none';
-                button.textContent = '显示参考答案';
-            } else {
-                answerDiv.style.display = 'block';
-                button.textContent = '隐藏参考答案';
-            }
+            if (answerDiv.style.display === 'block') { answerDiv.style.display = 'none'; button.textContent = '显示参考答案'; }
+            else { answerDiv.style.display = 'block'; button.textContent = '隐藏参考答案'; }
         }
 
-        // 更新填空题状态图标
         function updateAnswerStatusIcon(inputElement, status) {
             const statusIcon = inputElement.nextElementSibling;
             if (statusIcon && statusIcon.classList.contains('answer-status')) {
                 statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
-                
-                if (status === 'correct') {
-                    statusIcon.textContent = '✓';
-                    statusIcon.classList.add('correct-icon');
-                } else if (status === 'incorrect') {
-                    statusIcon.textContent = '✗';
-                    statusIcon.classList.add('incorrect-icon');
-                } else if (status === 'empty') {
-                    statusIcon.textContent = '○';
-                    statusIcon.classList.add('empty-icon');
-                } else {
-                    statusIcon.textContent = '';
-                }
+                if (status === 'correct') { statusIcon.textContent = '✓'; statusIcon.classList.add('correct-icon'); }
+                else if (status === 'incorrect') { statusIcon.textContent = '✗'; statusIcon.classList.add('incorrect-icon'); }
+                else if (status === 'empty') { statusIcon.textContent = '○'; statusIcon.classList.add('empty-icon'); }
+                else { statusIcon.textContent = ''; }
             }
         }
 
-        // 更新所有填空题的状态图标
         function updateAllAnswerStatusIcons() {
             const inputs = document.querySelectorAll('.fill-blank');
             inputs.forEach(input => {
                 const userAnswer = input.value.trim();
                 const correctAnswers = answers[input.dataset.answer];
-                
-                if (userAnswer === '') {
-                    updateAnswerStatusIcon(input, 'empty');
-                } else if (correctAnswers && correctAnswers.some(ans => {
+                if (userAnswer === '') updateAnswerStatusIcon(input, 'empty');
+                else if (correctAnswers && correctAnswers.some(ans => {
                     const userAns = userAnswer.toLowerCase().replace(/\s+/g, '');
                     const correctAns = ans.toLowerCase().replace(/\s+/g, '');
                     return userAns === correctAns || userAns.includes(correctAns) || correctAns.includes(userAns);
-                })) {
-                    updateAnswerStatusIcon(input, 'correct');
-                } else {
-                    updateAnswerStatusIcon(input, 'incorrect');
-                }
+                })) updateAnswerStatusIcon(input, 'correct');
+                else updateAnswerStatusIcon(input, 'incorrect');
             });
         }
 
-        // 填入参考数据
         function fillReferenceData() {
             if (confirm("警告：参考数据仅供对照使用！若直接搬用参考数据，数据部分将计0分！\n\n是否继续填入参考数据？")) {
-                // 表1数据
                 document.getElementById('t1_11').value = referenceData.t1_11;
                 document.getElementById('t1_12').value = referenceData.t1_12;
                 document.getElementById('t1_13').value = referenceData.t1_13;
                 document.getElementById('t2_11').value = referenceData.t2_11;
                 document.getElementById('t2_12').value = referenceData.t2_12;
                 document.getElementById('t2_13').value = referenceData.t2_13;
-                
                 document.getElementById('t1_21').value = referenceData.t1_21;
                 document.getElementById('t1_22').value = referenceData.t1_22;
                 document.getElementById('t1_23').value = referenceData.t1_23;
                 document.getElementById('t2_21').value = referenceData.t2_21;
                 document.getElementById('t2_22').value = referenceData.t2_22;
                 document.getElementById('t2_23').value = referenceData.t2_23;
-                
-                // 表2数据
                 document.getElementById('t1_31').value = referenceData.t1_31;
                 document.getElementById('t1_32').value = referenceData.t1_32;
                 document.getElementById('t1_33').value = referenceData.t1_33;
                 document.getElementById('t2_31').value = referenceData.t2_31;
                 document.getElementById('t2_32').value = referenceData.t2_32;
                 document.getElementById('t2_33').value = referenceData.t2_33;
-                
                 document.getElementById('t1_41').value = referenceData.t1_41;
                 document.getElementById('t1_42').value = referenceData.t1_42;
                 document.getElementById('t1_43').value = referenceData.t1_43;
                 document.getElementById('t2_41').value = referenceData.t2_41;
                 document.getElementById('t2_42').value = referenceData.t2_42;
                 document.getElementById('t2_43').value = referenceData.t2_43;
-                
-                // 质量数据
                 document.getElementById('mass1').value = referenceData.mass1;
                 document.getElementById('mass2').value = referenceData.mass2;
                 document.getElementById('mass3').value = referenceData.mass3;
                 document.getElementById('mass4').value = referenceData.mass4;
-                
                 calculateData();
                 alert("参考数据已填入。请注意：这些数据仅供对照，实际实验必须使用自己测量的数据！");
             }
         }
 
-        // 计算平均值
         function avg3(a, b, c) {
             const x = parseFloat(a) || 0;
             const y = parseFloat(b) || 0;
@@ -1388,14 +1239,12 @@
             return (x + y + z) / 3;
         }
 
-        // 计算速度
         function calcV(tBar) {
             const t = parseFloat(tBar);
             if (t === 0) return 0;
             return (0.01 / (t * 0.001)).toFixed(2);
         }
 
-        // 计算加速度
         function calcA(v1, v2) {
             const a = parseFloat(v1) || 0;
             const b = parseFloat(v2) || 0;
@@ -1403,7 +1252,6 @@
             return ((b * b - a * a) / (2 * 0.5)).toFixed(2);
         }
 
-        // 计算所有数据
         function calculateData() {
             const mass1 = parseFloat(document.getElementById('mass1').value) || 0.155;
             const mass2 = parseFloat(document.getElementById('mass2').value) || 0.155;
@@ -1413,101 +1261,53 @@
             document.getElementById('mass1-display').textContent = mass1.toFixed(3);
             document.getElementById('force-display').textContent = "0.098";
             
-            // 表1-1
-            const t1_1avg = avg3(
-                document.getElementById('t1_11').value,
-                document.getElementById('t1_12').value,
-                document.getElementById('t1_13').value
-            ).toFixed(1);
-            const t2_1avg = avg3(
-                document.getElementById('t2_11').value,
-                document.getElementById('t2_12').value,
-                document.getElementById('t2_13').value
-            ).toFixed(1);
-            
+            const t1_1avg = avg3(document.getElementById('t1_11').value, document.getElementById('t1_12').value, document.getElementById('t1_13').value).toFixed(1);
+            const t2_1avg = avg3(document.getElementById('t2_11').value, document.getElementById('t2_12').value, document.getElementById('t2_13').value).toFixed(1);
             document.getElementById('t1-1avg').textContent = t1_1avg;
             document.getElementById('t2-1avg').textContent = t2_1avg;
-            
             const v1_1 = calcV(t1_1avg);
             const v2_1 = calcV(t2_1avg);
             document.getElementById('v1-1').textContent = v1_1;
             document.getElementById('v2-1').textContent = v2_1;
-            
             const a1 = parseFloat(calcA(v1_1, v2_1));
             document.getElementById('a1').textContent = a1.toFixed(2);
-            const fa1 = a1 > 0 ? (0.049 / a1) : 0;
+            const fa1 = a1 > 0 ? (0.098 / a1) : 0;
             document.getElementById('f_a1').textContent = fa1.toFixed(3);
 
-            // 表1-2
-            const t1_2avg = avg3(
-                document.getElementById('t1_21').value,
-                document.getElementById('t1_22').value,
-                document.getElementById('t1_23').value
-            ).toFixed(1);
-            const t2_2avg = avg3(
-                document.getElementById('t2_21').value,
-                document.getElementById('t2_22').value,
-                document.getElementById('t2_23').value
-            ).toFixed(1);
-            
+            const t1_2avg = avg3(document.getElementById('t1_21').value, document.getElementById('t1_22').value, document.getElementById('t1_23').value).toFixed(1);
+            const t2_2avg = avg3(document.getElementById('t2_21').value, document.getElementById('t2_22').value, document.getElementById('t2_23').value).toFixed(1);
             document.getElementById('t1-2avg').textContent = t1_2avg;
             document.getElementById('t2-2avg').textContent = t2_2avg;
-            
             const v1_2 = calcV(t1_2avg);
             const v2_2 = calcV(t2_2avg);
             document.getElementById('v1-2').textContent = v1_2;
             document.getElementById('v2-2').textContent = v2_2;
-            
             const a2 = parseFloat(calcA(v1_2, v2_2));
             document.getElementById('a2').textContent = a2.toFixed(2);
-            const fa2 = a2 > 0 ? (0.098 / a2) : 0;
+            const fa2 = a2 > 0 ? (0.147 / a2) : 0;
             document.getElementById('f_a2').textContent = fa2.toFixed(3);
 
-            // 表2-3
-            const t1_3avg = avg3(
-                document.getElementById('t1_31').value,
-                document.getElementById('t1_32').value,
-                document.getElementById('t1_33').value
-            ).toFixed(1);
-            const t2_3avg = avg3(
-                document.getElementById('t2_31').value,
-                document.getElementById('t2_32').value,
-                document.getElementById('t2_33').value
-            ).toFixed(1);
-            
+            const t1_3avg = avg3(document.getElementById('t1_31').value, document.getElementById('t1_32').value, document.getElementById('t1_33').value).toFixed(1);
+            const t2_3avg = avg3(document.getElementById('t2_31').value, document.getElementById('t2_32').value, document.getElementById('t2_33').value).toFixed(1);
             document.getElementById('t1-3avg').textContent = t1_3avg;
             document.getElementById('t2-3avg').textContent = t2_3avg;
-            
             const v1_3 = calcV(t1_3avg);
             const v2_3 = calcV(t2_3avg);
             document.getElementById('v1-3').textContent = v1_3;
             document.getElementById('v2-3').textContent = v2_3;
-            
             const a3 = parseFloat(calcA(v1_3, v2_3));
             document.getElementById('a3').textContent = a3.toFixed(2);
             const ma3 = a3 > 0 ? (mass3 * a3) : 0;
             document.getElementById('ma3').textContent = ma3.toFixed(3);
 
-            // 表2-4
-            const t1_4avg = avg3(
-                document.getElementById('t1_41').value,
-                document.getElementById('t1_42').value,
-                document.getElementById('t1_43').value
-            ).toFixed(1);
-            const t2_4avg = avg3(
-                document.getElementById('t2_41').value,
-                document.getElementById('t2_42').value,
-                document.getElementById('t2_43').value
-            ).toFixed(1);
-            
+            const t1_4avg = avg3(document.getElementById('t1_41').value, document.getElementById('t1_42').value, document.getElementById('t1_43').value).toFixed(1);
+            const t2_4avg = avg3(document.getElementById('t2_41').value, document.getElementById('t2_42').value, document.getElementById('t2_43').value).toFixed(1);
             document.getElementById('t1-4avg').textContent = t1_4avg;
             document.getElementById('t2-4avg').textContent = t2_4avg;
-            
             const v1_4 = calcV(t1_4avg);
             const v2_4 = calcV(t2_4avg);
             document.getElementById('v1-4').textContent = v1_4;
             document.getElementById('v2-4').textContent = v2_4;
-            
             const a4 = parseFloat(calcA(v1_4, v2_4));
             document.getElementById('a4').textContent = a4.toFixed(2);
             const ma4 = a4 > 0 ? (mass4 * a4) : 0;
@@ -1516,92 +1316,54 @@
             calculateErrors();
         }
 
-        // 计算误差
         function calculateErrors() {
             const mass1 = parseFloat(document.getElementById('mass1').value) || 0.155;
             const mass3 = parseFloat(document.getElementById('mass3').value) || 0.105;
             const mass4 = parseFloat(document.getElementById('mass4').value) || 0.155;
-            
             const fa1 = parseFloat(document.getElementById('f_a1').textContent) || 0;
             const fa2 = parseFloat(document.getElementById('f_a2').textContent) || 0;
-            
             if (fa1 && fa2) {
                 const err = Math.abs(fa2 - fa1) / fa1 * 100;
                 document.getElementById('error1').textContent = err.toFixed(1);
                 document.getElementById('ratio1').textContent = fa1.toFixed(3);
                 document.getElementById('ratio2').textContent = fa2.toFixed(3);
-                
-                if (err < 20) {
-                    document.getElementById('result1').textContent = "验证通过！F与a成正比关系成立";
-                    document.getElementById('result1').style.color = "#2e7d32";
-                } else if (err < 30) {
-                    document.getElementById('result1').textContent = "基本符合！存在一定误差";
-                    document.getElementById('result1').style.color = "#ff9800";
-                } else {
-                    document.getElementById('result1').textContent = "验证失败！请检查实验数据";
-                    document.getElementById('result1').style.color = "#c62828";
-                }
+                if (err < 20) { document.getElementById('result1').textContent = "验证通过！F与a成正比关系成立"; document.getElementById('result1').style.color = "#2e7d32"; }
+                else if (err < 30) { document.getElementById('result1').textContent = "基本符合！存在一定误差"; document.getElementById('result1').style.color = "#ff9800"; }
+                else { document.getElementById('result1').textContent = "验证失败！请检查实验数据"; document.getElementById('result1').style.color = "#c62828"; }
             }
-            
             const ma3 = parseFloat(document.getElementById('ma3').textContent) || 0;
             const ma4 = parseFloat(document.getElementById('ma4').textContent) || 0;
-            
             if (ma3 && ma4) {
                 const err = Math.abs(ma4 - ma3) / ma3 * 100;
                 document.getElementById('error2').textContent = err.toFixed(1);
                 document.getElementById('product1').textContent = ma3.toFixed(3);
                 document.getElementById('product2').textContent = ma4.toFixed(3);
-                
-                if (err < 20) {
-                    document.getElementById('result2').textContent = "验证通过！a与M成反比关系成立";
-                    document.getElementById('result2').style.color = "#2e7d32";
-                } else if (err < 30) {
-                    document.getElementById('result2').textContent = "基本符合！存在一定误差";
-                    document.getElementById('result2').style.color = "#ff9800";
-                } else {
-                    document.getElementById('result2').textContent = "验证失败！请检查实验数据";
-                    document.getElementById('result2').style.color = "#c62828";
-                }
+                if (err < 20) { document.getElementById('result2').textContent = "验证通过！a与M成反比关系成立"; document.getElementById('result2').style.color = "#2e7d32"; }
+                else if (err < 30) { document.getElementById('result2').textContent = "基本符合！存在一定误差"; document.getElementById('result2').style.color = "#ff9800"; }
+                else { document.getElementById('result2').textContent = "验证失败！请检查实验数据"; document.getElementById('result2').style.color = "#c62828"; }
             }
         }
 
-        // 绘制F-a关系图
         function drawFvsAChart() {
             calculateData();
-            
             const a1 = parseFloat(document.getElementById('a1').textContent) || 0;
             const a2 = parseFloat(document.getElementById('a2').textContent) || 0;
-            
-            if (a1 === 0 || a2 === 0) {
-                alert("请先输入并计算表1数据！");
-                return;
-            }
-            
+            if (a1 === 0 || a2 === 0) { alert("请先输入并计算表1数据！"); return; }
             const ctx = document.getElementById('fvsAChart').getContext('2d');
-            
-            if (fvsAChartInstance) {
-                fvsAChartInstance.destroy();
-            }
-            
+            if (fvsAChartInstance) fvsAChartInstance.destroy();
             fvsAChartInstance = new Chart(ctx, {
                 type: 'scatter',
                 data: {
                     datasets: [{
                         label: '实验数据点',
-                        data: [
-                            {x: a1, y: 0.049},
-                            {x: a2, y: 0.098}
-                        ],
+                        data: [{x: a1, y: 0.098}, {x: a2, y: 0.147}],
                         backgroundColor: 'rgba(54, 162, 235, 0.7)',
                         borderColor: 'rgba(54, 162, 235, 1)',
                         borderWidth: 1,
                         pointRadius: 8
                     }, {
                         label: '理论直线（过原点）',
-                        data: [
-                            {x: 0, y: 0},
-                            {x: Math.max(a1, a2) * 1.2, y: 0.098 * Math.max(a1, a2) * 1.2 / a2}
-                        ],
+                        data: [{x: 0, y: 0}, {x: Math.max(a1, a2) * 1.2, y: 0.147 * Math.max(a1, a2) * 1.2 / a2}],
                         backgroundColor: 'rgba(255, 99, 132, 0.1)',
                         borderColor: 'rgba(255, 99, 132, 1)',
                         borderWidth: 2,
@@ -1613,317 +1375,124 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: '外力F与加速度a的关系图（验证F ∝ a）'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    if (context.datasetIndex === 0) {
-                                        return `F = ${context.parsed.y.toFixed(3)}N, a = ${context.parsed.x.toFixed(2)}m/s²`;
-                                    }
-                                    return context.dataset.label;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: { title: { display: true, text: '加速度 a (m/s²)' }, beginAtZero: true },
-                        y: { title: { display: true, text: '外力 F (N)' }, beginAtZero: true }
-                    }
+                    plugins: { title: { display: true, text: '外力F与加速度a的关系图（验证F ∝ a）' }, tooltip: { callbacks: { label: function(context) { if (context.datasetIndex === 0) return `F = ${context.parsed.y.toFixed(3)}N, a = ${context.parsed.x.toFixed(2)}m/s²`; return context.dataset.label; } } } },
+                    scales: { x: { title: { display: true, text: '加速度 a (m/s²)' }, beginAtZero: true }, y: { title: { display: true, text: '外力 F (N)' }, beginAtZero: true } }
                 }
             });
         }
 
-        // 绘制M-1/a关系图
-       // 绘制M-1/a关系图 (修正版)
-function drawMvsAChart() {
-    calculateData();
-    
-    const mass3 = parseFloat(document.getElementById('mass3').value) || 0.105;
-    const mass4 = parseFloat(document.getElementById('mass4').value) || 0.155;
-    const a3 = parseFloat(document.getElementById('a3').textContent) || 0;
-    const a4 = parseFloat(document.getElementById('a4').textContent) || 0;
-    
-    if (a3 === 0 || a4 === 0) {
-        alert("请先输入并计算表2数据！");
-        return;
-    }
-
-    // --- 修正开始 ---
-    // 根据牛顿第二定律 F = M * a, 当F为常数时, M 与 1/a 成正比, 比例系数为 F。
-    // 我们应该用实验数据点来拟合这条理论线，或者用实验数据估算出的F来绘制。
-    // 更合理的方法是：取两个实验点的 M 和 1/a 的平均比例系数来绘制理论线。
-    
-    // 1. 计算两个实验点对应的外力 F (理论上应相等)
-    const F3 = mass3 * a3;
-    const F4 = mass4 * a4;
-    // 取平均外力作为理论F值
-    const averageF = (F3 + F4) / 2; 
-
-    // 2. 准备数据点: x = 1/a, y = M
-    const point3 = { x: 1 / a3, y: mass3 };
-    const point4 = { x: 1 / a4, y: mass4 };
-
-    // 3. 计算理论直线的终点 (过原点, 斜率为 averageF)
-    // 直线方程: M = F * (1/a) 
-    // 取一个合适的最大 x 值
-    const maxX = Math.max(point3.x, point4.x) * 1.2;
-    const lineEndX = maxX;
-    const lineEndY = averageF * lineEndX;
-    // --- 修正结束 ---
-
-    const ctx = document.getElementById('mvsAChart').getContext('2d');
-    
-    if (mvsAChartInstance) {
-        mvsAChartInstance.destroy();
-    }
-    
-    mvsAChartInstance = new Chart(ctx, {
-        type: 'scatter',
-        data: {
-            datasets: [{
-                label: '实验数据点',
-                data: [point3, point4], // 使用修正后的点
-                backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1,
-                pointRadius: 8
-            }, {
-                label: '理论直线 (M = F·1/a)',
-                data: [
-                    { x: 0, y: 0 },
-                    { x: lineEndX, y: lineEndY } // 使用动态计算的理论终点
-                ],
-                backgroundColor: 'rgba(153, 102, 255, 0.1)',
-                borderColor: 'rgba(153, 102, 255, 1)',
-                borderWidth: 2,
-                pointRadius: 0,
-                type: 'line',
-                fill: false,
-                tension: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                title: {
-                    display: true,
-                    text: '质量M与加速度倒数1/a的关系图（验证a ∝ 1/M）'
+        function drawMvsAChart() {
+            calculateData();
+            const mass3 = parseFloat(document.getElementById('mass3').value) || 0.105;
+            const mass4 = parseFloat(document.getElementById('mass4').value) || 0.155;
+            const a3 = parseFloat(document.getElementById('a3').textContent) || 0;
+            const a4 = parseFloat(document.getElementById('a4').textContent) || 0;
+            if (a3 === 0 || a4 === 0) { alert("请先输入并计算表2数据！"); return; }
+            const ctx = document.getElementById('mvsAChart').getContext('2d');
+            if (mvsAChartInstance) mvsAChartInstance.destroy();
+            mvsAChartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '实验数据点',
+                        data: [{x: 1/a3, y: mass3}, {x: 1/a4, y: mass4}],
+                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        pointRadius: 8
+                    }, {
+                        label: '理论直线',
+                        data: [{x: 0, y: 0}, {x: Math.max(1/a3, 1/a4) * 1.2, y: 0.098 * Math.max(1/a3, 1/a4) * 1.2}],
+                        backgroundColor: 'rgba(153, 102, 255, 0.1)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        type: 'line',
+                        fill: false,
+                        tension: 0
+                    }]
                 },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            if (context.datasetIndex === 0) {
-                                return `M = ${context.parsed.y.toFixed(3)} kg, 1/a = ${context.parsed.x.toFixed(3)} s²/m`;
-                            }
-                            return context.dataset.label;
-                        }
-                    }
+                options: {
+                    responsive: true,
+                    plugins: { title: { display: true, text: '质量M与加速度倒数1/a的关系图（验证a ∝ 1/M）' }, tooltip: { callbacks: { label: function(context) { if (context.datasetIndex === 0) return `M = ${context.parsed.y.toFixed(3)}kg, 1/a = ${context.parsed.x.toFixed(3)}s²/m`; return context.dataset.label; } } } },
+                    scales: { x: { title: { display: true, text: '加速度倒数 1/a (s²/m)' }, beginAtZero: true }, y: { title: { display: true, text: '质量 M (kg)' }, beginAtZero: true } }
                 }
-            },
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: '加速度倒数 1/a (s²/m)'
-                    },
-                    beginAtZero: true
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: '质量 M (kg)'
-                    },
-                    beginAtZero: true
-                }
-            }
+            });
         }
-    });
-}
 
-        // 检查是否使用了参考数据
         function checkReferenceDataUsage() {
-            let referenceCount = 0;
-            let totalCount = 0;
-            
-            const dataInputIds = ['t1_11', 't1_12', 't1_13', 't2_11', 't2_12', 't2_13',
-                                   't1_21', 't1_22', 't1_23', 't2_21', 't2_22', 't2_23',
-                                   't1_31', 't1_32', 't1_33', 't2_31', 't2_32', 't2_33',
-                                   't1_41', 't1_42', 't1_43', 't2_41', 't2_42', 't2_43'];
-            
-            dataInputIds.forEach(id => {
-                const value = parseFloat(document.getElementById(id)?.value) || 0;
-                if (value > 0) {
-                    totalCount++;
-                    const refValue = referenceData[id];
-                    if (refValue && Math.abs(value - refValue) < 0.3) {
-                        referenceCount++;
-                    }
-                }
-            });
-            
+            let referenceCount = 0, totalCount = 0;
+            const dataInputIds = ['t1_11', 't1_12', 't1_13', 't2_11', 't2_12', 't2_13', 't1_21', 't1_22', 't1_23', 't2_21', 't2_22', 't2_23', 't1_31', 't1_32', 't1_33', 't2_31', 't2_32', 't2_33', 't1_41', 't1_42', 't1_43', 't2_41', 't2_42', 't2_43'];
+            dataInputIds.forEach(id => { const value = parseFloat(document.getElementById(id)?.value) || 0; if (value > 0) { totalCount++; const refValue = referenceData[id]; if (refValue && Math.abs(value - refValue) < 0.3) referenceCount++; } });
             const massIds = ['mass1', 'mass2', 'mass3', 'mass4'];
-            massIds.forEach(id => {
-                const value = parseFloat(document.getElementById(id)?.value) || 0;
-                if (value > 0) {
-                    totalCount++;
-                    const refValue = referenceData[id];
-                    if (refValue && Math.abs(value - refValue) < 0.003) {
-                        referenceCount++;
-                    }
-                }
-            });
-            
-            if (totalCount > 5 && (referenceCount / totalCount) > 0.85) {
-                return true;
-            }
+            massIds.forEach(id => { const value = parseFloat(document.getElementById(id)?.value) || 0; if (value > 0) { totalCount++; const refValue = referenceData[id]; if (refValue && Math.abs(value - refValue) < 0.003) referenceCount++; } });
+            if (totalCount > 5 && (referenceCount / totalCount) > 0.85) return true;
             return false;
         }
 
-        // 计算预习分数
         function calculatePreScore() {
             const inputs = document.querySelectorAll('.fill-blank');
-            let correct = 0;
-            let total = inputs.length;
-            let emptyCount = 0;
-
+            let correct = 0, total = inputs.length, emptyCount = 0;
             inputs.forEach(input => {
                 const userAnswer = input.value.trim();
                 const correctAnswers = answers[input.dataset.answer];
-                
                 input.classList.remove('correct', 'incorrect', 'empty');
-                
-                if (userAnswer === '') {
-                    emptyCount++;
-                    input.classList.add('empty');
-                    updateAnswerStatusIcon(input, 'empty');
-                } else if (correctAnswers && correctAnswers.some(ans => {
-                    const userAns = userAnswer.toLowerCase().replace(/\s+/g, '');
-                    const correctAns = ans.toLowerCase().replace(/\s+/g, '');
-                    return userAns === correctAns || userAns.includes(correctAns) || correctAns.includes(userAns);
-                })) {
-                    correct++;
-                    input.classList.add('correct');
-                    updateAnswerStatusIcon(input, 'correct');
-                } else {
-                    input.classList.add('incorrect');
-                    updateAnswerStatusIcon(input, 'incorrect');
-                }
+                if (userAnswer === '') { emptyCount++; input.classList.add('empty'); updateAnswerStatusIcon(input, 'empty'); }
+                else if (correctAnswers && correctAnswers.some(ans => { const userAns = userAnswer.toLowerCase().replace(/\s+/g, ''); const correctAns = ans.toLowerCase().replace(/\s+/g, ''); return userAns === correctAns || userAns.includes(correctAns) || correctAns.includes(userAns); })) { correct++; input.classList.add('correct'); updateAnswerStatusIcon(input, 'correct'); }
+                else { input.classList.add('incorrect'); updateAnswerStatusIcon(input, 'incorrect'); }
             });
-
             const score = Math.round((correct / total) * 100);
-            
             let scoreText = `预习分数：${score}分（答对${correct}/${total}题）`;
-            if (emptyCount > 0) {
-                scoreText += `，未答：${emptyCount}题`;
-            }
-            if (correct === total) {
-                scoreText += " 🎉 满分！";
-            } else if (correct === 0) {
-                scoreText += " 😢 请认真预习后再作答！";
-            }
-            
+            if (emptyCount > 0) scoreText += `，未答：${emptyCount}题`;
+            if (correct === total) scoreText += " 🎉 满分！";
+            else if (correct === 0) scoreText += " 😢 请认真预习后再作答！";
             document.getElementById('scoreDisplay').innerHTML = scoreText;
             return {score, correct, total, emptyCount};
         }
 
-        // 自动评分并生成评语
         function autoGrade() {
             const preScoreResult = calculatePreScore();
             const preScore = preScoreResult.score;
             calculateData();
             calculateErrors();
-            
             const fa1 = parseFloat(document.getElementById('f_a1').textContent) || 0;
             const fa2 = parseFloat(document.getElementById('f_a2').textContent) || 0;
             const ma3 = parseFloat(document.getElementById('ma3').textContent) || 0;
             const ma4 = parseFloat(document.getElementById('ma4').textContent) || 0;
             const error1 = parseFloat(document.getElementById('error1').textContent) || 0;
             const error2 = parseFloat(document.getElementById('error2').textContent) || 0;
-            
             const summary = document.getElementById('summary').value.trim();
             const chart1Drawn = fvsAChartInstance !== null;
             const chart2Drawn = mvsAChartInstance !== null;
-            
             const usedReferenceData = checkReferenceDataUsage();
-            
             let totalScore = 0;
-            
-            // 1. 预习填空（25%）
             const preScoreWeighted = Math.round(preScore * 0.25);
             totalScore += preScoreWeighted;
             document.getElementById('detailPreScore').textContent = `${preScoreWeighted}/25`;
-            
-            // 2. 数据记录（25%）
             let dataScore = 0;
-            if (usedReferenceData) {
-                dataScore = 0;
-            } else {
-                let dataCompleteness = 0;
-                const dataInputs = document.querySelectorAll('.data-input, .mass-input');
-                let filledCount = 0;
-                dataInputs.forEach(input => {
-                    if (input.value.trim() !== '') filledCount++;
-                });
-                dataCompleteness = Math.round((filledCount / dataInputs.length) * 100);
-                
-                dataScore = Math.round(dataCompleteness * 0.25);
-            }
+            if (usedReferenceData) dataScore = 0;
+            else { let filledCount = 0; const dataInputs = document.querySelectorAll('.data-input, .mass-input'); dataInputs.forEach(input => { if (input.value.trim() !== '') filledCount++; }); dataScore = Math.round((filledCount / dataInputs.length) * 25); }
             totalScore += dataScore;
             document.getElementById('detailDataScore').textContent = `${dataScore}/25`;
-            
-            // 3. 数据处理与误差分析（20%）
             let calculationScore = 0;
             if (fa1 > 0 && fa2 > 0 && ma3 > 0 && ma4 > 0) {
                 const faError = Math.abs(fa2 - fa1) / fa1 * 100;
                 const maError = Math.abs(ma4 - ma3) / ma3 * 100;
-                
                 let score1 = 0, score2 = 0;
-                if (faError < 15) score1 = 100;
-                else if (faError < 20) score1 = 90;
-                else if (faError < 25) score1 = 80;
-                else if (faError < 30) score1 = 70;
-                else if (faError < 40) score1 = 60;
-                else score1 = 40;
-                
-                if (maError < 15) score2 = 100;
-                else if (maError < 20) score2 = 90;
-                else if (maError < 25) score2 = 80;
-                else if (maError < 30) score2 = 70;
-                else if (maError < 40) score2 = 60;
-                else score2 = 40;
-                
+                if (faError < 15) score1 = 100; else if (faError < 20) score1 = 90; else if (faError < 25) score1 = 80; else if (faError < 30) score1 = 70; else if (faError < 40) score1 = 60; else score1 = 40;
+                if (maError < 15) score2 = 100; else if (maError < 20) score2 = 90; else if (maError < 25) score2 = 80; else if (maError < 30) score2 = 70; else if (maError < 40) score2 = 60; else score2 = 40;
                 calculationScore = Math.round(((score1 + score2) / 2) * 0.2);
-            } else if (fa1 > 0 && fa2 > 0) {
-                calculationScore = Math.round(60 * 0.2);
-            } else if (ma3 > 0 && ma4 > 0) {
-                calculationScore = Math.round(60 * 0.2);
-            } else {
-                calculationScore = Math.round(30 * 0.2);
-            }
+            } else if (fa1 > 0 && fa2 > 0) calculationScore = Math.round(60 * 0.2);
+            else if (ma3 > 0 && ma4 > 0) calculationScore = Math.round(60 * 0.2);
+            else calculationScore = Math.round(30 * 0.2);
             totalScore += calculationScore;
             document.getElementById('detailCalcScore').textContent = `${calculationScore}/20`;
-            
-            // 4. 思考题（15%）
             let thoughtScore = 0;
             const thoughtInputs = document.querySelectorAll('.thought-input');
-            let thoughtFilled = 0;
-            let thoughtTotalLength = 0;
-            
-            thoughtInputs.forEach(input => {
-                const answer = input.value.trim();
-                if (answer !== '') {
-                    thoughtFilled++;
-                    thoughtTotalLength += answer.length;
-                }
-            });
-            
+            let thoughtFilled = 0, thoughtTotalLength = 0;
+            thoughtInputs.forEach(input => { const answer = input.value.trim(); if (answer !== '') { thoughtFilled++; thoughtTotalLength += answer.length; } });
             const fillRate = thoughtFilled / thoughtInputs.length;
             const avgLength = thoughtFilled > 0 ? thoughtTotalLength / thoughtFilled : 0;
-            
             if (fillRate === 1 && avgLength > 60) thoughtScore = 100;
             else if (fillRate === 1 && avgLength > 40) thoughtScore = 90;
             else if (fillRate >= 0.8 && avgLength > 30) thoughtScore = 80;
@@ -1934,20 +1503,14 @@ function drawMvsAChart() {
             else if (fillRate >= 0.3) thoughtScore = 30;
             else if (fillRate >= 0.2) thoughtScore = 20;
             else thoughtScore = 0;
-            
             const thoughtScoreWeighted = Math.round(thoughtScore * 0.15);
             totalScore += thoughtScoreWeighted;
             document.getElementById('detailThoughtScore').textContent = `${thoughtScoreWeighted}/15`;
-            
-            // 5. 实验小结（15%）
             let summaryScore = 0;
             const summaryLength = summary.length;
             const keywords = ['牛顿第二定律', '加速度', '外力', '质量', '误差分析', '实验', '收获', '问题', '解决', '改进'];
             let keywordCount = 0;
-            keywords.forEach(keyword => {
-                if (summary.includes(keyword)) keywordCount++;
-            });
-            
+            keywords.forEach(keyword => { if (summary.includes(keyword)) keywordCount++; });
             if (summaryLength > 150 && keywordCount >= 5) summaryScore = 100;
             else if (summaryLength > 120 && keywordCount >= 4) summaryScore = 85;
             else if (summaryLength > 100 && keywordCount >= 3) summaryScore = 70;
@@ -1956,45 +1519,20 @@ function drawMvsAChart() {
             else if (summaryLength > 30) summaryScore = 25;
             else if (summaryLength > 10) summaryScore = 15;
             else summaryScore = 0;
-            
             const summaryScoreWeighted = Math.round(summaryScore * 0.15);
             totalScore += summaryScoreWeighted;
             document.getElementById('detailSummaryScore').textContent = `${summaryScoreWeighted}/15`;
-            
             document.getElementById('detailTotalScore').textContent = `${totalScore}/100`;
             document.getElementById('scoreDetails').style.display = 'block';
-            
-            // 生成评语
             let comment = "";
             let grade = "不及格";
             let gradeColor = "#c62828";
-            
-            if (usedReferenceData) {
-                grade = "不及格";
-                gradeColor = "#c62828";
-                comment = `❌ 实验报告不合格！检测到直接搬用参考数据，数据部分计0分！综合得分${totalScore}分。必须使用实际实验测量数据完成报告！`;
-            } else if (totalScore >= 90) {
-                grade = "优秀";
-                gradeColor = "#2e7d32";
-                comment = `🎉 实验报告非常出色！综合得分${totalScore}分。预习扎实（${preScore}分），数据记录完整准确，实验验证成功（F/a误差: ${error1.toFixed(1)}%，M×a误差: ${error2.toFixed(1)}%），分析深入，图表规范。`;
-            } else if (totalScore >= 80) {
-                grade = "良好";
-                gradeColor = "#388e3c";
-                comment = `👍 实验报告质量较高！综合得分${totalScore}分。预习较好（${preScore}分），数据记录较为完整，实验验证基本成功，分析较为充分。`;
-            } else if (totalScore >= 70) {
-                grade = "中等";
-                gradeColor = "#f57c00";
-                comment = `✊ 实验报告基本合格！综合得分${totalScore}分。预习一般（${preScore}分），数据记录和计算存在一定误差，分析较为简单。`;
-            } else if (totalScore >= 60) {
-                grade = "及格";
-                gradeColor = "#ff9800";
-                comment = `⚠️ 实验报告勉强及格！综合得分${totalScore}分。预习不足（${preScore}分），数据记录或计算存在明显问题，分析不足。`;
-            } else {
-                grade = "不及格";
-                gradeColor = "#d32f2f";
-                comment = `❌ 实验报告未达到基本要求！报告得分${totalScore}分。请重新认真学习实验原理，补充完整实验记录！`;
-            }
-            
+            if (usedReferenceData) { grade = "不及格"; gradeColor = "#c62828"; comment = `❌ 实验报告不合格！检测到直接搬用参考数据，数据部分计0分！综合得分${totalScore}分。必须使用实际实验测量数据完成报告！`; }
+            else if (totalScore >= 90) { grade = "优秀"; gradeColor = "#2e7d32"; comment = `🎉 实验报告非常出色！综合得分${totalScore}分。预习扎实（${preScore}分），数据记录完整准确，实验验证成功（F/a误差: ${error1.toFixed(1)}%，M×a误差: ${error2.toFixed(1)}%），分析深入，图表规范。`; }
+            else if (totalScore >= 80) { grade = "良好"; gradeColor = "#388e3c"; comment = `👍 实验报告质量较高！综合得分${totalScore}分。预习较好（${preScore}分），数据记录较为完整，实验验证基本成功，分析较为充分。`; }
+            else if (totalScore >= 70) { grade = "中等"; gradeColor = "#f57c00"; comment = `✊ 实验报告基本合格！综合得分${totalScore}分。预习一般（${preScore}分），数据记录和计算存在一定误差，分析较为简单。`; }
+            else if (totalScore >= 60) { grade = "及格"; gradeColor = "#ff9800"; comment = `⚠️ 实验报告勉强及格！综合得分${totalScore}分。预习不足（${preScore}分），数据记录或计算存在明显问题，分析不足。`; }
+            else { grade = "不及格"; gradeColor = "#d32f2f"; comment = `❌ 实验报告未达到基本要求！报告得分${totalScore}分。请重新认真学习实验原理，补充完整实验记录！`; }
             let suggestions = [];
             if (preScore < 70) suggestions.push("预习部分需要加强");
             if (usedReferenceData) suggestions.push("必须使用实际测量数据");
@@ -2003,94 +1541,41 @@ function drawMvsAChart() {
             if (thoughtScoreWeighted < 10) suggestions.push("思考题回答需要更加充分详细");
             if (summaryScoreWeighted < 10) suggestions.push("实验小结需要更加详实");
             if (!chart1Drawn || !chart2Drawn) suggestions.push("请完成图表的绘制");
-            
-            if (suggestions.length > 0) {
-                comment += ` 改进建议：${suggestions.join('；')}。`;
-            }
-            
+            if (suggestions.length > 0) comment += ` 改进建议：${suggestions.join('；')}。`;
             comment += ` 总评：${grade}（${totalScore}分）。`;
-            
-            // 更新实验结论
             let conclusionText = `实验结论：`;
             if (fa1 > 0 && fa2 > 0 && ma3 > 0 && ma4 > 0) {
-                conclusionText += `通过实验验证了牛顿第二定律F=Ma。`;
-                conclusionText += ` 1) 当系统质量M≈${document.getElementById('mass1').value}kg不变时，外力F与加速度a成正比，F₁/a₁=${fa1.toFixed(3)}，F₂/a₂=${fa2.toFixed(3)}，相对误差${error1.toFixed(1)}%；`;
-                conclusionText += ` 2) 当外力F≈0.098N不变时，加速度a与系统质量M成反比，M₃a₃=${ma3.toFixed(3)}，M₄a₄=${ma4.toFixed(3)}，相对误差${error2.toFixed(1)}%。`;
-                conclusionText += ` 实验结果验证了牛顿第二定律的正确性。`;
-            } else {
-                conclusionText += `根据数据分析，可以验证牛顿第二定律F=Ma。请根据计算结果填写具体结论。`;
-            }
+                conclusionText += `通过实验验证了牛顿第二定律F=Ma。 1) 当系统质量M≈${document.getElementById('mass1').value}kg不变时，外力F与加速度a成正比，F₁/a₁=${fa1.toFixed(3)}，F₂/a₂=${fa2.toFixed(3)}，相对误差${error1.toFixed(1)}%； 2) 当外力F≈0.098N不变时，加速度a与系统质量M成反比，M₃a₃=${ma3.toFixed(3)}，M₄a₄=${ma4.toFixed(3)}，相对误差${error2.toFixed(1)}%。 实验结果验证了牛顿第二定律的正确性。`;
+            } else conclusionText += `根据数据分析，可以验证牛顿第二定律F=Ma。请根据计算结果填写具体结论。`;
             document.getElementById('conclusion').textContent = conclusionText;
-            
             const teacherName = document.getElementById('instructor').value || '马厂';
-            const currentDate = new Date().toLocaleDateString('zh-CN', {
-                year: 'numeric', month: 'long', day: 'numeric'
-            });
-            
+            const currentDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
             document.getElementById('commentContent').innerHTML = comment;
             document.getElementById('commentContent').style.color = gradeColor;
             document.getElementById('teacherName').textContent = teacherName;
             document.getElementById('currentDate').textContent = currentDate;
             document.getElementById('commentFooter').style.display = 'block';
-            
-            if (window.MathJax) {
-                MathJax.typesetPromise();
-            }
+            if (window.MathJax) MathJax.typesetPromise();
         }
 
-        // 初始化页面
         window.onload = function() {
-            // 加载保存的数据
             loadAllSavedData();
-            
-            // 添加输入监听，实时保存
             document.addEventListener('input', function(e) {
                 if (e.target.matches('.info-input, .fill-blank, .data-input, .mass-input, .thought-input, #summary')) {
                     if (autoSaveTimer) clearTimeout(autoSaveTimer);
-                    autoSaveTimer = setTimeout(() => {
-                        saveAllData();
-                    }, 1000);
+                    autoSaveTimer = setTimeout(() => { saveAllData(); }, 1000);
                 }
             });
-            
-            // 定时自动保存（每60秒）
-            setInterval(() => {
-                saveAllData();
-            }, 60000);
-            
-            // 表格输入监听
-            document.querySelectorAll('.data-input, .mass-input').forEach(input => {
-                input.addEventListener('change', function() {
-                    setTimeout(calculateData, 100);
-                });
-            });
-            
-            // 填空框监听
-            document.querySelectorAll('.fill-blank').forEach(input => {
-                input.addEventListener('change', function() {
-                    this.classList.remove('correct', 'incorrect', 'empty');
-                    const statusIcon = this.nextElementSibling;
-                    if (statusIcon && statusIcon.classList.contains('answer-status')) {
-                        statusIcon.textContent = '';
-                        statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
-                    }
-                });
-            });
-            
-            // 设置默认日期
+            setInterval(() => { saveAllData(); }, 60000);
+            document.querySelectorAll('.data-input, .mass-input').forEach(input => { input.addEventListener('change', function() { setTimeout(calculateData, 100); }); });
+            document.querySelectorAll('.fill-blank').forEach(input => { input.addEventListener('change', function() { this.classList.remove('correct', 'incorrect', 'empty'); const statusIcon = this.nextElementSibling; if (statusIcon && statusIcon.classList.contains('answer-status')) { statusIcon.textContent = ''; statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon'); } }); });
             const today = new Date().toISOString().split('T')[0];
             const dateInput = document.getElementById('expDate');
-            if (dateInput && !dateInput.value) {
-                dateInput.value = today;
-            }
-            
-            // 计算初始数据
+            if (dateInput && !dateInput.value) dateInput.value = today;
             calculateData();
-            
-            if (window.MathJax) {
-                MathJax.typesetPromise();
-            }
+            if (window.MathJax) MathJax.typesetPromise();
         };
     </script>
 </body>
 </html>
+```
