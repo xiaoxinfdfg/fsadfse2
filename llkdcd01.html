@@ -2,1045 +2,483 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>理论课程目标达成度分析系统</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>课程目标达成度分析系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            font-family: 'Segoe UI', Roboto, 'Microsoft YaHei', sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
-            color: #333;
+            background: #eef2f7;
+            color: #1a2c3e;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background: white;
+            padding: 24px;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.08);
         }
         h1, h2 {
-            color: #2c3e50;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            color: #1e466e;
+            border-left: 5px solid #2c7da0;
+            padding-left: 16px;
+            margin-top: 0;
         }
-        .section {
-            margin-bottom: 30px;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
+        .report-banner {
+            background: linear-gradient(98deg, #1f4870 0%, #1b6b87 100%);
+            border-radius: 24px;
+            padding: 18px 28px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 18px;
+            color: white;
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
+        .btn-report { background: #f9c74f; color: #1e3a5f; border: none; padding: 12px 28px; border-radius: 60px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-report:hover { background: #f9844a; transform: translateY(-2px); color: white; }
+        .section { background: #f8fafc; border-radius: 24px; padding: 22px; margin-bottom: 28px; border: 1px solid #e2edf2; }
+        .norm-section { background: #eef2fa; border-left: 6px solid #2c7da0; }
+        .form-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 16px; align-items: flex-end; }
+        .form-group { flex: 1; min-width: 150px; }
+        .form-group label { font-weight: 600; margin-bottom: 6px; display: block; font-size: 0.9rem; color: #2c3e66; }
+        input, select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 20px; background: white; font-size: 0.9rem; }
+        input:focus { border-color: #2c7da0; outline: none; box-shadow: 0 0 0 2px rgba(44,125,160,0.2); }
         button {
-            background-color: #3498db;
+            background: #2c7da0;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
+            padding: 8px 20px;
+            border-radius: 40px;
             cursor: pointer;
-            margin-right: 10px;
+            font-weight: 500;
+            margin-right: 12px;
             margin-bottom: 10px;
+            font-size: 0.85rem;
+            transition: 0.2s;
         }
-        button:hover {
-            background-color: #2980b9;
+        button:hover { background: #1f5e7a; transform: scale(0.97); }
+        .btn-success { background: #2a9d8f; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; overflow-x: auto; display: block; }
+        th, td { border: 1px solid #d4dee5; padding: 10px 6px; text-align: center; vertical-align: middle; }
+        th { background: #e9f0f5; font-weight: 700; }
+        .highlight-low { background: #ffe0e0 !important; font-weight: bold; color: #b00020; }
+        .highlight-medium { background: #fff3cf !important; }
+        .highlight-high { background: #d9f0e6 !important; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 28px; border-bottom: 2px solid #cbdbe2; flex-wrap: wrap; }
+        .tab { padding: 8px 24px; background: #eef2fa; border-radius: 40px 40px 0 0; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .tab.active { background: #2c7da0; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fade 0.2s ease; }
+        @keyframes fade { from { opacity:0; transform: translateY(6px);} to { opacity:1; transform: translateY(0);} }
+        .stats-box { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 18px; }
+        .stat-item { background: white; border-radius: 28px; padding: 14px 18px; flex: 1; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #e0ecf2; }
+        .stat-value { font-size: 32px; font-weight: 800; color: #1f5e7a; }
+        .chart-container { height: 500px; margin-top: 20px; }
+        .legend-box { display: inline-block; width: 18px; height: 18px; border-radius: 4px; margin-right: 8px; vertical-align: middle; }
+        .filter-note { background: #fef9e6; border-left: 5px solid #f4a261; padding: 14px; margin-top: 14px; font-size: 0.85rem; border-radius: 18px; }
+        .warning-badge { background: #e63946; color: white; padding: 3px 10px; border-radius: 40px; font-size: 0.7rem; font-weight: bold; display: inline-block; }
+        .success-badge { background: #2a9d8f; color: white; padding: 3px 10px; border-radius: 40px; font-size: 0.7rem; font-weight: bold; }
+        .norm-compare-card { background: #e9f4f8; border-radius: 20px; padding: 18px; margin-bottom: 22px; border-left: 6px solid #1f7b4d; }
+        .learning-analysis { background: linear-gradient(115deg, #eef9f5 0%, #e3f0ec 100%); border-radius: 24px; padding: 22px; margin-top: 24px; }
+        .insight-card { background: white; border-radius: 20px; padding: 16px; margin-top: 16px; border-left: 6px solid #2c7da0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .badge-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .course-badge { background: #deeaf2; border-radius: 26px; padding: 5px 12px; font-size: 0.75rem; font-weight: 500; }
+        .admin-note { background: #e9ecef; border-radius: 16px; padding: 12px; font-size: 0.8rem; margin-top: 12px; }
+        .toast-msg {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: #1e466e; color: white; padding: 10px 24px; border-radius: 40px;
+            font-size: 0.9rem; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: fadeOut 2s ease forwards;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .chart-container {
-            width: 100%;
-            height: 400px;
-            margin-top: 20px;
-        }
-        .tabs {
-            display: flex;
-            margin-bottom: 20px;
-        }
-        .tab {
-            padding: 10px 20px;
-            background-color: #eee;
-            cursor: pointer;
-            margin-right: 5px;
-            border-radius: 5px 5px 0 0;
-        }
-        .tab.active {
-            background-color: #3498db;
-            color: white;
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .filter-results {
-            margin-top: 20px;
-        }
-        .student-row:hover {
-            background-color: #e6f7ff;
-        }
-        .highlight-low {
-            background-color: #ffcccc !important;
-        }
-        .highlight-medium {
-            background-color: #fff3cd !important;
-        }
-        .highlight-high {
-            background-color: #d4edda !important;
-        }
-        .analysis-panel {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-        .warning-badge {
-            background-color: #dc3545;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-        .success-badge {
-            background-color: #28a745;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-        .learning-analysis {
-            background-color: #e3f2fd;
-            border: 1px solid #2196f3;
-            border-radius: 4px;
-            padding: 15px;
-            margin-top: 15px;
-        }
+        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+        @media (max-width: 700px) { .form-row { flex-direction: column; } .stats-box { flex-direction: column; } .chart-container { height: 340px; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>理论课程目标达成度分析系统</h1>
-        
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('basic-info')">基本信息</div>
-            <div class="tab" onclick="switchTab('data-input')">数据输入</div>
-            <div class="tab" onclick="switchTab('analysis-results')">分析结果</div>
-            <div class="tab" onclick="switchTab('chart-analysis')">图表分析</div>
-            <div class="tab" onclick="switchTab('filter-analysis')">筛选分析</div>
+<div class="container">
+    <h1>📐 课程目标达成度分析系统</h1>
+    <div class="report-banner">
+        <div class="report-text"><strong>📈 校级教学质量数据上报</strong> — 数据自动复制，一键粘贴提交</div>
+        <button class="btn-report" id="submitToPlatformBtn">✨ 提交达成度数据（复制+打开表单）</button>
+    </div>
+    <div class="tabs">
+        <div class="tab active" data-tab="basic-info">📋 课程信息</div>
+        <div class="tab" data-tab="data-input">📝 学生成绩</div>
+        <div class="tab" data-tab="analysis-results">📊 达成度结果</div>
+        <div class="tab" data-tab="chart-analysis">📈 图表分析</div>
+        <div class="tab" data-tab="filter-analysis">🔍 筛选报告</div>
+        <div class="tab" data-tab="norm-admin">🏫 校级常模管理</div>
+    </div>
+    
+    <div id="basic-info" class="tab-content active">
+        <div class="section">
+            <h2>✏️ 课程基本信息</h2>
+            <div class="form-row">
+                <div class="form-group"><label>📖 课程名称</label><input type="text" id="course-name" value="大学物理BI"></div>
+                <div class="form-group"><label>👩‍🏫 教师姓名</label><input type="text" id="teacher-name" value="马厂"></div>
+                <div class="form-group"><label>🏫 班级</label><input type="text" id="class-name" value="信息与计算科学2024级(1-3)班"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>🎯 课程目标1权重 γ₁</label><input type="number" id="gamma1" step="0.05" min="0.1" max="1" value="0.4"></div>
+                <div class="form-group"><label>🎯 课程目标2权重 γ₂</label><input type="number" id="gamma2" step="0.05" min="0.1" max="1" value="0.3"></div>
+                <div class="form-group"><label>🎯 课程目标3权重 γ₃</label><input type="number" id="gamma3" step="0.05" min="0.1" max="1" value="0.3"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>📚 平时成绩系数</label><input type="number" id="usual-coefficient" step="0.05" min="0" max="1" value="0.4"></div>
+                <div class="form-group"><label>📝 期末成绩系数</label><input type="number" id="final-coefficient" step="0.05" min="0" max="1" value="0.6"></div>
+            </div>
+            <button onclick="saveBasicInfo()">💾 保存课程配置</button>
+            <div class="filter-note" style="margin-top:12px"><strong>📖 课程目标定义：</strong><br>目标1：掌握基本理论、物理图像及发展前沿；目标2：熟练运用矢量与微积分解决物理问题，了解物理与工程技术交叉；目标3：具备综合运用物理/数学知识解决实际问题能力，提升创新素质。</div>
         </div>
-        
-        <!-- 基本信息编辑 -->
-        <div id="basic-info" class="tab-content active">
-            <h2>基本信息编辑</h2>
-            <div class="section">
-                <div class="form-group">
-                    <label for="table-name">表格名称</label>
-                    <input type="text" id="table-name" value="《大学物理BI》课程目标达成度分析表">
-                </div>
-                <div class="form-group">
-                    <label for="course-type">课程性质</label>
-                    <input type="text" id="course-type" value="专业基础">
-                </div>
-                <div class="form-group">
-                    <label for="course-credit">课程学分</label>
-                    <input type="number" id="course-credit" step="0.1" value="2.5">
-                </div>
-                <div class="form-group">
-                    <label for="teacher-name">教师姓名</label>
-                    <input type="text" id="teacher-name" value="马厂">
-                </div>
-                <div class="form-group">
-                    <label for="class-name">班级</label>
-                    <input type="text" id="class-name" value="信息与计算科学2024(1)(2)(3)班">
-                </div>
-            </div>
-            
-            <div class="section">
-                <h3>权重设置</h3>
-                <div class="form-group">
-                    <label for="gamma1">γ₁ (课程目标1权重)</label>
-                    <input type="number" id="gamma1" step="0.1" min="0" max="1" value="0.4">
-                </div>
-                <div class="form-group">
-                    <label for="gamma2">γ₂ (课程目标2权重)</label>
-                    <input type="number" id="gamma2" step="0.1" min="0" max="1" value="0.3">
-                </div>
-                <div class="form-group">
-                    <label for="gamma3">γ₃ (课程目标3权重)</label>
-                    <input type="number" id="gamma3" step="0.1" min="0" max="1" value="0.3">
-                </div>
-            </div>
-            
-            <div class="section">
-                <h3>成绩系数设置</h3>
-                <div class="form-group">
-                    <label for="usual-coefficient">平时成绩系数</label>
-                    <input type="number" id="usual-coefficient" step="0.1" min="0" max="1" value="0.4">
-                </div>
-                <div class="form-group">
-                    <label for="final-coefficient">期末成绩系数</label>
-                    <input type="number" id="final-coefficient" step="0.1" min="0" max="1" value="0.6">
-                </div>
-            </div>
-            
-            <button onclick="saveBasicInfo()">保存基本信息</button>
-        </div>
-        
-        <!-- 数据输入 -->
-        <div id="data-input" class="tab-content">
-            <h2>数据输入</h2>
-            <div class="section">
-                <button onclick="addStudent()">添加学生</button>
-                <button onclick="removeSelectedStudents()">删除选中学生</button>
-                <button onclick="importFromExcel()">从Excel导入</button>
-                <button onclick="exportToExcel()">导出到Excel</button>
-                <input type="file" id="file-input" style="display: none;" accept=".xlsx,.xls">
-            </div>
-            
-            <div class="section">
+    </div>
+    
+    <div id="data-input" class="tab-content">
+        <div class="section">
+            <h2>📎 学生成绩管理</h2>
+            <button onclick="addStudent()">➕ 添加学生</button>
+            <button onclick="removeSelectedStudents()">❌ 删除选中</button>
+            <button onclick="importFromExcel()">📂 导入Excel</button>
+            <button onclick="exportToExcel()">📎 导出Excel</button>
+            <input type="file" id="file-input" style="display:none" accept=".xlsx,.xls">
+            <div style="overflow-x: auto; margin-top: 20px;">
                 <table id="input-table">
-                    <thead>
-                        <tr>
-                            <th><input type="checkbox" id="select-all" onclick="toggleSelectAll()"></th>
-                            <th>序号</th>
-                            <th>学号</th>
-                            <th>姓名</th>
-                            <th>平时成绩项目1</th>
-                            <th>平时成绩项目2</th>
-                            <th>平时成绩项目3</th>
-                            <th>平时成绩项目4</th>
-                            <th>期末成绩课程目标1</th>
-                            <th>期末成绩课程目标2</th>
-                            <th>期末成绩课程目标3</th>
-                        </tr>
-                    </thead>
-                    <tbody id="input-data">
-                        <!-- 数据将通过JavaScript动态添加 -->
-                    </tbody>
+                    <thead><tr><th style="width:30px"><input type="checkbox" id="select-all" onclick="toggleSelectAll()"></th><th>序号</th><th>学号</th><th>姓名</th><th>平时1</th><th>平时2</th><th>平时3</th><th>平时4</th><th>期末目标1<br><span style="font-size:12px">(理论掌握)</span></th><th>期末目标2<br><span style="font-size:12px">(矢量/微积分)</span></th><th>期末目标3<br><span style="font-size:12px">(综合应用)</span></th> </tr></thead>
+                    <tbody id="input-data"></tbody>
                 </table>
-            </div>
-        </div>
-        
-        <!-- 分析结果 -->
-        <div id="analysis-results" class="tab-content">
-            <h2>分析结果</h2>
-            <div class="section">
-                <button onclick="exportResultTable()">导出分析结果</button>
-            </div>
-            
-            <div class="section">
-                <table id="result-table">
-                    <thead>
-                        <tr>
-                            <th>序号</th>
-                            <th>学号</th>
-                            <th>姓名</th>
-                            <th>平时成绩</th>
-                            <th>期末成绩</th>
-                            <th>R1</th>
-                            <th>R2</th>
-                            <th>R3</th>
-                            <th>课程达成度R</th>
-                        </tr>
-                    </thead>
-                    <tbody id="result-data">
-                        <!-- 结果将通过JavaScript动态添加 -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="section">
-                <h3>达成度平均值</h3>
-                <table>
-                    <tr>
-                        <th>目标1均值 (R1)</th>
-                        <th>目标2均值 (R2)</th>
-                        <th>目标3均值 (R3)</th>
-                        <th>总达成度均值</th>
-                    </tr>
-                    <tr>
-                        <td id="avg-r1">0.00</td>
-                        <td id="avg-r2">0.00</td>
-                        <td id="avg-r3">0.00</td>
-                        <td id="avg-total">0.00</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        
-        <!-- 图表分析 -->
-        <div id="chart-analysis" class="tab-content">
-            <h2>图表分析</h2>
-            <div class="section">
-                <div class="chart-container">
-                    <canvas id="achievement-chart"></canvas>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 筛选分析 -->
-        <div id="filter-analysis" class="tab-content">
-            <h2>筛选分析与学情分析</h2>
-            
-            <div class="section">
-                <h3>筛选功能</h3>
-                <button onclick="filterLowR1()">筛选R1 < 0.6</button>
-                <button onclick="filterLowR2()">筛选R2 < 0.6</button>
-                <button onclick="filterLowR3()">筛选R3 < 0.6</button>
-                <button onclick="filterAllLow()">筛选R1、R2、R3均 < 0.6</button>
-                <button onclick="filterMultipleLow()">筛选至少两项 < 0.6</button>
-                <button onclick="clearAllFilters()">清除筛选</button>
-            </div>
-            
-            <div class="section">
-                <h3>筛选结果</h3>
-                <table id="filter-table">
-                    <thead>
-                        <tr>
-                            <th>序号</th>
-                            <th>学号</th>
-                            <th>姓名</th>
-                            <th>R1</th>
-                            <th>R2</th>
-                            <th>R3</th>
-                            <th>课程达成度R</th>
-                            <th>状态标识</th>
-                        </tr>
-                    </thead>
-                    <tbody id="filter-data">
-                        <!-- 筛选结果将通过JavaScript动态添加 -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="learning-analysis" id="learning-analysis">
-                <h3>学情分析报告</h3>
-                <div id="analysis-content">
-                    <p>请选择筛选条件或点击"生成学情分析报告"查看详细分析。</p>
-                </div>
             </div>
         </div>
     </div>
+    
+    <div id="analysis-results" class="tab-content">
+        <div class="section">
+            <h2>📋 个人达成度明细 & 常模对比定位</h2>
+            <button onclick="exportResultTable()">📥 导出分析结果Excel</button>
+            <div id="norm-comparison-card" class="norm-compare-card" style="margin-top: 16px;">
+                <strong>🏆 校级常模对比 (基于近3年该课程数据)</strong><br>
+                <span id="norm-compare-text">正在计算班级达成度与基准对比...</span>
+            </div>
+            <div style="overflow-x: auto;"><table id="result-table"><thead><tr><th>序号</th><th>学号</th><th>姓名</th><th>平时均分</th><th>期末总分</th><th>R1(理论体系)</th><th>R2(数理工具)</th><th>R3(应用创新)</th><th>课程达成度R</th> </tr></thead><tbody id="result-data"></tbody></table></div>
+            <div class="stats-box"><div class="stat-item"><div class="stat-value" id="avg-r1">0.00</div><div>🎯 目标1均值</div></div><div class="stat-item"><div class="stat-value" id="avg-r2">0.00</div><div>🎯 目标2均值</div></div><div class="stat-item"><div class="stat-value" id="avg-r3">0.00</div><div>🎯 目标3均值</div></div><div class="stat-item"><div class="stat-value" id="avg-total">0.00</div><div>📌 达成度均值</div></div></div>
+        </div>
+    </div>
+    
+    <div id="chart-analysis" class="tab-content">
+        <div class="section">
+            <h2>📉 达成度趋势曲线</h2>
+            <div class="chart-controls" style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:16px;">
+                <label><input type="checkbox" id="show-r1" checked onchange="toggleDataset('r1')"><span class="legend-box" style="background:rgba(255,99,132,0.7)"></span>R1(理论物理)</label>
+                <label><input type="checkbox" id="show-r2" checked onchange="toggleDataset('r2')"><span class="legend-box" style="background:rgba(54,162,235,0.7)"></span>R2(数理工具)</label>
+                <label><input type="checkbox" id="show-r3" checked onchange="toggleDataset('r3')"><span class="legend-box" style="background:rgba(75,192,192,0.7)"></span>R3(应用创新)</label>
+                <label><input type="checkbox" id="show-r1-mean" checked onchange="toggleDataset('r1-mean')"><span class="legend-box" style="background:rgba(255,99,132,0.3); border:1px dashed #ff6384"></span>R1均值</label>
+                <label><input type="checkbox" id="show-r2-mean" checked onchange="toggleDataset('r2-mean')"><span class="legend-box" style="background:rgba(54,162,235,0.3); border:1px dashed #36a2eb"></span>R2均值</label>
+                <label><input type="checkbox" id="show-r3-mean" checked onchange="toggleDataset('r3-mean')"><span class="legend-box" style="background:rgba(75,192,192,0.3); border:1px dashed #4bc0c0"></span>R3均值</label>
+                <label><input type="checkbox" id="show-threshold" checked onchange="toggleDataset('threshold')"><span class="legend-box" style="background:rgba(220,53,69,0.3); border:1px dashed #dc3545"></span>及格线(0.6)</label>
+            </div>
+            <div class="chart-container"><canvas id="achievement-chart"></canvas></div>
+        </div>
+    </div>
+    
+    <div id="filter-analysis" class="tab-content">
+        <div class="section">
+            <h2>🎛️ 多维筛选 & 靶向学情报告</h2>
+            <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                <button id="btnR1" class="filter-btn">📖 R1 < 0.6 (理论体系薄弱)</button>
+                <button id="btnR2" class="filter-btn">🧮 R2 < 0.6 (数理工具薄弱)</button>
+                <button id="btnR3" class="filter-btn">💡 R3 < 0.6 (应用创新薄弱)</button>
+                <button id="btnAllLow" class="filter-btn">🚨 三项均未达标 (全面危机)</button>
+                <button id="btnMultiLow" class="filter-btn">⚠️ 至少两项未达标 (结构失衡)</button>
+                <button onclick="clearAllFilters()">🗑️ 清除筛选</button>
+            </div>
+            <div class="filter-note"><strong>💡 说明：</strong> 学情报告是根据大学物理的三个课程目标内容撰写的详细干预方案。</div>
+            <div style="overflow-x: auto; margin-top: 22px;">
+                <table id="filter-table"><thead><tr><th>序号</th><th>学号</th><th>姓名</th><th>R1</th><th>R2</th><th>R3</th><th>达成度R</th><th>预警标识</th></tr></thead><tbody id="filter-data"><tr><td colspan="8">暂无筛选结果</td></tr></tbody></table>
+            </div>
+            <div class="learning-analysis" id="learning-analysis">
+                <h4>📖 差异化深度学情报告 · 基于课程目标体系</h4>
+                <div id="analysis-content"><p>✨ 点击五种筛选按钮，系统将依据物理课程三大目标内涵生成详细教学干预策略。</p></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="norm-admin" class="tab-content">
+        <div class="section norm-section">
+            <h2>🏛️ 校级常模参数设置 (管理员)</h2>
+            <div class="form-row">
+                <div class="form-group"><label>📌 课程校级常模基准均值 (近3年该课程达成度均值)</label><input type="number" id="norm-baseline" step="0.01" min="0" max="1" value="0.75"></div>
+                <div class="form-group"><label>📌 常模描述 / 数据来源</label><input type="text" id="norm-source" value="本校教学质量监测平台·近3年大学物理BI数据"></div>
+            </div>
+            <button id="updateNormBtn" class="btn-success">✅ 更新校级常模基准</button>
+            <div class="admin-note"><strong>🔔 说明：</strong> 管理员可根据统计平台反馈数据在此处修改“校级常模基准”。初始默认值设定为 <strong>0.75</strong>，系统将基于此基准对比当前班级平均达成度，生成科学改进建议。</div>
+        </div>
+    </div>
+</div>
 
-    <script>
-        // 全局变量
-        let students = [];
-        let chart = null;
-        
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            // 添加一个示例学生
-            addStudent();
-            
-            // 初始化图表
-            initChart();
-            
-            // 计算初始结果
-            calculateResults();
-        });
-        
-        // 切换标签页
-        function switchTab(tabId) {
-            // 隐藏所有标签内容
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // 取消所有标签的活动状态
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // 显示选中的标签内容
-            document.getElementById(tabId).classList.add('active');
-            
-            // 设置选中标签的活动状态
-            event.currentTarget.classList.add('active');
-            
-            // 如果是图表标签，重新绘制图表
-            if (tabId === 'chart-analysis') {
-                updateChart();
-            }
+<script>
+    let students = [];
+    let chart = null;
+    let avgR1 = 0, avgR2 = 0, avgR3 = 0, avgTotal = 0;
+    let currentFilterType = null;
+    let schoolNormBaseline = 0.75;
+    let normDataSource = "本校教学质量监测平台·近3年数据";
+    
+    function showToast(message) {
+        let toast = document.createElement('div');
+        toast.className = 'toast-msg';
+        toast.innerText = message;
+        document.body.appendChild(toast);
+        setTimeout(() => { if(toast && toast.remove) toast.remove(); }, 2000);
+    }
+    
+    function loadNormConfig() {
+        const savedNorm = localStorage.getItem('uni_norm_baseline');
+        if(savedNorm !== null && !isNaN(parseFloat(savedNorm))) schoolNormBaseline = parseFloat(savedNorm);
+        const savedSource = localStorage.getItem('uni_norm_source');
+        if(savedSource) normDataSource = savedSource;
+        document.getElementById('norm-baseline').value = schoolNormBaseline;
+        document.getElementById('norm-source').value = normDataSource;
+    }
+    function saveNormConfig() {
+        let newBase = parseFloat(document.getElementById('norm-baseline').value);
+        if(isNaN(newBase)) newBase = 0.75;
+        schoolNormBaseline = Math.min(1, Math.max(0, newBase));
+        normDataSource = document.getElementById('norm-source').value || "校级常模";
+        localStorage.setItem('uni_norm_baseline', schoolNormBaseline);
+        localStorage.setItem('uni_norm_source', normDataSource);
+        alert(`校级常模基准已更新为 ${schoolNormBaseline.toFixed(3)}，对比报告将实时生效。`);
+        updateNormComparison();
+        computeAchievements();
+    }
+    
+    function updateNormComparison() {
+        const container = document.getElementById('norm-compare-text');
+        if(!container) return;
+        if(students.length === 0) { container.innerHTML = `暂无学生数据，请填写成绩后查看对比分析。`; return; }
+        const classAvg = avgTotal;
+        const baseline = schoolNormBaseline;
+        let diff = classAvg - baseline;
+        let compareMsg = '';
+        let advice = '';
+        if(diff > 0.05) {
+            compareMsg = `✅ 显著高于校级常模 (高出 ${diff.toFixed(3)})`;
+            advice = `🎉 您班级的平均达成度 ${classAvg.toFixed(4)} 高于本校近3年该课程的平均水平 ${baseline.toFixed(3)}。建议总结有效教学策略，提炼优秀案例，保持优势并适当挑战高阶目标。`;
+        } else if(diff >= -0.02 && diff <= 0.05) {
+            compareMsg = `📊 持平/略高于校级常模 (差值 ${diff.toFixed(3)})`;
+            advice = `📌 您班级的平均达成度 ${classAvg.toFixed(4)}，与本校近3年该课程平均水平 ${baseline.toFixed(3)} 相当。建议微调教学设计，重点关注薄弱课程目标(如R1/R2/R3中较低者)，寻求突破。`;
+        } else if(diff < -0.02) {
+            compareMsg = `⚠️ 低于校级常模 (低出 ${Math.abs(diff).toFixed(3)})`;
+            advice = `🔻 您班级的平均达成度 ${classAvg.toFixed(4)} 低于本校近3年该课程的平均水平 ${baseline.toFixed(3)}。建议加强形成性评价，开展针对性辅导，参考校级优秀教学案例，制定追赶计划（重点强化薄弱分项）。`;
         }
-        
-        // 保存基本信息
-        function saveBasicInfo() {
-            alert('基本信息已保存！');
-        }
-        
-        // 添加学生
-        function addStudent() {
-            const tbody = document.getElementById('input-data');
-            const newId = students.length + 1;
-            
+        container.innerHTML = `<span style="font-weight:700">📈 班级达成度均值: ${classAvg.toFixed(4)} | 校级常模基准: ${baseline.toFixed(3)} (${normDataSource})</span><br>
+                                <span style="color: #1f5e7a;">${compareMsg}</span><br>
+                                <span style="font-size:0.9rem;">💡 ${advice}</span>`;
+    }
+    
+    function getGamma() { return { g1: parseFloat(document.getElementById('gamma1').value) || 0.4, g2: parseFloat(document.getElementById('gamma2').value) || 0.3, g3: parseFloat(document.getElementById('gamma3').value) || 0.3 }; }
+    function getCoeffs() { return { usual: parseFloat(document.getElementById('usual-coefficient').value) || 0.4, final: parseFloat(document.getElementById('final-coefficient').value) || 0.6 }; }
+    function getClassByVal(v) { if(v<0.6) return 'highlight-low'; if(v<0.8) return 'highlight-medium'; return 'highlight-high'; }
+    
+    function computeAchievements() {
+        const gamma = getGamma();
+        const coeff = getCoeffs();
+        const tbody = document.getElementById('result-data');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+        let sumR1=0, sumR2=0, sumR3=0, sumTotal=0, valid=0;
+        for(let i=0; i<students.length; i++) {
+            const s = students[i];
+            const usualArr = s.usualScores || [];
+            const validUsual = usualArr.filter(v => v !== null && !isNaN(v) && v>=0);
+            const usualAvg = validUsual.length ? validUsual.reduce((a,b)=>a+b,0)/validUsual.length : 0;
+            let final1 = (s.finalScores && typeof s.finalScores[0]==='number') ? s.finalScores[0] : 0;
+            let final2 = (s.finalScores && typeof s.finalScores[1]==='number') ? s.finalScores[1] : 0;
+            let final3 = (s.finalScores && typeof s.finalScores[2]==='number') ? s.finalScores[2] : 0;
+            const maxF1 = gamma.g1 * 100, maxF2 = gamma.g2 * 100, maxF3 = gamma.g3 * 100;
+            if(final1 > maxF1) final1 = maxF1; if(final2 > maxF2) final2 = maxF2; if(final3 > maxF3) final3 = maxF3;
+            const r1 = gamma.g1 > 0 ? (usualAvg * coeff.usual * gamma.g1 + final1 * coeff.final) / (gamma.g1 * 100) : 0;
+            const r2 = gamma.g2 > 0 ? (usualAvg * coeff.usual * gamma.g2 + final2 * coeff.final) / (gamma.g2 * 100) : 0;
+            const r3 = gamma.g3 > 0 ? (usualAvg * coeff.usual * gamma.g3 + final3 * coeff.final) / (gamma.g3 * 100) : 0;
+            s.r1 = Math.min(1, Math.max(0, r1));
+            s.r2 = Math.min(1, Math.max(0, r2));
+            s.r3 = Math.min(1, Math.max(0, r3));
+            s.achievement = gamma.g1 * s.r1 + gamma.g2 * s.r2 + gamma.g3 * s.r3;
+            s.usualAvg = usualAvg;
+            s.finalTotal = final1+final2+final3;
+            if (validUsual.length>0 || s.finalTotal>0) { sumR1 += s.r1; sumR2 += s.r2; sumR3 += s.r3; sumTotal += s.achievement; valid++; }
             const tr = document.createElement('tr');
-            tr.className = 'student-row';
-            tr.innerHTML = `
-                <td><input type="checkbox" class="student-checkbox"></td>
-                <td>${newId}</td>
-                <td><input type="text" class="student-id" placeholder="学号"></td>
-                <td><input type="text" class="student-name" placeholder="姓名"></td>
-                <td><input type="number" class="usual-score1" placeholder="成绩1" min="0" max="100" onchange="calculateResults()"></td>
-                <td><input type="number" class="usual-score2" placeholder="成绩2" min="0" max="100" onchange="calculateResults()"></td>
-                <td><input type="number" class="usual-score3" placeholder="成绩3" min="0" max="100" onchange="calculateResults()"></td>
-                <td><input type="number" class="usual-score4" placeholder="成绩4" min="0" max="100" onchange="calculateResults()"></td>
-                <td><input type="number" class="final-score1" placeholder="目标1" min="0" max="100" onchange="calculateResults()"></td>
-                <td><input type="number" class="final-score2" placeholder="目标2" min="0" max="100" onchange="calculateResults()"></td>
-                <td><input type="number" class="final-score3" placeholder="目标3" min="0" max="100" onchange="calculateResults()"></td>
-            `;
-            
+            tr.innerHTML = `<td>${s.id}</td><td>${s.studentId}</td><td>${s.name}</td><td>${usualAvg.toFixed(2)}</td><td>${s.finalTotal.toFixed(2)}</td>
+                <td class="${getClassByVal(s.r1)}">${s.r1.toFixed(4)}</td><td class="${getClassByVal(s.r2)}">${s.r2.toFixed(4)}</td>
+                <td class="${getClassByVal(s.r3)}">${s.r3.toFixed(4)}</td><td class="${getClassByVal(s.achievement)}">${s.achievement.toFixed(4)}</td>`;
             tbody.appendChild(tr);
-            
-            // 添加到学生数组
-            students.push({
-                id: newId,
-                studentId: '',
-                name: '',
-                usualScores: [null, null, null, null],
-                finalScores: [null, null, null]
-            });
         }
-        
-        // 删除选中的学生
-        function removeSelectedStudents() {
-            const checkboxes = document.querySelectorAll('.student-checkbox:checked');
-            if (checkboxes.length === 0) {
-                alert('请先选择要删除的学生！');
-                return;
-            }
-            
-            if (confirm(`确定要删除选中的 ${checkboxes.length} 条学生记录吗？`)) {
-                checkboxes.forEach(checkbox => {
-                    const tr = checkbox.closest('tr');
-                    const index = Array.from(tr.parentNode.children).indexOf(tr) - 1; // 减去表头
-                    
-                    // 从数组中删除
-                    students.splice(index, 1);
-                    
-                    // 从DOM中删除
-                    tr.remove();
-                });
-                
-                // 重新计算序号
-                updateStudentIds();
-                
-                // 重新计算结果
-                calculateResults();
-            }
-        }
-        
-        // 更新学生序号
-        function updateStudentIds() {
-            const rows = document.querySelectorAll('#input-data tr');
-            rows.forEach((row, index) => {
-                const idCell = row.querySelector('td:nth-child(2)');
-                idCell.textContent = index + 1;
-                
-                // 更新数组中的ID
-                if (students[index]) {
-                    students[index].id = index + 1;
-                }
-            });
-        }
-        
-        // 全选/取消全选
-        function toggleSelectAll() {
-            const selectAll = document.getElementById('select-all').checked;
-            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
-                checkbox.checked = selectAll;
-            });
-        }
-        
-        // 从Excel导入数据
-        function importFromExcel() {
-            document.getElementById('file-input').click();
-        }
-        
-        // 处理文件导入
-        document.getElementById('file-input').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                
-                // 获取第一个工作表
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                
-                // 转换为JSON
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-                
-                // 清空现有数据
-                document.getElementById('input-data').innerHTML = '';
-                students = [];
-                
-                // 跳过表头，从第二行开始处理数据
-                for (let i = 1; i < jsonData.length; i++) {
-                    const row = jsonData[i];
-                    if (row.length === 0) continue; // 跳过空行
-                    
-                    addStudent();
-                    
-                    const lastIndex = students.length - 1;
-                    const currentStudent = students[lastIndex];
-                    const currentRow = document.querySelector(`#input-data tr:nth-child(${lastIndex + 1})`);
-                    
-                    // 填充数据
-                    if (row[1]) {
-                        currentStudent.studentId = row[1].toString();
-                        currentRow.querySelector('.student-id').value = row[1].toString();
-                    }
-                    
-                    if (row[2]) {
-                        currentStudent.name = row[2].toString();
-                        currentRow.querySelector('.student-name').value = row[2].toString();
-                    }
-                    
-                    // 平时成绩项目
-                    for (let j = 3; j <= 6; j++) {
-                        if (row[j] !== undefined && row[j] !== null && row[j] !== '') {
-                            const score = parseFloat(row[j]);
-                            if (!isNaN(score)) {
-                                currentStudent.usualScores[j-3] = score;
-                                currentRow.querySelector(`.usual-score${j-2}`).value = score;
-                            }
-                        }
-                    }
-                    
-                    // 期末成绩课程目标
-                    for (let j = 7; j <= 9; j++) {
-                        if (row[j] !== undefined && row[j] !== null && row[j] !== '') {
-                            const score = parseFloat(row[j]);
-                            if (!isNaN(score)) {
-                                currentStudent.finalScores[j-7] = score;
-                                currentRow.querySelector(`.final-score${j-6}`).value = score;
-                            }
-                        }
-                    }
-                }
-                
-                // 重新计算结果
-                calculateResults();
-            };
-            reader.readAsArrayBuffer(file);
-            
-            // 重置文件输入，以便可以重复选择同一个文件
-            e.target.value = '';
+        if(valid>0) { avgR1 = sumR1/valid; avgR2 = sumR2/valid; avgR3 = sumR3/valid; avgTotal = sumTotal/valid; } 
+        else { avgR1=avgR2=avgR3=avgTotal=0; }
+        document.getElementById('avg-r1').innerText = avgR1.toFixed(4);
+        document.getElementById('avg-r2').innerText = avgR2.toFixed(4);
+        document.getElementById('avg-r3').innerText = avgR3.toFixed(4);
+        document.getElementById('avg-total').innerText = avgTotal.toFixed(4);
+        updateNormComparison();
+        updateChart();
+        if(currentFilterType) applyFilterByType(currentFilterType);
+    }
+    
+    function syncFromTable() {
+        const rows = document.querySelectorAll('#input-data tr');
+        students = [];
+        rows.forEach((row, idx) => {
+            const studentId = row.querySelector('.student-id')?.value || '';
+            const name = row.querySelector('.student-name')?.value || `学生${idx+1}`;
+            const usualScores = [];
+            for(let i=1;i<=4;i++) { let val = parseFloat(row.querySelector(`.usual-score${i}`)?.value); if(isNaN(val)) val = null; usualScores.push(val); }
+            const final1 = parseFloat(row.querySelector('.final-score1')?.value) || 0;
+            const final2 = parseFloat(row.querySelector('.final-score2')?.value) || 0;
+            const final3 = parseFloat(row.querySelector('.final-score3')?.value) || 0;
+            students.push({ id: idx+1, studentId, name, usualScores, finalScores: [final1, final2, final3] });
         });
-        
-        // 导出到Excel
-        function exportToExcel() {
-            // 收集数据
-            const data = [];
-            
-            // 表头
-            data.push([
-                '序号', '学号', '姓名', 
-                '平时成绩项目1', '平时成绩项目2', '平时成绩项目3', '平时成绩项目4',
-                '期末成绩课程目标1', '期末成绩课程目标2', '期末成绩课程目标3'
-            ]);
-            
-            // 学生数据
-            const rows = document.querySelectorAll('#input-data tr');
-            rows.forEach(row => {
-                const rowData = [
-                    row.querySelector('td:nth-child(2)').textContent,
-                    row.querySelector('.student-id').value,
-                    row.querySelector('.student-name').value,
-                    row.querySelector('.usual-score1').value || '',
-                    row.querySelector('.usual-score2').value || '',
-                    row.querySelector('.usual-score3').value || '',
-                    row.querySelector('.usual-score4').value || '',
-                    row.querySelector('.final-score1').value || '',
-                    row.querySelector('.final-score2').value || '',
-                    row.querySelector('.final-score3').value || ''
-                ];
-                data.push(rowData);
-            });
-            
-            // 创建工作表
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            
-            // 创建工作簿
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "学生成绩数据");
-            
-            // 导出Excel文件
-            const tableName = document.getElementById('table-name').value || '理论课程目标达成度数据';
-            XLSX.writeFile(wb, `${tableName}.xlsx`);
-        }
-        
-        // 计算结果
-        function calculateResults() {
-            // 获取权重和系数
-            const gamma1 = parseFloat(document.getElementById('gamma1').value) || 0;
-            const gamma2 = parseFloat(document.getElementById('gamma2').value) || 0;
-            const gamma3 = parseFloat(document.getElementById('gamma3').value) || 0;
-            const usualCoefficient = parseFloat(document.getElementById('usual-coefficient').value) || 0;
-            const finalCoefficient = parseFloat(document.getElementById('final-coefficient').value) || 0;
-            
-            // 验证权重总和是否为1
-            const totalGamma = gamma1 + gamma2 + gamma3;
-            if (Math.abs(totalGamma - 1) > 0.001) {
-                alert(`警告：课程目标权重总和应为1，当前为${totalGamma}`);
-            }
-            
-            // 验证成绩系数总和是否为1
-            const totalCoefficient = usualCoefficient + finalCoefficient;
-            if (Math.abs(totalCoefficient - 1) > 0.001) {
-                alert(`警告：成绩系数总和应为1，当前为${totalCoefficient}`);
-            }
-            
-            // 清空结果表格
-            const resultTbody = document.getElementById('result-data');
-            resultTbody.innerHTML = '';
-            
-            // 统计数据
-            let totalR1 = 0, totalR2 = 0, totalR3 = 0, totalAchievement = 0;
-            let validCount = 0;
-            
-            // 处理每一行数据
-            const rows = document.querySelectorAll('#input-data tr');
-            rows.forEach((row, index) => {
-                // 获取学生数据
-                const studentId = row.querySelector('.student-id').value;
-                const name = row.querySelector('.student-name').value;
-                
-                // 计算平时成绩（取非空成绩的平均值）
-                const usualScores = [];
-                for (let i = 1; i <= 4; i++) {
-                    const score = parseFloat(row.querySelector(`.usual-score${i}`).value);
-                    if (!isNaN(score)) {
-                        usualScores.push(score);
-                    }
-                }
-                
-                const usualAvg = usualScores.length > 0 ? usualScores.reduce((a, b) => a + b, 0) / usualScores.length : 0;
-                
-                // 计算期末成绩（三个目标成绩之和）
-                const finalScore1 = parseFloat(row.querySelector('.final-score1').value) || 0;
-                const finalScore2 = parseFloat(row.querySelector('.final-score2').value) || 0;
-                const finalScore3 = parseFloat(row.querySelector('.final-score3').value) || 0;
-                const finalTotal = finalScore1 + finalScore2 + finalScore3;
-                
-                // 计算各项R值
-                const r1 = (usualAvg * usualCoefficient * gamma1 + finalScore1 * finalCoefficient) / (gamma1 * 100);
-                const r2 = (usualAvg * usualCoefficient * gamma2 + finalScore2 * finalCoefficient) / (gamma2 * 100);
-                const r3 = (usualAvg * usualCoefficient * gamma3 + finalScore3 * finalCoefficient) / (gamma3 * 100);
-                
-                // 计算总达成度
-                const achievement = gamma1 * r1 + gamma2 * r2 + gamma3 * r3;
-                
-                // 添加到统计
-                if (usualScores.length > 0 || finalTotal > 0) {
-                    totalR1 += r1;
-                    totalR2 += r2;
-                    totalR3 += r3;
-                    totalAchievement += achievement;
-                    validCount++;
-                }
-                
-                // 添加到结果表格
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${studentId}</td>
-                    <td>${name}</td>
-                    <td>${usualAvg.toFixed(2)}</td>
-                    <td>${finalTotal.toFixed(2)}</td>
-                    <td class="${getAchievementClass(r1)}">${r1.toFixed(4)}</td>
-                    <td class="${getAchievementClass(r2)}">${r2.toFixed(4)}</td>
-                    <td class="${getAchievementClass(r3)}">${r3.toFixed(4)}</td>
-                    <td>${achievement.toFixed(4)}</td>
-                `;
-                resultTbody.appendChild(tr);
-                
-                // 更新学生数组
-                if (students[index]) {
-                    students[index] = {
-                        id: index + 1,
-                        studentId,
-                        name,
-                        usualScores,
-                        finalScores: [finalScore1, finalScore2, finalScore3],
-                        usualAvg,
-                        finalTotal,
-                        r1,
-                        r2,
-                        r3,
-                        achievement
-                    };
-                }
-            });
-            
-            // 计算平均值
-            if (validCount > 0) {
-                document.getElementById('avg-r1').textContent = (totalR1 / validCount).toFixed(4);
-                document.getElementById('avg-r2').textContent = (totalR2 / validCount).toFixed(4);
-                document.getElementById('avg-r3').textContent = (totalR3 / validCount).toFixed(4);
-                document.getElementById('avg-total').textContent = (totalAchievement / validCount).toFixed(4);
-            } else {
-                document.getElementById('avg-r1').textContent = '0.0000';
-                document.getElementById('avg-r2').textContent = '0.0000';
-                document.getElementById('avg-r3').textContent = '0.0000';
-                document.getElementById('avg-total').textContent = '0.0000';
-            }
-            
-            // 更新图表
-            updateChart();
-        }
-        
-        // 获取达成度等级样式
-        function getAchievementClass(value) {
-            if (value < 0.6) return 'highlight-low';
-            if (value < 0.8) return 'highlight-medium';
-            return 'highlight-high';
-        }
-        
-        // 初始化图表
-        function initChart() {
-            const ctx = document.getElementById('achievement-chart').getContext('2d');
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        {
-                            label: 'R1',
-                            data: [],
-                            borderColor: 'rgb(255, 99, 132)',
-                            backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                            tension: 0.1
-                        },
-                        {
-                            label: 'R2',
-                            data: [],
-                            borderColor: 'rgb(54, 162, 235)',
-                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                            tension: 0.1
-                        },
-                        {
-                            label: 'R3',
-                            data: [],
-                            borderColor: 'rgb(75, 192, 192)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                            tension: 0.1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 1,
-                            title: {
-                                display: true,
-                                text: '达成度'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: '学生序号'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // 更新图表数据
-        function updateChart() {
-            if (!chart) return;
-            
-            const labels = [];
-            const r1Data = [];
-            const r2Data = [];
-            const r3Data = [];
-            
-            students.forEach(student => {
-                labels.push(student.id);
-                r1Data.push(student.r1 || 0);
-                r2Data.push(student.r2 || 0);
-                r3Data.push(student.r3 || 0);
-            });
-            
-            chart.data.labels = labels;
-            chart.data.datasets[0].data = r1Data;
-            chart.data.datasets[1].data = r2Data;
-            chart.data.datasets[2].data = r3Data;
-            
-            chart.update();
-        }
-        
-        // 新增：导出分析结果
-        function exportResultTable() {
-            // 表头
-            const header = [
-                '序号','学号','姓名',
-                '平时成绩','期末成绩',
-                'R1','R2','R3','课程达成度R'
-            ];
-
-            // 逐行收集数据
-            const rows = Array.from(document.querySelectorAll('#result-data tr'))
-                .map(tr => Array.from(tr.querySelectorAll('td'))
-                    .map(td => td.textContent.trim())
-                );
-
-            if(rows.length === 0){
-                alert('暂无分析结果可导出！');
-                return;
-            }
-
-            // 合并表头与数据
-            const sheetData = [header, ...rows];
-
-            // 生成工作表
-            const ws = XLSX.utils.aoa_to_sheet(sheetData);
-
-            // 生成工作簿
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, '分析结果');
-
-            // 下载文件
-            const fileName = (document.getElementById('table-name').value || '理论课程目标达成度分析') + '_结果.xlsx';
-            XLSX.writeFile(wb, fileName);
-        }
-        
-        // 筛选功能
-        function filterLowR1() {
-            const filtered = students.filter(student => student.r1 < 0.6);
-            displayFilteredResults(filtered, 'R1 < 0.6');
-            generateLearningAnalysis(filtered, 'R1');
-        }
-        
-        function filterLowR2() {
-            const filtered = students.filter(student => student.r2 < 0.6);
-            displayFilteredResults(filtered, 'R2 < 0.6');
-            generateLearningAnalysis(filtered, 'R2');
-        }
-        
-        function filterLowR3() {
-            const filtered = students.filter(student => student.r3 < 0.6);
-            displayFilteredResults(filtered, 'R3 < 0.6');
-            generateLearningAnalysis(filtered, 'R3');
-        }
-        
-        function filterAllLow() {
-            const filtered = students.filter(student => 
-                student.r1 < 0.6 && student.r2 < 0.6 && student.r3 < 0.6
-            );
-            displayFilteredResults(filtered, 'R1、R2、R3均 < 0.6');
-            generateLearningAnalysis(filtered, 'all');
-        }
-        
-        function filterMultipleLow() {
-            const filtered = students.filter(student => {
-                let lowCount = 0;
-                if (student.r1 < 0.6) lowCount++;
-                if (student.r2 < 0.6) lowCount++;
-                if (student.r3 < 0.6) lowCount++;
-                return lowCount >= 2;
-            });
-            displayFilteredResults(filtered, '至少两项 < 0.6');
-            generateLearningAnalysis(filtered, 'multiple');
-        }
-        
-        function clearAllFilters() {
-            document.getElementById('filter-data').innerHTML = '';
-            document.getElementById('analysis-content').innerHTML = '<p>请选择筛选条件或点击"生成学情分析报告"查看详细分析。</p>';
-        }
-        
-        function displayFilteredResults(filteredStudents, filterType) {
-            const tbody = document.getElementById('filter-data');
-            tbody.innerHTML = '';
-            
-            if (filteredStudents.length === 0) {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `<td colspan="8">没有找到${filterType}的学生</td>`;
-                tbody.appendChild(tr);
-                return;
-            }
-            
-            // 按序号排序
-            filteredStudents.sort((a, b) => a.id - b.id);
-            
-            filteredStudents.forEach(student => {
-                const tr = document.createElement('tr');
-                const statusBadge = getStatusBadge(student);
-                
-                tr.innerHTML = `
-                    <td>${student.id}</td>
-                    <td>${student.studentId}</td>
-                    <td>${student.name}</td>
-                    <td class="${getAchievementClass(student.r1)}">${student.r1 ? student.r1.toFixed(4) : '-'}</td>
-                    <td class="${getAchievementClass(student.r2)}">${student.r2 ? student.r2.toFixed(4) : '-'}</td>
-                    <td class="${getAchievementClass(student.r3)}">${student.r3 ? student.r3.toFixed(4) : '-'}</td>
-                    <td>${student.achievement ? student.achievement.toFixed(4) : '-'}</td>
-                    <td>${statusBadge}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-        
-        function getStatusBadge(student) {
-            let badges = [];
-            if (student.r1 < 0.6) badges.push('<span class="warning-badge">R1预警</span>');
-            if (student.r2 < 0.6) badges.push('<span class="warning-badge">R2预警</span>');
-            if (student.r3 < 0.6) badges.push('<span class="warning-badge">R3预警</span>');
-            
-            if (badges.length === 0) {
-                return '<span class="success-badge">正常</span>';
-            }
-            return badges.join(' ');
-        }
-        
-        function generateLearningAnalysis(filteredStudents, filterType) {
-            const analysisDiv = document.getElementById('analysis-content');
-            
-            if (filteredStudents.length === 0) {
-                analysisDiv.innerHTML = '<p>没有符合条件的学生，无法生成学情分析报告。</p>';
-                return;
-            }
-            
-            let analysisHTML = '<h4>理论课程学情分析报告</h4>';
-            
-            // 基本统计
-            analysisHTML += `<p><strong>筛选条件：</strong>${getFilterTypeName(filterType)}</p>`;
-            analysisHTML += `<p><strong>涉及学生人数：</strong>${filteredStudents.length} 人</p>`;
-            analysisHTML += `<p><strong>占比：</strong>${(filteredStudents.length / students.length * 100).toFixed(1)}%</p>`;
-            
-            // 详细分析
-            if (filterType === 'all' || filterType === 'multiple') {
-                analysisHTML += '<h5>理论课程学习困难深度分析</h5>';
-                analysisHTML += '<p><strong>问题严重性：</strong>';
-                
-                if (filterType === 'all') {
-                    analysisHTML += '这类学生在理论课程的所有学习目标上均未达标，表明其在课程的理论知识掌握、概念理解和应用能力等各个方面都存在明显不足，需要重点关注和干预。';
-                } else {
-                    analysisHTML += '这类学生在多个理论学习目标上未达标，说明存在较为严重的理论学习困难，需要针对性地加强辅导和知识巩固。';
-                }
-                analysisHTML += '</p>';
-                
-                // 成绩分析
-                const avgUsual = filteredStudents.reduce((sum, s) => sum + (s.usualAvg || 0), 0) / filteredStudents.length;
-                const avgFinal = filteredStudents.reduce((sum, s) => sum + (s.finalTotal || 0), 0) / filteredStudents.length;
-                
-                analysisHTML += '<h5>成绩特征分析</h5>';
-                analysisHTML += '<ul>';
-                analysisHTML += `<li>平均平时成绩：${avgUsual.toFixed(2)} 分</li>`;
-                analysisHTML += `<li>平均期末成绩：${avgFinal.toFixed(2)} 分</li>`;
-                analysisHTML += `<li>平均总达成度：${(filteredStudents.reduce((sum, s) => sum + (s.achievement || 0), 0) / filteredStudents.length).toFixed(4)}</li>`;
-                analysisHTML += '</ul>';
-                
-                // 建议措施
-                analysisHTML += '<h5>理论学习改进建议</h5>';
-                analysisHTML += '<ol>';
-                analysisHTML += '<li><strong>基础知识强化：</strong>针对理论基础知识薄弱的环节进行重点复习和巩固</li>';
-                analysisHTML += '<li><strong>学习方法指导：</strong>帮助他们建立正确的理论学习方法，如概念图构建、知识点梳理等</li>';
-                analysisHTML += '<li><strong>个别辅导：</strong>为这类学生安排专门的辅导时间，进行一对一或小组辅导</li>';
-                analysisHTML += '<li><strong>增加练习：</strong>提供更多的理论练习题和案例分析机会</li>';
-                analysisHTML += '<li><strong>过程监控：</strong>加强对他们学习过程的监督，定期检查学习进度</li>';
-                analysisHTML += '<li><strong>同伴互助：</strong>安排成绩优秀的学生与他们结对，提供学习帮助</li>';
-                analysisHTML += '</ol>';
-                
-                // 学生名单
-                analysisHTML += '<h5>重点关注学生名单</h5>';
-                analysisHTML += '<table class="table table-sm" style="width:100%">';
-                analysisHTML += '<tr><th>序号</th><th>学号</th><th>姓名</th><th>R1</th><th>R2</th><th>R3</th><th>总达成度</th></tr>';
-                filteredStudents.forEach(student => {
-                    analysisHTML += `<tr>
-                        <td>${student.id}</td>
-                        <td>${student.studentId}</td>
-                        <td>${student.name}</td>
-                        <td>${student.r1.toFixed(4)}</td>
-                        <td>${student.r2.toFixed(4)}</td>
-                        <td>${student.r3.toFixed(4)}</td>
-                        <td>${student.achievement.toFixed(4)}</td>
-                    </tr>`;
-                });
-                analysisHTML += '</table>';
-            } else {
-                // 单个目标分析
-                const targetName = filterType.toUpperCase();
-                analysisHTML += `<h5>${targetName} 理论学习目标达成分析</h5>`;
-                analysisHTML += `<p>这些学生在课程目标${filterType.slice(1)}的达成上存在困难，需要针对性地加强相关理论知识和能力的培养。</p>`;
-                
-                // 具体建议
-                analysisHTML += '<h5>针对性改进措施</h5>';
-                if (filterType === 'r1') {
-                    analysisHTML += '<ul>';
-                    analysisHTML += '<li>加强基础理论知识的讲解和复习</li>';
-                    analysisHTML += '<li>提供更多的理论概念解释和例题分析</li>';
-                    analysisHTML += '<li>在课程开始前进行预备知识检查，确保学生具备必要的基础</li>';
-                    analysisHTML += '</ul>';
-                } else if (filterType === 'r2') {
-                    analysisHTML += '<ul>';
-                    analysisHTML += '<li>加强理论应用能力的培养，增加案例分析</li>';
-                    analysisHTML += '<li>提供更多的理论推导和证明过程</li>';
-                    analysisHTML += '<li>组织理论问题的讨论和解答环节</li>';
-                    analysisHTML += '</ul>';
-                } else if (filterType === 'r3') {
-                    analysisHTML += '<ul>';
-                    analysisHTML += '<li>加强理论综合应用和分析能力的培养</li>';
-                    analysisHTML += '<li>提供更多的综合性理论问题和项目</li>';
-                    analysisHTML += '<li>组织理论知识的综合应用训练</li>';
-                    analysisHTML += '</ul>';
+        computeAchievements();
+    }
+    
+    function attachInputEvents() { document.getElementById('input-data')?.addEventListener('change', () => syncFromTable()); document.getElementById('input-data')?.addEventListener('input', () => syncFromTable()); }
+    function addStudent() {
+        const tbody = document.getElementById('input-data');
+        const newId = students.length+1;
+        const tr = document.createElement('tr');
+        tr.className = 'student-row';
+        tr.innerHTML = `<td><input type="checkbox" class="student-checkbox"></td><td>${newId}</td>
+            <td><input type="text" class="student-id" placeholder="学号"></td><td><input type="text" class="student-name" placeholder="姓名"></td>
+            <td><input type="number" class="usual-score1" placeholder="平时1" min="0" max="100"></td>
+            <td><input type="number" class="usual-score2" placeholder="平时2" min="0" max="100"></td>
+            <td><input type="number" class="usual-score3" placeholder="平时3" min="0" max="100"></td>
+            <td><input type="number" class="usual-score4" placeholder="平时4" min="0" max="100"></td>
+            <td><input type="number" class="final-score1" placeholder="目标1" min="0" step="0.5"></td>
+            <td><input type="number" class="final-score2" placeholder="目标2" min="0" step="0.5"></td>
+            <td><input type="number" class="final-score3" placeholder="目标3" min="0" step="0.5"></td>`;
+        tbody.appendChild(tr);
+        syncFromTable();
+    }
+    function removeSelectedStudents() { const checks = document.querySelectorAll('.student-checkbox:checked'); if(checks.length===0) return alert('请勾选学生'); if(confirm(`删除${checks.length}名学生`)) { checks.forEach(cb => cb.closest('tr')?.remove()); syncFromTable(); } }
+    function toggleSelectAll() { const all = document.getElementById('select-all').checked; document.querySelectorAll('.student-checkbox').forEach(cb => cb.checked = all); }
+    function importFromExcel() { document.getElementById('file-input').click(); }
+    document.getElementById('file-input').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const data = new Uint8Array(ev.target.result);
+            const workbook = XLSX.read(data, {type:'array'});
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(sheet, {header:1});
+            document.getElementById('input-data').innerHTML = '';
+            if(rows.length>1) {
+                for(let i=1; i<rows.length; i++) {
+                    const row = rows[i];
+                    if(row.length<3) continue;
+                    addStudent();
+                    const lastRow = document.querySelector(`#input-data tr:last-child`);
+                    if(row[1]) lastRow.querySelector('.student-id').value = row[1].toString();
+                    if(row[2]) lastRow.querySelector('.student-name').value = row[2].toString();
+                    for(let j=3;j<=6;j++) if(row[j]!==undefined && !isNaN(parseFloat(row[j]))) lastRow.querySelector(`.usual-score${j-2}`).value = parseFloat(row[j]);
+                    for(let j=7;j<=9;j++) if(row[j]!==undefined && !isNaN(parseFloat(row[j]))) lastRow.querySelector(`.final-score${j-6}`).value = parseFloat(row[j]);
                 }
             }
-            
-            analysisDiv.innerHTML = analysisHTML;
+            syncFromTable();
+        };
+        reader.readAsArrayBuffer(file);
+        e.target.value = '';
+    });
+    function exportToExcel() { const data=[['序号','学号','姓名','平时1','平时2','平时3','平时4','期末目标1','期末目标2','期末目标3']]; document.querySelectorAll('#input-data tr').forEach(row=>{data.push([row.querySelector('td:nth-child(2)')?.innerText, row.querySelector('.student-id')?.value,row.querySelector('.student-name')?.value,row.querySelector('.usual-score1')?.value,row.querySelector('.usual-score2')?.value,row.querySelector('.usual-score3')?.value,row.querySelector('.usual-score4')?.value,row.querySelector('.final-score1')?.value,row.querySelector('.final-score2')?.value,row.querySelector('.final-score3')?.value]);}); const ws=XLSX.utils.aoa_to_sheet(data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'成绩'); XLSX.writeFile(wb,`${document.getElementById('course-name').value}_成绩.xlsx`); }
+    function exportResultTable() { const header=['序号','学号','姓名','平时均分','期末总分','R1理论体系','R2数理工具','R3应用创新','达成度']; const rows=Array.from(document.querySelectorAll('#result-data tr')).map(tr=>Array.from(tr.querySelectorAll('td')).map(td=>td.innerText)); if(!rows.length) return alert('无数据'); const ws=XLSX.utils.aoa_to_sheet([header,...rows]); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'达成度'); XLSX.writeFile(wb,'达成度分析.xlsx'); }
+    
+    const STATS_PLATFORM_URL = "https://qrbgda8w.jsjform.com/f/WmN0Q6";
+    
+    // 增强提交：自动复制格式化内容到剪贴板 + 打开表单页面（新标签页）
+    async function submitAchievementToPlatform() {
+        // 1. 从界面同步最新数据并重算达成度
+        syncFromTable();
+        
+        const teacher = document.getElementById('teacher-name').value.trim();
+        const className = document.getElementById('class-name').value.trim();
+        const course = document.getElementById('course-name').value.trim();
+        const studentCount = students.length;
+        
+        if(studentCount === 0) {
+            alert('暂无学生数据，请先添加或导入学生成绩。');
+            return;
         }
         
-        function getFilterTypeName(filterType) {
-            const names = {
-                'r1': 'R1 < 0.6',
-                'r2': 'R2 < 0.6',
-                'r3': 'R3 < 0.6',
-                'all': 'R1、R2、R3均 < 0.6',
-                'multiple': '至少两项 < 0.6'
-            };
-            return names[filterType] || filterType;
+        // 2. 构造便于粘贴的文本内容（清晰结构，一次性提交所有关键字段）
+        const currentDate = new Date().toLocaleString('zh-CN');
+        const reportText = `【课程达成度上报数据】\n课程名称：${course}\n班级：${className}\n任课教师：${teacher}\n学生人数：${studentCount}\n课程达成度均值：${avgTotal.toFixed(4)}\n\n上报时间：${currentDate}\n`;
+        
+        // 3. 复制到剪贴板（现代浏览器Clipboard API）
+        try {
+            await navigator.clipboard.writeText(reportText);
+            showToast('✅ 数据已复制到剪贴板！打开表单后 Ctrl+V 粘贴即可');
+        } catch (err) {
+            console.warn('Clipboard failed: ', err);
+            // 降级方案：使用传统方法
+            const textarea = document.createElement('textarea');
+            textarea.value = reportText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('✅ 数据已复制（传统方式），可粘贴至表单');
         }
-    </script>
+        
+        // 4. 新标签页打开校级统计平台（与复制同时进行）
+        if(confirm(`📋 已复制上报内容到剪贴板。\n即将打开校级统计平台表单，在任意文本输入框中按 Ctrl+V 粘贴即可一次性提交。\n是否继续打开表单页面？`)) {
+            window.open(STATS_PLATFORM_URL, '_blank');
+        }
+    }
+    
+    function displayFilteredResults(filtered, mode) { const tbody = document.getElementById('filter-data'); tbody.innerHTML = ''; if(filtered.length===0) { tbody.innerHTML='<tr><td colspan="8">暂无符合条件学生</td></tr>'; return; } filtered.forEach(s => { let html = `<tr><td>${s.id}</td><td>${s.studentId}</td><td>${s.name}</td>`; if(mode==='r1') html += `<td class="${getClassByVal(s.r1)}">${s.r1.toFixed(4)}</td><td>--</td><td>--</td><td>${s.achievement.toFixed(4)}</td><td><span class="warning-badge">R1理论体系薄弱</span></td>`; else if(mode==='r2') html += `<td>--</td><td class="${getClassByVal(s.r2)}">${s.r2.toFixed(4)}</td><td>--</td><td>${s.achievement.toFixed(4)}</td><td><span class="warning-badge">R2数理工具薄弱</span></td>`; else if(mode==='r3') html += `<td>--</td><td>--</td><td class="${getClassByVal(s.r3)}">${s.r3.toFixed(4)}</td><td>${s.achievement.toFixed(4)}</td><td><span class="warning-badge">R3应用创新薄弱</span></td>`; else html += `<td class="${getClassByVal(s.r1)}">${s.r1.toFixed(4)}</td><td class="${getClassByVal(s.r2)}">${s.r2.toFixed(4)}</td><td class="${getClassByVal(s.r3)}">${s.r3.toFixed(4)}</td><td>${s.achievement.toFixed(4)}</td><td>${(s.r1<0.6||s.r2<0.6||s.r3<0.6)?'<span class="warning-badge">预警</span>':'<span class="success-badge">达标</span>'}</td>`; html += `</tr>`; tbody.insertAdjacentHTML('beforeend', html); }); }
+    
+    function generateDifferentiatedReport(filtered, type) {
+        const div = document.getElementById('analysis-content');
+        if(filtered.length===0) { div.innerHTML='<div class="insight-card">✅ 当前筛选无学生，整体课程目标达成良好。</div>'; return; }
+        const r1Avg = filtered.reduce((a,b)=>a+b.r1,0)/filtered.length;
+        const r2Avg = filtered.reduce((a,b)=>a+b.r2,0)/filtered.length;
+        const r3Avg = filtered.reduce((a,b)=>a+b.r3,0)/filtered.length;
+        let title = '', diagnosis = '', intervention = '', actionItems = '';
+        if(type === 'r1') { title = '📖 课程目标1未达标：物理学理论体系与物理图像建构薄弱'; diagnosis = '学生对于基本理论、概念及物理图像掌握不足，对物理学发展历史、前沿及其科学社会作用缺乏系统认知。期末目标1（理论掌握）得分偏低，反映出基础知识内化欠缺，概念辨析能力弱，物理建模的起点薄弱。'; intervention = '强化物理概念图谱教学，组织物理学史专题研讨，建立“基本理论-典型现象-前沿应用”的关联学习模式；增加概念辨析型平时作业，并利用思维导图工具帮助学生构建知识网络。'; actionItems = '1) 每周一次物理概念思维导图作业，梳理章节核心公式与物理图像；2) 观看指定物理学前沿纪录片并撰写不少于300字的心得体会；3) 开展小组物理科普报告，通过讲解加深对理论体系的理解。'; } 
+        else if(type === 'r2') { title = '🧮 课程目标2未达标：矢量和微积分在物理中的应用能力不足'; diagnosis = '学生在矢量分析、微积分处理物理问题方面表现薄弱，对高等数学工具（梯度、通量、环量）与物理模型（如电磁场、力学过程）的结合缺乏熟练度，物理与工程技术交叉应用的视野偏窄，定量计算能力亟待提升。'; intervention = '专项开设“数理方法工作坊”，强化矢量场、微积分在力学/电磁学中的实操训练，结合工程案例（如流体力学、电路分析）展现数学工具的价值，同时引入数值求解思想。'; actionItems = '1) 每周一次微积分-物理综合小测，重点训练变力做功、场强积分等题型；2) 引入MATLAB/Python进行简单物理系统的数值模拟与验证实验；3) 开展跨学科(如机械、电子)物理建模练习，提升工具迁移能力。'; } 
+        else if(type === 'r3') { title = '💡 课程目标3未达标：综合运用物理与数学解决实际问题及创新能力欠缺'; diagnosis = '学生发现问题、分析问题和运用物理/数学知识解决复杂情境的能力较弱，创新素质与科学思维方式尚未形成。面对综合应用题（如多过程、多场耦合问题）时，信息提取、模型构建和问题拆解能力不足，迁移能力弱。'; intervention = '引入项目式学习(PBL)，设计真实物理问题解决任务（如设计一个简易降噪装置、分析体育项目中的物理原理），鼓励自主探究与小组协作，提升批判性思维与创新素养。'; actionItems = '1) 每两周一次物理建模挑战赛，给定开放性场景进行解题设计；2) 设置开放性课题，撰写一篇不少于1500字的小论文（文献综述+简易建模）；3) 举办创新思维辩论会，剖析尖端物理技术的社会应用与伦理问题。'; } 
+        else if(type === 'allLow') { title = '🚨 一级预警：三大课程目标均未达标，综合学业危机'; diagnosis = '学生在理论认知、数学工具应用、综合创新三个维度全部低于期望值。学习动机、基础知识和学习方法均存在严重缺陷，急需个性化紧急干预。初步判断可能面临前置知识断层、学习投入不足或学习方法低效等问题。'; intervention = '全面排查学习障碍，制定阶梯式基础巩固计划，从高中物理与高等数学基础补起。建立心理疏导与学业支持并行机制，利用同伴助学与AI自适应学习资源，启动“多对一”导师帮扶机制，每周复盘学习进展。'; actionItems = '1) 每周3次强制基础辅导（内容涵盖矢量运算、微积分基础、经典物理模型）；2) 建立个人周达成目标卡，完成基础知识闯关测试；3) 学优生一对一结对子，进行作业同做与错题讲解；4) 每两周一次阶段性模拟测试，并给予明确激励反馈。'; } 
+        else { title = '⚠️ 结构失衡：至少两项课程目标未达标（局部重度缺陷）'; diagnosis = '学生在两个课程目标维度上同时低于0.6，表现为能力结构性失衡。常见类型如“理论尚可但工具应用薄弱”（如R1≥0.6但R2<0.6）或“有思路但计算执行差”（R3≥0.6但R2<0.6），这种失衡会阻碍学生综合素质的协调发展。'; intervention = '针对弱势双目标定制“补短板融合计划”，绘制个人知识漏洞图谱，实施专题强化集训（例如专门针对“微积分在电磁学中的应用”或“复杂物理情景的建模步骤”），弥补能力断层。'; actionItems = '1) 针对弱项组合设计双目标交叉案例精讲课（如“变化的磁场产生电动势”同时考核理论理解和微积分应用）；2) 完成错题归因分析报告，要求写明错误属于理论、工具还是综合能力；3) 分层小组靶向训练，同一能力缺口的学生组成攻关小组；4) 阶段性能力复测，重点观测弱势维度的进步幅度。'; }
+        div.innerHTML = `<div class="insight-card"><h4>${title}</h4><p><strong>👥 涉及人数：</strong> ${filtered.length} 人 (占比 ${(filtered.length/students.length*100).toFixed(1)}%) &nbsp;|&nbsp; <strong>群体达成度均值：</strong> ${(filtered.reduce((a,b)=>a+b.achievement,0)/filtered.length).toFixed(4)}</p><p><strong>📊 目标分项均值：</strong> R1理论体系=${r1Avg.toFixed(3)} &nbsp; R2数理工具=${r2Avg.toFixed(3)} &nbsp; R3应用创新=${r3Avg.toFixed(3)}</p><p><strong>🔍 教学诊断：</strong> ${diagnosis}</p><p><strong>🎯 干预策略：</strong> ${intervention}</p><p><strong>✅ 具体行动方案：</strong> ${actionItems}</p><div class="badge-list"><span class="course-badge">📅 建议追踪周期：2周</span><span class="course-badge">🎓 增强形成性评价</span><span class="course-badge">📈 对标毕业要求指标点</span></div></div>`;
+    }
+    function applyFilterByType(type) { currentFilterType = type; let filtered = []; if(type === 'r1') filtered = students.filter(s=>s.r1<0.6); else if(type === 'r2') filtered = students.filter(s=>s.r2<0.6); else if(type === 'r3') filtered = students.filter(s=>s.r3<0.6); else if(type === 'allLow') filtered = students.filter(s=>s.r1<0.6 && s.r2<0.6 && s.r3<0.6); else if(type === 'multiLow') filtered = students.filter(s=>[s.r1<0.6, s.r2<0.6, s.r3<0.6].filter(Boolean).length>=2); else return; displayFilteredResults(filtered, type); generateDifferentiatedReport(filtered, type); }
+    function clearAllFilters() { currentFilterType=null; document.getElementById('filter-data').innerHTML='<tr><td colspan="8">暂无筛选结果</td></tr>'; document.getElementById('analysis-content').innerHTML='<p>✨ 点击五种筛选按钮获取个性化大学物理课程目标诊断报告。</p>'; }
+    
+    function initChart() { const ctx = document.getElementById('achievement-chart').getContext('2d'); chart = new Chart(ctx, { type:'line', data:{ labels:[], datasets:[ {label:'R1 理论体系', data:[], borderColor:'rgb(255,99,132)', borderWidth:2, pointRadius:3, tension:0.2}, {label:'R2 数理工具', data:[], borderColor:'rgb(54,162,235)', borderWidth:2, pointRadius:3, tension:0.2}, {label:'R3 应用创新', data:[], borderColor:'rgb(75,192,192)', borderWidth:2, pointRadius:3, tension:0.2}, {label:'R1均值', data:[], borderColor:'rgb(255,99,132)', borderWidth:2, borderDash:[6,6], pointRadius:0}, {label:'R2均值', data:[], borderColor:'rgb(54,162,235)', borderWidth:2, borderDash:[6,6], pointRadius:0}, {label:'R3均值', data:[], borderColor:'rgb(75,192,192)', borderWidth:2, borderDash:[6,6], pointRadius:0}, {label:'0.6线', data:[], borderColor:'#dc3545', borderWidth:2, borderDash:[5,5], pointRadius:0} ] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ min:0, max:1, title:{ display:true, text:'达成度' } } } } }); }
+    function updateChart() { if(!chart) return; const labels=students.map(s=>`${s.id}`); chart.data.labels=labels; for(let i=0;i<3;i++) chart.data.datasets[i].data=students.map(s=>i===0?s.r1:i===1?s.r2:s.r3||0); chart.data.datasets[3].data=Array(labels.length).fill(avgR1); chart.data.datasets[4].data=Array(labels.length).fill(avgR2); chart.data.datasets[5].data=Array(labels.length).fill(avgR3); chart.data.datasets[6].data=Array(labels.length).fill(0.6); chart.update(); }
+    function toggleDataset(dt) { if(!chart) return; const map={r1:0,r2:1,r3:2,'r1-mean':3,'r2-mean':4,'r3-mean':5,threshold:6}; const idx=map[dt]; const chk=document.getElementById(`show-${dt}`); if(chk) chart.data.datasets[idx].hidden = !chk.checked; chart.update(); }
+    function saveBasicInfo() { syncFromTable(); alert('课程信息已保存并重新计算达成度'); }
+    function switchTab(tabId) { document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById(tabId).classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); Array.from(document.querySelectorAll('.tab')).find(t=>t.getAttribute('data-tab')===tabId)?.classList.add('active'); if(tabId==='chart-analysis') updateChart(); }
+    function loadDemoData() { const gamma = getGamma(); const demo = [ {id:'240101', name:'张三', usual:[85,78,92,80], final:[gamma.g1*100*0.75, gamma.g2*100*0.65, gamma.g3*100*0.55]}, {id:'240102', name:'李四', usual:[90,85,88,82], final:[gamma.g1*100*0.92, gamma.g2*100*0.45, gamma.g3*100*0.88]}, {id:'240103', name:'王五', usual:[70,65,75,68], final:[gamma.g1*100*0.45, gamma.g2*100*0.42, gamma.g3*100*0.38]}, {id:'240104', name:'赵六', usual:[95,90,92,88], final:[gamma.g1*100*0.98, gamma.g2*100*0.96, gamma.g3*100*0.94]}, {id:'240105', name:'钱七', usual:[60,55,65,58], final:[gamma.g1*100*0.59, gamma.g2*100*0.58, gamma.g3*100*0.72]}, {id:'240106', name:'孙八', usual:[80,75,82,78], final:[gamma.g1*100*0.88, gamma.g2*100*0.57, gamma.g3*100*0.48]} ]; demo.forEach(d => { addStudent(); const lastRow = document.querySelector(`#input-data tr:last-child`); if(lastRow){ lastRow.querySelector('.student-id').value = d.id; lastRow.querySelector('.student-name').value = d.name; d.usual.forEach((v,i)=> lastRow.querySelector(`.usual-score${i+1}`).value = v); lastRow.querySelector('.final-score1').value = d.final[0]; lastRow.querySelector('.final-score2').value = d.final[1]; lastRow.querySelector('.final-score3').value = d.final[2]; } }); syncFromTable(); }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        loadNormConfig();
+        initChart();
+        loadDemoData();
+        attachInputEvents();
+        document.querySelectorAll('.tab').forEach(tab => { tab.addEventListener('click', (e) => { switchTab(tab.getAttribute('data-tab')); }); });
+        document.getElementById('submitToPlatformBtn').addEventListener('click', submitAchievementToPlatform);
+        document.getElementById('btnR1').addEventListener('click',()=>applyFilterByType('r1'));
+        document.getElementById('btnR2').addEventListener('click',()=>applyFilterByType('r2'));
+        document.getElementById('btnR3').addEventListener('click',()=>applyFilterByType('r3'));
+        document.getElementById('btnAllLow').addEventListener('click',()=>applyFilterByType('allLow'));
+        document.getElementById('btnMultiLow').addEventListener('click',()=>applyFilterByType('multiLow'));
+        document.getElementById('updateNormBtn').addEventListener('click', saveNormConfig);
+    });
+</script>
 </body>
 </html>
