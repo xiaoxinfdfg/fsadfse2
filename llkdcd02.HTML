@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>课程目标达成度分析系统 </title>
+    <title>课程目标达成度分析系统</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -92,6 +92,13 @@
         .badge-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
         .course-badge { background: #deeaf2; border-radius: 26px; padding: 5px 12px; font-size: 0.75rem; font-weight: 500; }
         .admin-note { background: #e9ecef; border-radius: 16px; padding: 12px; font-size: 0.8rem; margin-top: 12px; }
+        .toast-msg {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: #1e466e; color: white; padding: 10px 24px; border-radius: 40px;
+            font-size: 0.9rem; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: fadeOut 2s ease forwards;
+        }
+        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
         @media (max-width: 700px) { .form-row { flex-direction: column; } .stats-box { flex-direction: column; } .chart-container { height: 340px; } }
     </style>
 </head>
@@ -99,8 +106,8 @@
 <div class="container">
     <h1>📐 课程目标达成度分析系统</h1>
     <div class="report-banner">
-        <div class="report-text"><strong>📈 校级教学质量数据上报</strong> — 科学定位改进方向</div>
-        <button class="btn-report" id="submitToPlatformBtn">✨ 提交达成度数据至本校统计平台</button>
+        <div class="report-text"><strong>📈 校级教学质量数据上报</strong> — 数据自动复制，一键粘贴提交</div>
+        <button class="btn-report" id="submitToPlatformBtn">✨ 提交达成度数据（复制+打开表单）</button>
     </div>
     <div class="tabs">
         <div class="tab active" data-tab="basic-info">📋 课程信息</div>
@@ -143,7 +150,7 @@
             <input type="file" id="file-input" style="display:none" accept=".xlsx,.xls">
             <div style="overflow-x: auto; margin-top: 20px;">
                 <table id="input-table">
-                    <thead><tr><th style="width:30px"><input type="checkbox" id="select-all" onclick="toggleSelectAll()"></th><th>序号</th><th>学号</th><th>姓名</th><th>平时1</th><th>平时2</th><th>平时3</th><th>平时4</th><th>期末目标1<br><span style="font-size:12px">(理论掌握)</span></th><th>期末目标2<br><span style="font-size:12px">(矢量/微积分)</span></th><th>期末目标3<br><span style="font-size:12px">(综合应用)</span></th> </thead>
+                    <thead><tr><th style="width:30px"><input type="checkbox" id="select-all" onclick="toggleSelectAll()"></th><th>序号</th><th>学号</th><th>姓名</th><th>平时1</th><th>平时2</th><th>平时3</th><th>平时4</th><th>期末目标1<br><span style="font-size:12px">(理论掌握)</span></th><th>期末目标2<br><span style="font-size:12px">(矢量/微积分)</span></th><th>期末目标3<br><span style="font-size:12px">(综合应用)</span></th> </tr></thead>
                     <tbody id="input-data"></tbody>
                 </table>
             </div>
@@ -158,7 +165,7 @@
                 <strong>🏆 校级常模对比 (基于近3年该课程数据)</strong><br>
                 <span id="norm-compare-text">正在计算班级达成度与基准对比...</span>
             </div>
-            <div style="overflow-x: auto;"><table id="result-table"><thead><tr><th>序号</th><th>学号</th><th>姓名</th><th>平时均分</th><th>期末总分</th><th>R1(理论体系)</th><th>R2(数理工具)</th><th>R3(应用创新)</th><th>课程达成度R</th> </thead><tbody id="result-data"></tbody></table></div>
+            <div style="overflow-x: auto;"><table id="result-table"><thead><tr><th>序号</th><th>学号</th><th>姓名</th><th>平时均分</th><th>期末总分</th><th>R1(理论体系)</th><th>R2(数理工具)</th><th>R3(应用创新)</th><th>课程达成度R</th> </tr></thead><tbody id="result-data"></tbody></table></div>
             <div class="stats-box"><div class="stat-item"><div class="stat-value" id="avg-r1">0.00</div><div>🎯 目标1均值</div></div><div class="stat-item"><div class="stat-value" id="avg-r2">0.00</div><div>🎯 目标2均值</div></div><div class="stat-item"><div class="stat-value" id="avg-r3">0.00</div><div>🎯 目标3均值</div></div><div class="stat-item"><div class="stat-value" id="avg-total">0.00</div><div>📌 达成度均值</div></div></div>
         </div>
     </div>
@@ -220,7 +227,15 @@
     let avgR1 = 0, avgR2 = 0, avgR3 = 0, avgTotal = 0;
     let currentFilterType = null;
     let schoolNormBaseline = 0.75;
-    let normDataSource = "本校教学质量监测平台·近3年大学物理BI数据";
+    let normDataSource = "本校教学质量监测平台·近3年数据";
+    
+    function showToast(message) {
+        let toast = document.createElement('div');
+        toast.className = 'toast-msg';
+        toast.innerText = message;
+        document.body.appendChild(toast);
+        setTimeout(() => { if(toast && toast.remove) toast.remove(); }, 2000);
+    }
     
     function loadNormConfig() {
         const savedNorm = localStorage.getItem('uni_norm_baseline');
@@ -380,8 +395,49 @@
     });
     function exportToExcel() { const data=[['序号','学号','姓名','平时1','平时2','平时3','平时4','期末目标1','期末目标2','期末目标3']]; document.querySelectorAll('#input-data tr').forEach(row=>{data.push([row.querySelector('td:nth-child(2)')?.innerText, row.querySelector('.student-id')?.value,row.querySelector('.student-name')?.value,row.querySelector('.usual-score1')?.value,row.querySelector('.usual-score2')?.value,row.querySelector('.usual-score3')?.value,row.querySelector('.usual-score4')?.value,row.querySelector('.final-score1')?.value,row.querySelector('.final-score2')?.value,row.querySelector('.final-score3')?.value]);}); const ws=XLSX.utils.aoa_to_sheet(data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'成绩'); XLSX.writeFile(wb,`${document.getElementById('course-name').value}_成绩.xlsx`); }
     function exportResultTable() { const header=['序号','学号','姓名','平时均分','期末总分','R1理论体系','R2数理工具','R3应用创新','达成度']; const rows=Array.from(document.querySelectorAll('#result-data tr')).map(tr=>Array.from(tr.querySelectorAll('td')).map(td=>td.innerText)); if(!rows.length) return alert('无数据'); const ws=XLSX.utils.aoa_to_sheet([header,...rows]); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'达成度'); XLSX.writeFile(wb,'达成度分析.xlsx'); }
+    
     const STATS_PLATFORM_URL = "https://qrbgda8w.jsjform.com/f/WmN0Q6";
-    function submitAchievementToPlatform() { const teacher=document.getElementById('teacher-name').value; const className=document.getElementById('class-name').value; const course=document.getElementById('course-name').value; let sumR1=0,sumR2=0,sumR3=0,sumTotal=0,valid=0,lowR1=0,lowR2=0,lowR3=0; students.forEach(s=>{ if(s.r1!==undefined){ sumR1+=s.r1; sumR2+=s.r2; sumR3+=s.r3; sumTotal+=s.achievement; valid++; if(s.r1<0.6) lowR1++; if(s.r2<0.6) lowR2++; if(s.r3<0.6) lowR3++; } }); const params=new URLSearchParams({teacher_name:teacher,class_name:className,course_name:course,avg_r1:(sumR1/valid||0).toFixed(4),avg_r2:(sumR2/valid||0).toFixed(4),avg_r3:(sumR3/valid||0).toFixed(4),total_avg:(sumTotal/valid||0).toFixed(4),low_r1:lowR1,low_r2:lowR2,low_r3:lowR3,stu_count:valid}); let url=STATS_PLATFORM_URL+(STATS_PLATFORM_URL.includes('?')?'&':'?')+params.toString(); if(confirm('提交至校级平台（常模对比参考）')) window.open(url,'_blank'); }
+    
+    // 增强提交：自动复制格式化内容到剪贴板 + 打开表单页面（新标签页）
+    async function submitAchievementToPlatform() {
+        // 1. 从界面同步最新数据并重算达成度
+        syncFromTable();
+        
+        const teacher = document.getElementById('teacher-name').value.trim();
+        const className = document.getElementById('class-name').value.trim();
+        const course = document.getElementById('course-name').value.trim();
+        const studentCount = students.length;
+        
+        if(studentCount === 0) {
+            alert('暂无学生数据，请先添加或导入学生成绩。');
+            return;
+        }
+        
+        // 2. 构造便于粘贴的文本内容（清晰结构，一次性提交所有关键字段）
+        const currentDate = new Date().toLocaleString('zh-CN');
+        const reportText = `【课程达成度上报数据】\n课程名称：${course}\n班级：${className}\n任课教师：${teacher}\n学生人数：${studentCount}\n课程达成度均值：${avgTotal.toFixed(4)}\n\n上报时间：${currentDate}\n`;
+        
+        // 3. 复制到剪贴板（现代浏览器Clipboard API）
+        try {
+            await navigator.clipboard.writeText(reportText);
+            showToast('✅ 数据已复制到剪贴板！打开表单后 Ctrl+V 粘贴即可');
+        } catch (err) {
+            console.warn('Clipboard failed: ', err);
+            // 降级方案：使用传统方法
+            const textarea = document.createElement('textarea');
+            textarea.value = reportText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showToast('✅ 数据已复制（传统方式），可粘贴至表单');
+        }
+        
+        // 4. 新标签页打开校级统计平台（与复制同时进行）
+        if(confirm(`📋 已复制上报内容到剪贴板。\n即将打开校级统计平台表单，在任意文本输入框中按 Ctrl+V 粘贴即可一次性提交。\n是否继续打开表单页面？`)) {
+            window.open(STATS_PLATFORM_URL, '_blank');
+        }
+    }
     
     function displayFilteredResults(filtered, mode) { const tbody = document.getElementById('filter-data'); tbody.innerHTML = ''; if(filtered.length===0) { tbody.innerHTML='<tr><td colspan="8">暂无符合条件学生</td></tr>'; return; } filtered.forEach(s => { let html = `<tr><td>${s.id}</td><td>${s.studentId}</td><td>${s.name}</td>`; if(mode==='r1') html += `<td class="${getClassByVal(s.r1)}">${s.r1.toFixed(4)}</td><td>--</td><td>--</td><td>${s.achievement.toFixed(4)}</td><td><span class="warning-badge">R1理论体系薄弱</span></td>`; else if(mode==='r2') html += `<td>--</td><td class="${getClassByVal(s.r2)}">${s.r2.toFixed(4)}</td><td>--</td><td>${s.achievement.toFixed(4)}</td><td><span class="warning-badge">R2数理工具薄弱</span></td>`; else if(mode==='r3') html += `<td>--</td><td>--</td><td class="${getClassByVal(s.r3)}">${s.r3.toFixed(4)}</td><td>${s.achievement.toFixed(4)}</td><td><span class="warning-badge">R3应用创新薄弱</span></td>`; else html += `<td class="${getClassByVal(s.r1)}">${s.r1.toFixed(4)}</td><td class="${getClassByVal(s.r2)}">${s.r2.toFixed(4)}</td><td class="${getClassByVal(s.r3)}">${s.r3.toFixed(4)}</td><td>${s.achievement.toFixed(4)}</td><td>${(s.r1<0.6||s.r2<0.6||s.r3<0.6)?'<span class="warning-badge">预警</span>':'<span class="success-badge">达标</span>'}</td>`; html += `</tr>`; tbody.insertAdjacentHTML('beforeend', html); }); }
     
