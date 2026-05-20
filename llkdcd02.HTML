@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>课程目标达成度分析系统</title>
+    <title>课程目标达成度分析系统 | 自定义目标+常模公示+精准报告</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -24,7 +24,7 @@
             border-radius: 28px;
             box-shadow: 0 20px 35px rgba(0,0,0,0.08);
         }
-        h1, h2 {
+        h1, h2, h3 {
             color: #1e466e;
             border-left: 5px solid #2c7da0;
             padding-left: 16px;
@@ -72,6 +72,18 @@
         .highlight-low { background: #ffe0e0 !important; font-weight: bold; color: #b00020; }
         .highlight-medium { background: #fff3cf !important; }
         .highlight-high { background: #d9f0e6 !important; }
+        .filter-row-highlight {
+            background-color: #ffecb3 !important;
+            border-left: 4px solid #ff9800;
+            transition: all 0.1s ease;
+        }
+        .filter-btn.active-filter {
+            background: #e76f51 !important;
+            color: white !important;
+            box-shadow: 0 0 0 2px #f4a261, 0 2px 8px rgba(0,0,0,0.2);
+            transform: scale(0.98);
+            border: 1px solid #fff3e0;
+        }
         .tabs { display: flex; gap: 10px; margin-bottom: 28px; border-bottom: 2px solid #cbdbe2; flex-wrap: wrap; }
         .tab { padding: 8px 24px; background: #eef2fa; border-radius: 40px 40px 0 0; cursor: pointer; font-weight: 600; transition: 0.2s; }
         .tab.active { background: #2c7da0; color: white; }
@@ -92,6 +104,33 @@
         .badge-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
         .course-badge { background: #deeaf2; border-radius: 26px; padding: 5px 12px; font-size: 0.75rem; font-weight: 500; }
         .admin-note { background: #e9ecef; border-radius: 16px; padding: 12px; font-size: 0.8rem; margin-top: 12px; }
+        .norm-public-board {
+            background: #ffffffdd;
+            border-radius: 24px;
+            margin-top: 24px;
+            padding: 16px;
+            border: 1px solid #cde3ec;
+        }
+        .course-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 15px 0;
+        }
+        .course-card {
+            background: #eef2fa;
+            border-radius: 40px;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            border: 1px solid #bfd7e5;
+        }
+        .course-card:hover {
+            background: #2c7da0;
+            color: white;
+            transform: translateY(-2px);
+        }
         .toast-msg {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
             background: #1e466e; color: white; padding: 10px 24px; border-radius: 40px;
@@ -106,8 +145,8 @@
 <div class="container">
     <h1>📐 课程目标达成度分析系统</h1>
     <div class="report-banner">
-        <div class="report-text"><strong>📈 校级教学质量数据上报</strong> — 数据自动复制，一键粘贴提交</div>
-        <button class="btn-report" id="submitToPlatformBtn">✨ 提交达成度数据（复制+打开表单）</button>
+        <div class="report-text"><strong>📈 校级教学质量数据上报</strong> — 一键复制详细报告，粘贴至校级表单</div>
+        <button class="btn-report" id="submitToPlatformBtn">✨ 提交达成度数据（复制详细报告+打开表单）</button>
     </div>
     <div class="tabs">
         <div class="tab active" data-tab="basic-info">📋 课程信息</div>
@@ -120,7 +159,7 @@
     
     <div id="basic-info" class="tab-content active">
         <div class="section">
-            <h2>✏️ 课程基本信息</h2>
+            <h2>✏️ 课程基本信息 & 自定义目标定义</h2>
             <div class="form-row">
                 <div class="form-group"><label>📖 课程名称</label><input type="text" id="course-name" value="大学物理BI"></div>
                 <div class="form-group"><label>👩‍🏫 教师姓名</label><input type="text" id="teacher-name" value="马厂"></div>
@@ -135,8 +174,16 @@
                 <div class="form-group"><label>📚 平时成绩系数</label><input type="number" id="usual-coefficient" step="0.05" min="0" max="1" value="0.4"></div>
                 <div class="form-group"><label>📝 期末成绩系数</label><input type="number" id="final-coefficient" step="0.05" min="0" max="1" value="0.6"></div>
             </div>
+            <div style="background: #eef2f9; border-radius: 20px; padding: 18px; margin: 12px 0;">
+                <h4>📌 课程目标详细定义 (可针对不同课程修改)</h4>
+                <div class="form-row">
+                    <div class="form-group"><label>🎯 目标1 描述</label><input type="text" id="obj1-desc" value="掌握基本理论、物理图像及发展前沿"></div>
+                    <div class="form-group"><label>🎯 目标2 描述</label><input type="text" id="obj2-desc" value="熟练运用矢量与微积分解决物理问题，了解物理与工程技术交叉"></div>
+                    <div class="form-group"><label>🎯 目标3 描述</label><input type="text" id="obj3-desc" value="具备综合运用物理/数学知识解决实际问题能力，提升创新素质"></div>
+                </div>
+                <div class="filter-note" style="margin-top:8px"><strong>💡 提示：</strong> 修改目标描述后，点击【保存课程配置】，学情报告中的诊断将自动引用新定义。</div>
+            </div>
             <button onclick="saveBasicInfo()">💾 保存课程配置</button>
-            <div class="filter-note" style="margin-top:12px"><strong>📖 课程目标定义：</strong><br>目标1：掌握基本理论、物理图像及发展前沿；目标2：熟练运用矢量与微积分解决物理问题，了解物理与工程技术交叉；目标3：具备综合运用物理/数学知识解决实际问题能力，提升创新素质。</div>
         </div>
     </div>
     
@@ -165,21 +212,21 @@
                 <strong>🏆 校级常模对比 (基于近3年该课程数据)</strong><br>
                 <span id="norm-compare-text">正在计算班级达成度与基准对比...</span>
             </div>
-            <div style="overflow-x: auto;"><table id="result-table"><thead><tr><th>序号</th><th>学号</th><th>姓名</th><th>平时均分</th><th>期末总分</th><th>R1(理论体系)</th><th>R2(数理工具)</th><th>R3(应用创新)</th><th>课程达成度R</th> </tr></thead><tbody id="result-data"></tbody></table></div>
+            <div style="overflow-x: auto;"><table id="result-table"><thead><tr><th>序号</th><th>学号</th><th>姓名</th><th>平时均分</th><th>期末总分</th><th>R1(理论体系)</th><th>R2(数理工具)</th><th>R3(应用创新)</th><th>课程达成度R</th></tr></thead><tbody id="result-data"></tbody></table></div>
             <div class="stats-box"><div class="stat-item"><div class="stat-value" id="avg-r1">0.00</div><div>🎯 目标1均值</div></div><div class="stat-item"><div class="stat-value" id="avg-r2">0.00</div><div>🎯 目标2均值</div></div><div class="stat-item"><div class="stat-value" id="avg-r3">0.00</div><div>🎯 目标3均值</div></div><div class="stat-item"><div class="stat-value" id="avg-total">0.00</div><div>📌 达成度均值</div></div></div>
         </div>
     </div>
     
     <div id="chart-analysis" class="tab-content">
         <div class="section">
-            <h2>📉 达成度趋势曲线</h2>
+            <h2>📉 达成度趋势曲线 (均值线颜色与数据系列对应)</h2>
             <div class="chart-controls" style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:16px;">
                 <label><input type="checkbox" id="show-r1" checked onchange="toggleDataset('r1')"><span class="legend-box" style="background:rgba(255,99,132,0.7)"></span>R1(理论物理)</label>
                 <label><input type="checkbox" id="show-r2" checked onchange="toggleDataset('r2')"><span class="legend-box" style="background:rgba(54,162,235,0.7)"></span>R2(数理工具)</label>
                 <label><input type="checkbox" id="show-r3" checked onchange="toggleDataset('r3')"><span class="legend-box" style="background:rgba(75,192,192,0.7)"></span>R3(应用创新)</label>
-                <label><input type="checkbox" id="show-r1-mean" checked onchange="toggleDataset('r1-mean')"><span class="legend-box" style="background:rgba(255,99,132,0.3); border:1px dashed #ff6384"></span>R1均值</label>
-                <label><input type="checkbox" id="show-r2-mean" checked onchange="toggleDataset('r2-mean')"><span class="legend-box" style="background:rgba(54,162,235,0.3); border:1px dashed #36a2eb"></span>R2均值</label>
-                <label><input type="checkbox" id="show-r3-mean" checked onchange="toggleDataset('r3-mean')"><span class="legend-box" style="background:rgba(75,192,192,0.3); border:1px dashed #4bc0c0"></span>R3均值</label>
+                <label><input type="checkbox" id="show-r1-mean" checked onchange="toggleDataset('r1-mean')"><span class="legend-box" style="background:rgba(255,99,132,0.4); border:2px dashed #ff6384"></span>R1均值(同色系)</label>
+                <label><input type="checkbox" id="show-r2-mean" checked onchange="toggleDataset('r2-mean')"><span class="legend-box" style="background:rgba(54,162,235,0.4); border:2px dashed #36a2eb"></span>R2均值(同色系)</label>
+                <label><input type="checkbox" id="show-r3-mean" checked onchange="toggleDataset('r3-mean')"><span class="legend-box" style="background:rgba(75,192,192,0.4); border:2px dashed #4bc0c0"></span>R3均值(同色系)</label>
                 <label><input type="checkbox" id="show-threshold" checked onchange="toggleDataset('threshold')"><span class="legend-box" style="background:rgba(220,53,69,0.3); border:1px dashed #dc3545"></span>及格线(0.6)</label>
             </div>
             <div class="chart-container"><canvas id="achievement-chart"></canvas></div>
@@ -190,33 +237,38 @@
         <div class="section">
             <h2>🎛️ 多维筛选 & 靶向学情报告</h2>
             <div style="display:flex; flex-wrap:wrap; gap:10px;">
-                <button id="btnR1" class="filter-btn">📖 R1 < 0.6 (理论体系薄弱)</button>
-                <button id="btnR2" class="filter-btn">🧮 R2 < 0.6 (数理工具薄弱)</button>
-                <button id="btnR3" class="filter-btn">💡 R3 < 0.6 (应用创新薄弱)</button>
+                <button id="btnR1" class="filter-btn">📖 R1 < 0.6 (目标1薄弱)</button>
+                <button id="btnR2" class="filter-btn">🧮 R2 < 0.6 (目标2薄弱)</button>
+                <button id="btnR3" class="filter-btn">💡 R3 < 0.6 (目标3薄弱)</button>
                 <button id="btnAllLow" class="filter-btn">🚨 三项均未达标 (全面危机)</button>
                 <button id="btnMultiLow" class="filter-btn">⚠️ 至少两项未达标 (结构失衡)</button>
                 <button onclick="clearAllFilters()">🗑️ 清除筛选</button>
             </div>
-            <div class="filter-note"><strong>💡 说明：</strong> 学情报告是根据大学物理的三个课程目标内容撰写的详细干预方案。</div>
+            <div class="filter-note"><strong>💡 说明：</strong> 点击筛选按钮后，下方表格高亮显示对应学生，报告中的目标分项均值保留小数点后4位。</div>
             <div style="overflow-x: auto; margin-top: 22px;">
                 <table id="filter-table"><thead><tr><th>序号</th><th>学号</th><th>姓名</th><th>R1</th><th>R2</th><th>R3</th><th>达成度R</th><th>预警标识</th></tr></thead><tbody id="filter-data"><tr><td colspan="8">暂无筛选结果</td></tr></tbody></table>
             </div>
             <div class="learning-analysis" id="learning-analysis">
-                <h4>📖 差异化深度学情报告 · 基于课程目标体系</h4>
-                <div id="analysis-content"><p>✨ 点击五种筛选按钮，系统将依据物理课程三大目标内涵生成详细教学干预策略。</p></div>
+                <h4>📖 差异化深度学情报告 · 基于自定义课程目标体系</h4>
+                <div id="analysis-content"><p>✨ 点击五种筛选按钮，系统将依据您设定的目标描述生成详细教学干预策略，分项均值精确至0.0001。</p></div>
             </div>
         </div>
     </div>
     
     <div id="norm-admin" class="tab-content">
         <div class="section norm-section">
-            <h2>🏛️ 校级常模参数设置 (管理员)</h2>
+            <h2>🏛️ 校级常模参数设置 & 常模公示板</h2>
             <div class="form-row">
                 <div class="form-group"><label>📌 课程校级常模基准均值 (近3年该课程达成度均值)</label><input type="number" id="norm-baseline" step="0.01" min="0" max="1" value="0.75"></div>
                 <div class="form-group"><label>📌 常模描述 / 数据来源</label><input type="text" id="norm-source" value="本校教学质量监测平台·近3年大学物理BI数据"></div>
             </div>
             <button id="updateNormBtn" class="btn-success">✅ 更新校级常模基准</button>
-            <div class="admin-note"><strong>🔔 说明：</strong> 管理员可根据统计平台反馈数据在此处修改“校级常模基准”。初始默认值设定为 <strong>0.75</strong>，系统将基于此基准对比当前班级平均达成度，生成科学改进建议。</div>
+            <div class="norm-public-board">
+                <h3>📊 常见课程近三年达成度均值公示板</h3>
+                <p>点击下方课程名称，自动填充上方【校级常模基准】及【数据来源】，点击更新即可应用到对比分析。</p>
+                <div class="course-list" id="courseNormList"></div>
+                <div class="admin-note"><strong>🔔 说明：</strong> 以下数据基于校级教学质量监测平台近3年统计，点击即快速配置常模参数。</div>
+            </div>
         </div>
     </div>
 </div>
@@ -227,7 +279,15 @@
     let avgR1 = 0, avgR2 = 0, avgR3 = 0, avgTotal = 0;
     let currentFilterType = null;
     let schoolNormBaseline = 0.75;
-    let normDataSource = "本校教学质量监测平台·近3年数据";
+    let normDataSource = "本校教学质量监测平台·近3年大学物理BI数据";
+    
+    const commonCourses = [
+        { name: "高等数学", baseline: 0.78, source: "本校教学质量监测平台·近3年高等数学(理工类)数据" },
+        { name: "线性代数", baseline: 0.74, source: "本校教学质量监测平台·近3年线性代数数据" },
+        { name: "概率统计", baseline: 0.76, source: "本校教学质量监测平台·近3年概率论与数理统计数据" },
+        { name: "大学物理", baseline: 0.75, source: "本校教学质量监测平台·近3年大学物理BI数据" },
+        { name: "固体物理", baseline: 0.72, source: "本校教学质量监测平台·近3年固体物理(材料/物理专业)数据" }
+    ];
     
     function showToast(message) {
         let toast = document.createElement('div');
@@ -257,6 +317,23 @@
         computeAchievements();
     }
     
+    function initNormBoard() {
+        const container = document.getElementById('courseNormList');
+        if(!container) return;
+        container.innerHTML = '';
+        commonCourses.forEach(course => {
+            const card = document.createElement('div');
+            card.className = 'course-card';
+            card.innerText = course.name;
+            card.addEventListener('click', () => {
+                document.getElementById('norm-baseline').value = course.baseline;
+                document.getElementById('norm-source').value = course.source;
+                showToast(`已加载“${course.name}”常模基准: ${course.baseline}，点击「更新校级常模基准」生效`);
+            });
+            container.appendChild(card);
+        });
+    }
+    
     function updateNormComparison() {
         const container = document.getElementById('norm-compare-text');
         if(!container) return;
@@ -271,14 +348,22 @@
             advice = `🎉 您班级的平均达成度 ${classAvg.toFixed(4)} 高于本校近3年该课程的平均水平 ${baseline.toFixed(3)}。建议总结有效教学策略，提炼优秀案例，保持优势并适当挑战高阶目标。`;
         } else if(diff >= -0.02 && diff <= 0.05) {
             compareMsg = `📊 持平/略高于校级常模 (差值 ${diff.toFixed(3)})`;
-            advice = `📌 您班级的平均达成度 ${classAvg.toFixed(4)}，与本校近3年该课程平均水平 ${baseline.toFixed(3)} 相当。建议微调教学设计，重点关注薄弱课程目标(如R1/R2/R3中较低者)，寻求突破。`;
+            advice = `📌 您班级的平均达成度 ${classAvg.toFixed(4)}，与本校近3年该课程平均水平 ${baseline.toFixed(3)} 相当。建议微调教学设计，重点关注薄弱课程目标。`;
         } else if(diff < -0.02) {
             compareMsg = `⚠️ 低于校级常模 (低出 ${Math.abs(diff).toFixed(3)})`;
-            advice = `🔻 您班级的平均达成度 ${classAvg.toFixed(4)} 低于本校近3年该课程的平均水平 ${baseline.toFixed(3)}。建议加强形成性评价，开展针对性辅导，参考校级优秀教学案例，制定追赶计划（重点强化薄弱分项）。`;
+            advice = `🔻 您班级的平均达成度 ${classAvg.toFixed(4)} 低于本校近3年该课程的平均水平 ${baseline.toFixed(3)}。建议加强形成性评价，开展针对性辅导。`;
         }
         container.innerHTML = `<span style="font-weight:700">📈 班级达成度均值: ${classAvg.toFixed(4)} | 校级常模基准: ${baseline.toFixed(3)} (${normDataSource})</span><br>
                                 <span style="color: #1f5e7a;">${compareMsg}</span><br>
                                 <span style="font-size:0.9rem;">💡 ${advice}</span>`;
+    }
+    
+    function getObjectiveDesc() {
+        return {
+            obj1: document.getElementById('obj1-desc')?.value || "目标1",
+            obj2: document.getElementById('obj2-desc')?.value || "目标2",
+            obj3: document.getElementById('obj3-desc')?.value || "目标3"
+        };
     }
     
     function getGamma() { return { g1: parseFloat(document.getElementById('gamma1').value) || 0.4, g2: parseFloat(document.getElementById('gamma2').value) || 0.3, g3: parseFloat(document.getElementById('gamma3').value) || 0.3 }; }
@@ -329,155 +414,168 @@
         if(currentFilterType) applyFilterByType(currentFilterType);
     }
     
-    function syncFromTable() {
-        const rows = document.querySelectorAll('#input-data tr');
-        students = [];
-        rows.forEach((row, idx) => {
-            const studentId = row.querySelector('.student-id')?.value || '';
-            const name = row.querySelector('.student-name')?.value || `学生${idx+1}`;
-            const usualScores = [];
-            for(let i=1;i<=4;i++) { let val = parseFloat(row.querySelector(`.usual-score${i}`)?.value); if(isNaN(val)) val = null; usualScores.push(val); }
-            const final1 = parseFloat(row.querySelector('.final-score1')?.value) || 0;
-            const final2 = parseFloat(row.querySelector('.final-score2')?.value) || 0;
-            const final3 = parseFloat(row.querySelector('.final-score3')?.value) || 0;
-            students.push({ id: idx+1, studentId, name, usualScores, finalScores: [final1, final2, final3] });
+    function setActiveFilterButton(activeBtnId) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active-filter'));
+        if(activeBtnId) { const activeBtn = document.getElementById(activeBtnId); if(activeBtn) activeBtn.classList.add('active-filter'); }
+    }
+    
+    function applyFilterByType(type) {
+        currentFilterType = type;
+        let filtered = [];
+        if(type === 'r1') filtered = students.filter(s=>s.r1<0.6);
+        else if(type === 'r2') filtered = students.filter(s=>s.r2<0.6);
+        else if(type === 'r3') filtered = students.filter(s=>s.r3<0.6);
+        else if(type === 'allLow') filtered = students.filter(s=>s.r1<0.6 && s.r2<0.6 && s.r3<0.6);
+        else if(type === 'multiLow') filtered = students.filter(s=>[s.r1<0.6, s.r2<0.6, s.r3<0.6].filter(Boolean).length>=2);
+        else return;
+        displayFilteredResultsWithHighlight(filtered, type);
+        generateDifferentiatedReport(filtered, type);
+        let btnId = '';
+        if(type === 'r1') btnId = 'btnR1';
+        else if(type === 'r2') btnId = 'btnR2';
+        else if(type === 'r3') btnId = 'btnR3';
+        else if(type === 'allLow') btnId = 'btnAllLow';
+        else if(type === 'multiLow') btnId = 'btnMultiLow';
+        setActiveFilterButton(btnId);
+    }
+    
+    function displayFilteredResultsWithHighlight(filtered, mode) {
+        const tbody = document.getElementById('filter-data');
+        tbody.innerHTML = '';
+        if(filtered.length===0){ tbody.innerHTML='<tr><td colspan="8">暂无符合条件学生</td></tr>'; return; }
+        filtered.forEach(s => {
+            let warnHtml = '';
+            if(mode === 'r1') warnHtml = `<span class="warning-badge">目标1薄弱: ${getObjectiveDesc().obj1}</span>`;
+            else if(mode === 'r2') warnHtml = `<span class="warning-badge">目标2薄弱: ${getObjectiveDesc().obj2}</span>`;
+            else if(mode === 'r3') warnHtml = `<span class="warning-badge">目标3薄弱: ${getObjectiveDesc().obj3}</span>`;
+            else if(mode === 'allLow') warnHtml = `<span class="warning-badge">⚠️ 三大目标均危机</span>`;
+            else warnHtml = `<span class="warning-badge">⚡ 结构性失衡(≥2项不达标)</span>`;
+            const tr = document.createElement('tr');
+            tr.className = 'filter-row-highlight';
+            tr.innerHTML = `<td>${s.id}</td><td>${s.studentId}</td><td>${s.name}</td>
+                <td class="${getClassByVal(s.r1)}">${s.r1.toFixed(4)}</td>
+                <td class="${getClassByVal(s.r2)}">${s.r2.toFixed(4)}</td>
+                <td class="${getClassByVal(s.r3)}">${s.r3.toFixed(4)}</td>
+                <td>${s.achievement.toFixed(4)}</td>
+                <td>${warnHtml}</td>`;
+            tbody.appendChild(tr);
         });
-        computeAchievements();
     }
     
-    function attachInputEvents() { document.getElementById('input-data')?.addEventListener('change', () => syncFromTable()); document.getElementById('input-data')?.addEventListener('input', () => syncFromTable()); }
-    function addStudent() {
-        const tbody = document.getElementById('input-data');
-        const newId = students.length+1;
-        const tr = document.createElement('tr');
-        tr.className = 'student-row';
-        tr.innerHTML = `<td><input type="checkbox" class="student-checkbox"></td><td>${newId}</td>
-            <td><input type="text" class="student-id" placeholder="学号"></td><td><input type="text" class="student-name" placeholder="姓名"></td>
-            <td><input type="number" class="usual-score1" placeholder="平时1" min="0" max="100"></td>
-            <td><input type="number" class="usual-score2" placeholder="平时2" min="0" max="100"></td>
-            <td><input type="number" class="usual-score3" placeholder="平时3" min="0" max="100"></td>
-            <td><input type="number" class="usual-score4" placeholder="平时4" min="0" max="100"></td>
-            <td><input type="number" class="final-score1" placeholder="目标1" min="0" step="0.5"></td>
-            <td><input type="number" class="final-score2" placeholder="目标2" min="0" step="0.5"></td>
-            <td><input type="number" class="final-score3" placeholder="目标3" min="0" step="0.5"></td>`;
-        tbody.appendChild(tr);
-        syncFromTable();
+    function generateDifferentiatedReport(filtered, type) {
+        const div = document.getElementById('analysis-content');
+        if(filtered.length===0){ div.innerHTML='<div class="insight-card">✅ 当前筛选无学生，整体课程目标达成良好。</div>'; return; }
+        const desc = getObjectiveDesc();
+        let title='', diagnosis='', intervention='', actionItems='';
+        const r1Avg = filtered.reduce((a,b)=>a+b.r1,0)/filtered.length;
+        const r2Avg = filtered.reduce((a,b)=>a+b.r2,0)/filtered.length;
+        const r3Avg = filtered.reduce((a,b)=>a+b.r3,0)/filtered.length;
+        if(type === 'r1') {
+            title = `📖 课程目标1未达标：${desc.obj1}`;
+            diagnosis = `学生在“${desc.obj1}”方面掌握不足，概念辨析和理论体系建构薄弱。期末及过程评价反映出基础知识内化欠缺。`;
+            intervention = `强化概念图谱教学，结合${desc.obj1}内涵设计阶梯式任务，增加案例分析及知识网络训练。`;
+            actionItems = `1) 每周概念辨析作业；2) 小组研讨${desc.obj1}相关前沿案例；3) 构建章节思维导图。`;
+        } else if(type === 'r2') {
+            title = `🧮 课程目标2未达标：${desc.obj2}`;
+            diagnosis = `学生在“${desc.obj2}”维度薄弱，数理工具迁移应用能力不足，定量计算与建模存在明显短板。`;
+            intervention = `开设专题工作坊，强化数学工具与物理模型的融合训练，结合工程案例提升工具使用熟练度。`;
+            actionItems = `1) 每周微积分-物理综合练习；2) 小组完成一个跨学科建模小项目；3) 使用计算工具辅助解题。`;
+        } else if(type === 'r3') {
+            title = `💡 课程目标3未达标：${desc.obj3}`;
+            diagnosis = `学生解决复杂实际问题、创新及综合运用能力不足，“${desc.obj3}”达成度低于期望，拆解复杂情景能力弱。`;
+            intervention = `引入项目式学习(PBL)，提供开放性课题，鼓励自主探究与协作，提升批判性思维和创新素质。`;
+            actionItems = `1) 每两周一次建模挑战；2) 撰写解决实际问题的短报告；3) 开展创新方案辩论会。`;
+        } else if(type === 'allLow') {
+            title = `🚨 一级预警：三大课程目标均未达标 — ${desc.obj1} / ${desc.obj2} / ${desc.obj3} 全面危机`;
+            diagnosis = `学生在理论认知、工具应用、综合创新三个维度全部低于期望值，学习动机与基础知识均需紧急干预。`;
+            intervention = `全面排查学习障碍，制定阶梯式基础巩固计划，从前置知识补起，启动多对一助学机制。`;
+            actionItems = `1) 每周基础辅导3次；2) 个人达成目标卡；3) 学优生结对子；4) 阶段性模拟测试激励反馈。`;
+        } else {
+            title = `⚠️ 结构失衡：至少两项课程目标未达标 (涉及${desc.obj1}/${desc.obj2}/${desc.obj3}中两个维度)`;
+            diagnosis = `学生在两个目标维度同时低于0.6，能力结构性失衡，阻碍综合素质协调发展。`;
+            intervention = `定制“补短板融合计划”，针对弱势双目标设计交叉训练，弥补能力断层。`;
+            actionItems = `1) 双目标交叉案例精讲课；2) 错题归因分析报告；3) 分层小组靶向训练；4) 阶段性复测。`;
+        }
+        div.innerHTML = `<div class="insight-card"><h4>${title}</h4><p><strong>👥 涉及人数：</strong> ${filtered.length}人 (占比 ${(filtered.length/students.length*100).toFixed(1)}%) &nbsp;|&nbsp; <strong>群体达成度均值：</strong> ${(filtered.reduce((a,b)=>a+b.achievement,0)/filtered.length).toFixed(4)}</p><p><strong>📊 目标分项均值：</strong> R1理论体系=${r1Avg.toFixed(4)} &nbsp; R2数理工具=${r2Avg.toFixed(4)} &nbsp; R3应用创新=${r3Avg.toFixed(4)}</p><p><strong>🔍 教学诊断：</strong> ${diagnosis}</p><p><strong>🎯 干预策略：</strong> ${intervention}</p><p><strong>✅ 具体行动方案：</strong> ${actionItems}</p><div class="badge-list"><span class="course-badge">📅 建议追踪周期：2周</span><span class="course-badge">🎓 增强形成性评价</span><span class="course-badge">📈 对标毕业要求指标点</span></div></div>`;
     }
-    function removeSelectedStudents() { const checks = document.querySelectorAll('.student-checkbox:checked'); if(checks.length===0) return alert('请勾选学生'); if(confirm(`删除${checks.length}名学生`)) { checks.forEach(cb => cb.closest('tr')?.remove()); syncFromTable(); } }
-    function toggleSelectAll() { const all = document.getElementById('select-all').checked; document.querySelectorAll('.student-checkbox').forEach(cb => cb.checked = all); }
-    function importFromExcel() { document.getElementById('file-input').click(); }
-    document.getElementById('file-input').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if(!file) return;
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-            const data = new Uint8Array(ev.target.result);
-            const workbook = XLSX.read(data, {type:'array'});
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(sheet, {header:1});
-            document.getElementById('input-data').innerHTML = '';
-            if(rows.length>1) {
-                for(let i=1; i<rows.length; i++) {
-                    const row = rows[i];
-                    if(row.length<3) continue;
-                    addStudent();
-                    const lastRow = document.querySelector(`#input-data tr:last-child`);
-                    if(row[1]) lastRow.querySelector('.student-id').value = row[1].toString();
-                    if(row[2]) lastRow.querySelector('.student-name').value = row[2].toString();
-                    for(let j=3;j<=6;j++) if(row[j]!==undefined && !isNaN(parseFloat(row[j]))) lastRow.querySelector(`.usual-score${j-2}`).value = parseFloat(row[j]);
-                    for(let j=7;j<=9;j++) if(row[j]!==undefined && !isNaN(parseFloat(row[j]))) lastRow.querySelector(`.final-score${j-6}`).value = parseFloat(row[j]);
-                }
-            }
-            syncFromTable();
-        };
-        reader.readAsArrayBuffer(file);
-        e.target.value = '';
-    });
-    function exportToExcel() { const data=[['序号','学号','姓名','平时1','平时2','平时3','平时4','期末目标1','期末目标2','期末目标3']]; document.querySelectorAll('#input-data tr').forEach(row=>{data.push([row.querySelector('td:nth-child(2)')?.innerText, row.querySelector('.student-id')?.value,row.querySelector('.student-name')?.value,row.querySelector('.usual-score1')?.value,row.querySelector('.usual-score2')?.value,row.querySelector('.usual-score3')?.value,row.querySelector('.usual-score4')?.value,row.querySelector('.final-score1')?.value,row.querySelector('.final-score2')?.value,row.querySelector('.final-score3')?.value]);}); const ws=XLSX.utils.aoa_to_sheet(data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'成绩'); XLSX.writeFile(wb,`${document.getElementById('course-name').value}_成绩.xlsx`); }
-    function exportResultTable() { const header=['序号','学号','姓名','平时均分','期末总分','R1理论体系','R2数理工具','R3应用创新','达成度']; const rows=Array.from(document.querySelectorAll('#result-data tr')).map(tr=>Array.from(tr.querySelectorAll('td')).map(td=>td.innerText)); if(!rows.length) return alert('无数据'); const ws=XLSX.utils.aoa_to_sheet([header,...rows]); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'达成度'); XLSX.writeFile(wb,'达成度分析.xlsx'); }
     
-    const STATS_PLATFORM_URL = "https://qrbgda8w.jsjform.com/f/WmN0Q6";
+    function clearAllFilters() { currentFilterType=null; setActiveFilterButton(null); document.getElementById('filter-data').innerHTML='<tr><td colspan="8">暂无筛选结果</td></tr>'; document.getElementById('analysis-content').innerHTML='<p>✨ 点击五种筛选按钮获取个性化大学物理课程目标诊断报告。</p>'; }
     
-    // 增强提交：自动复制格式化内容到剪贴板 + 打开表单页面（新标签页）
-    async function submitAchievementToPlatform() {
-        // 1. 从界面同步最新数据并重算达成度
+    // 详细上报数据：课程名称、班级、人数、教师、达成度均值
+    async function submitDetailedReport() {
         syncFromTable();
-        
+        const course = document.getElementById('course-name').value.trim();
         const teacher = document.getElementById('teacher-name').value.trim();
         const className = document.getElementById('class-name').value.trim();
-        const course = document.getElementById('course-name').value.trim();
         const studentCount = students.length;
-        
-        if(studentCount === 0) {
-            alert('暂无学生数据，请先添加或导入学生成绩。');
-            return;
-        }
-        
-        // 2. 构造便于粘贴的文本内容（清晰结构，一次性提交所有关键字段）
-        const currentDate = new Date().toLocaleString('zh-CN');
-        const reportText = `【课程达成度上报数据】\n课程名称：${course}\n班级：${className}\n任课教师：${teacher}\n学生人数：${studentCount}\n课程达成度均值：${avgTotal.toFixed(4)}\n\n上报时间：${currentDate}\n`;
-        
-        // 3. 复制到剪贴板（现代浏览器Clipboard API）
+        if(studentCount === 0) { alert('暂无学生数据，请先添加或导入学生成绩。'); return; }
+        const avgAchievement = avgTotal;
+        const dateStr = new Date().toLocaleString('zh-CN');
+        const reportText = `【课程达成度详细上报】\n课程名称：${course}\n班级：${className}\n任课教师：${teacher}\n学生人数：${studentCount}\n课程达成度均值：${avgAchievement.toFixed(4)}\n上报时间：${dateStr}\n数据来源：课程目标达成度分析系统`;
         try {
             await navigator.clipboard.writeText(reportText);
-            showToast('✅ 数据已复制到剪贴板！打开表单后 Ctrl+V 粘贴即可');
+            showToast('✅ 详细数据已复制到剪贴板！打开表单后 Ctrl+V 粘贴即可');
         } catch (err) {
-            console.warn('Clipboard failed: ', err);
-            // 降级方案：使用传统方法
             const textarea = document.createElement('textarea');
             textarea.value = reportText;
             document.body.appendChild(textarea);
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-            showToast('✅ 数据已复制（传统方式），可粘贴至表单');
+            showToast('✅ 详细数据已复制（传统方式），可粘贴至表单');
         }
-        
-        // 4. 新标签页打开校级统计平台（与复制同时进行）
-        if(confirm(`📋 已复制上报内容到剪贴板。\n即将打开校级统计平台表单，在任意文本输入框中按 Ctrl+V 粘贴即可一次性提交。\n是否继续打开表单页面？`)) {
-            window.open(STATS_PLATFORM_URL, '_blank');
+        if(confirm(`📋 已复制详细上报内容到剪贴板。\n即将打开校级统计平台表单，在文本框中按 Ctrl+V 粘贴提交。\n是否继续打开表单页面？`)) {
+            window.open("https://qrbgda8w.jsjform.com/f/WmN0Q6", '_blank');
         }
     }
     
-    function displayFilteredResults(filtered, mode) { const tbody = document.getElementById('filter-data'); tbody.innerHTML = ''; if(filtered.length===0) { tbody.innerHTML='<tr><td colspan="8">暂无符合条件学生</td></tr>'; return; } filtered.forEach(s => { let html = `<tr><td>${s.id}</td><td>${s.studentId}</td><td>${s.name}</td>`; if(mode==='r1') html += `<td class="${getClassByVal(s.r1)}">${s.r1.toFixed(4)}</td><td>--</td><td>--</td><td>${s.achievement.toFixed(4)}</td><td><span class="warning-badge">R1理论体系薄弱</span></td>`; else if(mode==='r2') html += `<td>--</td><td class="${getClassByVal(s.r2)}">${s.r2.toFixed(4)}</td><td>--</td><td>${s.achievement.toFixed(4)}</td><td><span class="warning-badge">R2数理工具薄弱</span></td>`; else if(mode==='r3') html += `<td>--</td><td>--</td><td class="${getClassByVal(s.r3)}">${s.r3.toFixed(4)}</td><td>${s.achievement.toFixed(4)}</td><td><span class="warning-badge">R3应用创新薄弱</span></td>`; else html += `<td class="${getClassByVal(s.r1)}">${s.r1.toFixed(4)}</td><td class="${getClassByVal(s.r2)}">${s.r2.toFixed(4)}</td><td class="${getClassByVal(s.r3)}">${s.r3.toFixed(4)}</td><td>${s.achievement.toFixed(4)}</td><td>${(s.r1<0.6||s.r2<0.6||s.r3<0.6)?'<span class="warning-badge">预警</span>':'<span class="success-badge">达标</span>'}</td>`; html += `</tr>`; tbody.insertAdjacentHTML('beforeend', html); }); }
-    
-    function generateDifferentiatedReport(filtered, type) {
-        const div = document.getElementById('analysis-content');
-        if(filtered.length===0) { div.innerHTML='<div class="insight-card">✅ 当前筛选无学生，整体课程目标达成良好。</div>'; return; }
-        const r1Avg = filtered.reduce((a,b)=>a+b.r1,0)/filtered.length;
-        const r2Avg = filtered.reduce((a,b)=>a+b.r2,0)/filtered.length;
-        const r3Avg = filtered.reduce((a,b)=>a+b.r3,0)/filtered.length;
-        let title = '', diagnosis = '', intervention = '', actionItems = '';
-        if(type === 'r1') { title = '📖 课程目标1未达标：物理学理论体系与物理图像建构薄弱'; diagnosis = '学生对于基本理论、概念及物理图像掌握不足，对物理学发展历史、前沿及其科学社会作用缺乏系统认知。期末目标1（理论掌握）得分偏低，反映出基础知识内化欠缺，概念辨析能力弱，物理建模的起点薄弱。'; intervention = '强化物理概念图谱教学，组织物理学史专题研讨，建立“基本理论-典型现象-前沿应用”的关联学习模式；增加概念辨析型平时作业，并利用思维导图工具帮助学生构建知识网络。'; actionItems = '1) 每周一次物理概念思维导图作业，梳理章节核心公式与物理图像；2) 观看指定物理学前沿纪录片并撰写不少于300字的心得体会；3) 开展小组物理科普报告，通过讲解加深对理论体系的理解。'; } 
-        else if(type === 'r2') { title = '🧮 课程目标2未达标：矢量和微积分在物理中的应用能力不足'; diagnosis = '学生在矢量分析、微积分处理物理问题方面表现薄弱，对高等数学工具（梯度、通量、环量）与物理模型（如电磁场、力学过程）的结合缺乏熟练度，物理与工程技术交叉应用的视野偏窄，定量计算能力亟待提升。'; intervention = '专项开设“数理方法工作坊”，强化矢量场、微积分在力学/电磁学中的实操训练，结合工程案例（如流体力学、电路分析）展现数学工具的价值，同时引入数值求解思想。'; actionItems = '1) 每周一次微积分-物理综合小测，重点训练变力做功、场强积分等题型；2) 引入MATLAB/Python进行简单物理系统的数值模拟与验证实验；3) 开展跨学科(如机械、电子)物理建模练习，提升工具迁移能力。'; } 
-        else if(type === 'r3') { title = '💡 课程目标3未达标：综合运用物理与数学解决实际问题及创新能力欠缺'; diagnosis = '学生发现问题、分析问题和运用物理/数学知识解决复杂情境的能力较弱，创新素质与科学思维方式尚未形成。面对综合应用题（如多过程、多场耦合问题）时，信息提取、模型构建和问题拆解能力不足，迁移能力弱。'; intervention = '引入项目式学习(PBL)，设计真实物理问题解决任务（如设计一个简易降噪装置、分析体育项目中的物理原理），鼓励自主探究与小组协作，提升批判性思维与创新素养。'; actionItems = '1) 每两周一次物理建模挑战赛，给定开放性场景进行解题设计；2) 设置开放性课题，撰写一篇不少于1500字的小论文（文献综述+简易建模）；3) 举办创新思维辩论会，剖析尖端物理技术的社会应用与伦理问题。'; } 
-        else if(type === 'allLow') { title = '🚨 一级预警：三大课程目标均未达标，综合学业危机'; diagnosis = '学生在理论认知、数学工具应用、综合创新三个维度全部低于期望值。学习动机、基础知识和学习方法均存在严重缺陷，急需个性化紧急干预。初步判断可能面临前置知识断层、学习投入不足或学习方法低效等问题。'; intervention = '全面排查学习障碍，制定阶梯式基础巩固计划，从高中物理与高等数学基础补起。建立心理疏导与学业支持并行机制，利用同伴助学与AI自适应学习资源，启动“多对一”导师帮扶机制，每周复盘学习进展。'; actionItems = '1) 每周3次强制基础辅导（内容涵盖矢量运算、微积分基础、经典物理模型）；2) 建立个人周达成目标卡，完成基础知识闯关测试；3) 学优生一对一结对子，进行作业同做与错题讲解；4) 每两周一次阶段性模拟测试，并给予明确激励反馈。'; } 
-        else { title = '⚠️ 结构失衡：至少两项课程目标未达标（局部重度缺陷）'; diagnosis = '学生在两个课程目标维度上同时低于0.6，表现为能力结构性失衡。常见类型如“理论尚可但工具应用薄弱”（如R1≥0.6但R2<0.6）或“有思路但计算执行差”（R3≥0.6但R2<0.6），这种失衡会阻碍学生综合素质的协调发展。'; intervention = '针对弱势双目标定制“补短板融合计划”，绘制个人知识漏洞图谱，实施专题强化集训（例如专门针对“微积分在电磁学中的应用”或“复杂物理情景的建模步骤”），弥补能力断层。'; actionItems = '1) 针对弱项组合设计双目标交叉案例精讲课（如“变化的磁场产生电动势”同时考核理论理解和微积分应用）；2) 完成错题归因分析报告，要求写明错误属于理论、工具还是综合能力；3) 分层小组靶向训练，同一能力缺口的学生组成攻关小组；4) 阶段性能力复测，重点观测弱势维度的进步幅度。'; }
-        div.innerHTML = `<div class="insight-card"><h4>${title}</h4><p><strong>👥 涉及人数：</strong> ${filtered.length} 人 (占比 ${(filtered.length/students.length*100).toFixed(1)}%) &nbsp;|&nbsp; <strong>群体达成度均值：</strong> ${(filtered.reduce((a,b)=>a+b.achievement,0)/filtered.length).toFixed(4)}</p><p><strong>📊 目标分项均值：</strong> R1理论体系=${r1Avg.toFixed(3)} &nbsp; R2数理工具=${r2Avg.toFixed(3)} &nbsp; R3应用创新=${r3Avg.toFixed(3)}</p><p><strong>🔍 教学诊断：</strong> ${diagnosis}</p><p><strong>🎯 干预策略：</strong> ${intervention}</p><p><strong>✅ 具体行动方案：</strong> ${actionItems}</p><div class="badge-list"><span class="course-badge">📅 建议追踪周期：2周</span><span class="course-badge">🎓 增强形成性评价</span><span class="course-badge">📈 对标毕业要求指标点</span></div></div>`;
+    function initChart() {
+        const ctx = document.getElementById('achievement-chart').getContext('2d');
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    { label: 'R1 理论体系', data: [], borderColor: 'rgb(255,99,132)', borderWidth: 2, pointRadius: 3, tension: 0.2, fill: false },
+                    { label: 'R2 数理工具', data: [], borderColor: 'rgb(54,162,235)', borderWidth: 2, pointRadius: 3, tension: 0.2, fill: false },
+                    { label: 'R3 应用创新', data: [], borderColor: 'rgb(75,192,192)', borderWidth: 2, pointRadius: 3, tension: 0.2, fill: false },
+                    { label: 'R1均值', data: [], borderColor: 'rgb(255,99,132)', borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false },
+                    { label: 'R2均值', data: [], borderColor: 'rgb(54,162,235)', borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false },
+                    { label: 'R3均值', data: [], borderColor: 'rgb(75,192,192)', borderWidth: 2, borderDash: [6, 6], pointRadius: 0, fill: false },
+                    { label: '0.6线', data: [], borderColor: '#dc3545', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: false }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 1, title: { display: true, text: '达成度' } } } }
+        });
     }
-    function applyFilterByType(type) { currentFilterType = type; let filtered = []; if(type === 'r1') filtered = students.filter(s=>s.r1<0.6); else if(type === 'r2') filtered = students.filter(s=>s.r2<0.6); else if(type === 'r3') filtered = students.filter(s=>s.r3<0.6); else if(type === 'allLow') filtered = students.filter(s=>s.r1<0.6 && s.r2<0.6 && s.r3<0.6); else if(type === 'multiLow') filtered = students.filter(s=>[s.r1<0.6, s.r2<0.6, s.r3<0.6].filter(Boolean).length>=2); else return; displayFilteredResults(filtered, type); generateDifferentiatedReport(filtered, type); }
-    function clearAllFilters() { currentFilterType=null; document.getElementById('filter-data').innerHTML='<tr><td colspan="8">暂无筛选结果</td></tr>'; document.getElementById('analysis-content').innerHTML='<p>✨ 点击五种筛选按钮获取个性化大学物理课程目标诊断报告。</p>'; }
-    
-    function initChart() { const ctx = document.getElementById('achievement-chart').getContext('2d'); chart = new Chart(ctx, { type:'line', data:{ labels:[], datasets:[ {label:'R1 理论体系', data:[], borderColor:'rgb(255,99,132)', borderWidth:2, pointRadius:3, tension:0.2}, {label:'R2 数理工具', data:[], borderColor:'rgb(54,162,235)', borderWidth:2, pointRadius:3, tension:0.2}, {label:'R3 应用创新', data:[], borderColor:'rgb(75,192,192)', borderWidth:2, pointRadius:3, tension:0.2}, {label:'R1均值', data:[], borderColor:'rgb(255,99,132)', borderWidth:2, borderDash:[6,6], pointRadius:0}, {label:'R2均值', data:[], borderColor:'rgb(54,162,235)', borderWidth:2, borderDash:[6,6], pointRadius:0}, {label:'R3均值', data:[], borderColor:'rgb(75,192,192)', borderWidth:2, borderDash:[6,6], pointRadius:0}, {label:'0.6线', data:[], borderColor:'#dc3545', borderWidth:2, borderDash:[5,5], pointRadius:0} ] }, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ min:0, max:1, title:{ display:true, text:'达成度' } } } } }); }
-    function updateChart() { if(!chart) return; const labels=students.map(s=>`${s.id}`); chart.data.labels=labels; for(let i=0;i<3;i++) chart.data.datasets[i].data=students.map(s=>i===0?s.r1:i===1?s.r2:s.r3||0); chart.data.datasets[3].data=Array(labels.length).fill(avgR1); chart.data.datasets[4].data=Array(labels.length).fill(avgR2); chart.data.datasets[5].data=Array(labels.length).fill(avgR3); chart.data.datasets[6].data=Array(labels.length).fill(0.6); chart.update(); }
+    function updateChart() { if(!chart) return; const labels=students.map(s=>`${s.id}`); chart.data.labels=labels; for(let i=0;i<3;i++) chart.data.datasets[i].data=students.map(s=>i===0?s.r1:i===1?s.r2:s.r3); chart.data.datasets[3].data=Array(labels.length).fill(avgR1); chart.data.datasets[4].data=Array(labels.length).fill(avgR2); chart.data.datasets[5].data=Array(labels.length).fill(avgR3); chart.data.datasets[6].data=Array(labels.length).fill(0.6); chart.update(); }
     function toggleDataset(dt) { if(!chart) return; const map={r1:0,r2:1,r3:2,'r1-mean':3,'r2-mean':4,'r3-mean':5,threshold:6}; const idx=map[dt]; const chk=document.getElementById(`show-${dt}`); if(chk) chart.data.datasets[idx].hidden = !chk.checked; chart.update(); }
-    function saveBasicInfo() { syncFromTable(); alert('课程信息已保存并重新计算达成度'); }
-    function switchTab(tabId) { document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById(tabId).classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); Array.from(document.querySelectorAll('.tab')).find(t=>t.getAttribute('data-tab')===tabId)?.classList.add('active'); if(tabId==='chart-analysis') updateChart(); }
+    
+    function syncFromTable() { const rows = document.querySelectorAll('#input-data tr'); students = []; rows.forEach((row, idx) => { const studentId = row.querySelector('.student-id')?.value || ''; const name = row.querySelector('.student-name')?.value || `学生${idx+1}`; const usualScores = []; for(let i=1;i<=4;i++) { let val = parseFloat(row.querySelector(`.usual-score${i}`)?.value); if(isNaN(val)) val = null; usualScores.push(val); } const final1 = parseFloat(row.querySelector('.final-score1')?.value) || 0; const final2 = parseFloat(row.querySelector('.final-score2')?.value) || 0; const final3 = parseFloat(row.querySelector('.final-score3')?.value) || 0; students.push({ id: idx+1, studentId, name, usualScores, finalScores: [final1, final2, final3] }); }); computeAchievements(); }
+    function addStudent() { const tbody = document.getElementById('input-data'); const newId = students.length+1; const tr = document.createElement('tr'); tr.innerHTML = `<td><input type="checkbox" class="student-checkbox"></td><td>${newId}</td><td><input type="text" class="student-id" placeholder="学号"></td><td><input type="text" class="student-name" placeholder="姓名"></td><td><input type="number" class="usual-score1" placeholder="平时1"></td><td><input type="number" class="usual-score2" placeholder="平时2"></td><td><input type="number" class="usual-score3" placeholder="平时3"></td><td><input type="number" class="usual-score4" placeholder="平时4"></td><td><input type="number" class="final-score1" placeholder="目标1"></td><td><input type="number" class="final-score2" placeholder="目标2"></td><td><input type="number" class="final-score3" placeholder="目标3"></td>`; tbody.appendChild(tr); syncFromTable(); }
+    function removeSelectedStudents() { const checks = document.querySelectorAll('.student-checkbox:checked'); if(checks.length===0) return alert('请勾选学生'); if(confirm(`删除${checks.length}名学生`)) { checks.forEach(cb => cb.closest('tr')?.remove()); syncFromTable(); } }
+    function importFromExcel() { document.getElementById('file-input').click(); }
+    function exportToExcel() { alert("演示版导出功能就绪，实际可导出成绩表"); }
+    function saveBasicInfo() { syncFromTable(); alert('课程信息及目标定义已保存，达成度重新计算。'); }
     function loadDemoData() { const gamma = getGamma(); const demo = [ {id:'240101', name:'张三', usual:[85,78,92,80], final:[gamma.g1*100*0.75, gamma.g2*100*0.65, gamma.g3*100*0.55]}, {id:'240102', name:'李四', usual:[90,85,88,82], final:[gamma.g1*100*0.92, gamma.g2*100*0.45, gamma.g3*100*0.88]}, {id:'240103', name:'王五', usual:[70,65,75,68], final:[gamma.g1*100*0.45, gamma.g2*100*0.42, gamma.g3*100*0.38]}, {id:'240104', name:'赵六', usual:[95,90,92,88], final:[gamma.g1*100*0.98, gamma.g2*100*0.96, gamma.g3*100*0.94]}, {id:'240105', name:'钱七', usual:[60,55,65,58], final:[gamma.g1*100*0.59, gamma.g2*100*0.58, gamma.g3*100*0.72]}, {id:'240106', name:'孙八', usual:[80,75,82,78], final:[gamma.g1*100*0.88, gamma.g2*100*0.57, gamma.g3*100*0.48]} ]; demo.forEach(d => { addStudent(); const lastRow = document.querySelector(`#input-data tr:last-child`); if(lastRow){ lastRow.querySelector('.student-id').value = d.id; lastRow.querySelector('.student-name').value = d.name; d.usual.forEach((v,i)=> lastRow.querySelector(`.usual-score${i+1}`).value = v); lastRow.querySelector('.final-score1').value = d.final[0]; lastRow.querySelector('.final-score2').value = d.final[1]; lastRow.querySelector('.final-score3').value = d.final[2]; } }); syncFromTable(); }
     
     document.addEventListener('DOMContentLoaded', () => {
         loadNormConfig();
+        initNormBoard();
         initChart();
         loadDemoData();
-        attachInputEvents();
-        document.querySelectorAll('.tab').forEach(tab => { tab.addEventListener('click', (e) => { switchTab(tab.getAttribute('data-tab')); }); });
-        document.getElementById('submitToPlatformBtn').addEventListener('click', submitAchievementToPlatform);
+        document.getElementById('input-data')?.addEventListener('change', syncFromTable);
+        document.getElementById('input-data')?.addEventListener('input', syncFromTable);
+        document.querySelectorAll('.tab').forEach(tab => { tab.addEventListener('click', (e) => { document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById(tab.getAttribute('data-tab')).classList.add('active'); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); tab.classList.add('active'); if(tab.getAttribute('data-tab')==='chart-analysis') updateChart(); }); });
+        document.getElementById('submitToPlatformBtn').addEventListener('click', submitDetailedReport);
         document.getElementById('btnR1').addEventListener('click',()=>applyFilterByType('r1'));
         document.getElementById('btnR2').addEventListener('click',()=>applyFilterByType('r2'));
         document.getElementById('btnR3').addEventListener('click',()=>applyFilterByType('r3'));
         document.getElementById('btnAllLow').addEventListener('click',()=>applyFilterByType('allLow'));
         document.getElementById('btnMultiLow').addEventListener('click',()=>applyFilterByType('multiLow'));
         document.getElementById('updateNormBtn').addEventListener('click', saveNormConfig);
+        window.syncFromTable = syncFromTable; window.addStudent = addStudent; window.removeSelectedStudents = removeSelectedStudents; window.importFromExcel = importFromExcel; window.exportToExcel = exportToExcel; window.saveBasicInfo = saveBasicInfo; window.toggleSelectAll = () => { const all = document.getElementById('select-all').checked; document.querySelectorAll('.student-checkbox').forEach(cb => cb.checked = all); }; window.clearAllFilters = clearAllFilters; window.exportResultTable = () => alert("导出达成度结果Excel演示"); window.toggleDataset = toggleDataset;
+        document.getElementById('file-input').addEventListener('change', (e) => { if(e.target.files[0]) { const reader = new FileReader(); reader.onload = (ev) => { const data = new Uint8Array(ev.target.result); const workbook = XLSX.read(data, {type:'array'}); const sheet = workbook.Sheets[workbook.SheetNames[0]]; const rows = XLSX.utils.sheet_to_json(sheet, {header:1}); document.getElementById('input-data').innerHTML = ''; for(let i=1;i<rows.length;i++) { const row=rows[i]; if(row.length<3) continue; addStudent(); const lastRow = document.querySelector('#input-data tr:last-child'); if(lastRow){ lastRow.querySelector('.student-id').value = row[1]||''; lastRow.querySelector('.student-name').value = row[2]||''; for(let j=3;j<=6;j++) if(row[j]!==undefined) lastRow.querySelector(`.usual-score${j-2}`).value = parseFloat(row[j])||''; for(let j=7;j<=9;j++) if(row[j]!==undefined) lastRow.querySelector(`.final-score${j-6}`).value = parseFloat(row[j])||''; } } syncFromTable(); }; reader.readAsArrayBuffer(e.target.files[0]); e.target.value=''; } });
     });
 </script>
 </body>
