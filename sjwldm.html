@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>神经网络代码知识导图 - 可折叠交互版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+        }
+        body {
+            background: #f0f2f8;
+            padding: 30px 20px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        .title {
+            text-align: center;
+            color: #1e2f3e;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            gap: 12px;
+            background: white;
+            padding: 6px 16px;
+            border-radius: 40px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        .ctrl-btn {
+            background: #eef2f7;
+            border: none;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            color: #2c3e50;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(2px);
+        }
+        .ctrl-btn:hover {
+            background: #3498db;
+            color: white;
+            transform: scale(0.96);
+            box-shadow: 0 2px 6px rgba(52,152,219,0.3);
+        }
+        .mind-map {
+            background: white;
+            border-radius: 24px;
+            padding: 28px 30px;
+            box-shadow: 0 10px 25px -8px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        /* 折叠面板样式 */
+        .section {
+            margin-bottom: 20px;
+            border-radius: 16px;
+            background: #ffffff;
+            transition: all 0.2s;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f6e8c;
+            background: #fefefe;
+            padding: 12px 16px 12px 12px;
+            border-left: 5px solid #3498db;
+            border-radius: 14px 14px 12px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            user-select: none;
+            margin-bottom: 0;
+            background: #fbfdff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+        .section-title:hover {
+            background: #eef5fc;
+            border-left-color: #2c81ba;
+            transform: translateX(3px);
+        }
+        .fold-icon {
+            font-size: 16px;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #2c8fbc;
+            background: #eef2fa;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .section-title:hover .fold-icon {
+            background: #cfe3f5;
+            color: #1a5a7a;
+        }
+        /* 内容区域容器 */
+        .section-content {
+            padding: 6px 0 12px 0;
+            background: #ffffff;
+            border-radius: 0 0 16px 16px;
+            transition: all 0.2s ease;
+            margin-top: 2px;
+        }
+        /* 原始内容样式保留并微调 */
+        .item {
+            margin-left: 28px;
+            margin-bottom: 10px;
+            line-height: 1.6;
+            font-size: 14.5px;
+            color: #2c3e4e;
+            position: relative;
+        }
+        .sub-item {
+            margin-left: 52px;
+            color: #4a627a;
+            margin-bottom: 7px;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+        .code {
+            background: #f0f3f8;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            color: #c44536;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .tip {
+            color: #1e7b5e;
+            font-weight: 600;
+        }
+        /* 让列表符号更统一 */
+        .item::before {
+            content: "▹";
+            position: absolute;
+            left: -18px;
+            color: #3498db;
+            font-size: 14px;
+        }
+        .sub-item::before {
+            content: "◦";
+            position: absolute;
+            left: -20px;
+            color: #6c8faa;
+            font-size: 14px;
+        }
+        /* 平滑折叠时无额外毛刺 */
+        .section-content[style*="display: none"] {
+            display: none !important;
+        }
+        /* 响应式 */
+        @media (max-width: 680px) {
+            body {
+                padding: 20px 12px;
+            }
+            .mind-map {
+                padding: 16px;
+            }
+            .item {
+                margin-left: 20px;
+            }
+            .sub-item {
+                margin-left: 40px;
+            }
+            .section-title {
+                font-size: 16px;
+                padding: 10px 12px;
+            }
+            .fold-icon {
+                width: 22px;
+                height: 22px;
+                font-size: 14px;
+            }
+        }
+        /* 加强内部代码块样式 */
+        .section-content .code {
+            background: #f1f3f7;
+        }
+        hr {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">
+        🧠 神经网络前端代码 · 知识导图
+        <div class="control-group">
+            <button class="ctrl-btn" id="expandAllBtn">📂 全部展开</button>
+            <button class="ctrl-btn" id="collapseAllBtn">📁 全部折叠</button>
+        </div>
+    </div>
+    <div class="mind-map">
+        <!-- 原始内容结构 —— 完全保留，JS 将动态重组以实现折叠/展开交互，保证内容零丢失 -->
+        <div class="section">
+            <div class="section-title">一、代码结构</div>
+            <div class="item">• 存放位置：HTML 文件内部 <span class="code">&lt;script&gt;</span> 标签</div>
+            <div class="item">• 代码范围：从注释 <span class="code">// ------------- AI 神经网络模型</span> 开始至文件末尾</div>
+            <div class="item">• 依赖框架：TensorFlow.js (tf)</div>
+            <div class="item">• 快速定位关键词：<span class="code">buildModel</span>、<span class="code">trainModelWithCustomLoss</span>、<span class="code">predictNextPosition</span></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">二、核心函数</div>
+            <div class="item">1. 模型构建：<span class="code">buildModel()</span></div>
+            <div class="item">2. 模型初始化：<span class="code">initModel()</span></div>
+            <div class="item">3. 样本收集：<span class="code">collectSamplesFromRealTraj()</span>、<span class="code">updateTrainingSamplesFromReal()</span></div>
+            <div class="item">4. 模型训练：<span class="code">trainModel()</span>、<span class="code">trainModelWithCustomLoss()</span></div>
+            <div class="item">5. 模型推理：<span class="code">predictNextPosition()</span></div>
+            <div class="item">6. 辅助逻辑：损失函数选择、物理约束计算</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">三、函数功能</div>
+            <div class="item">1. <span class="code">buildModel()</span>：定义神经网络结构、编译模型</div>
+            <div class="item">2. <span class="code">initModel()</span>：初始化/重置模型，释放内存，标记就绪状态</div>
+            <div class="item">3. <span class="code">collectSamplesFromRealTraj()</span>：从真实轨迹提取训练样本（输入+目标）</div>
+            <div class="item">4. <span class="code">updateTrainingSamplesFromReal()</span>：维护全局样本库（上限 500 条）</div>
+            <div class="item">5. <span class="code">trainModel()</span>：训练入口函数，响应用户按钮点击</div>
+            <div class="item">6. <span class="code">trainModelWithCustomLoss()</span>：自定义训练循环 + 物理约束损失计算</div>
+            <div class="item">7. <span class="code">predictNextPosition()</span>：实时预测下一时刻位置，生成 AI 轨迹</div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">四、关键实现细节</div>
+            <div class="item">🔹 网络结构（buildModel）</div>
+            <div class="sub-item">• 输入层：3 个神经元（归一化前两帧位置 + 当前速度）</div>
+            <div class="sub-item">• 隐藏层：64 神经元 + ReLU + Dropout(0.2)</div>
+            <div class="sub-item">• 输出层：1 个神经元（预测下一位置，linear 激活）</div>
+            <div class="sub-item">• 优化器：Adam(0.003)，损失函数：MSE</div>
+
+            <div class="item">🔹 训练细节（trainModelWithCustomLoss）</div>
+            <div class="sub-item">• 输入：xsTensor、目标：ysTensor、物理理论值：yPhysicsTensor</div>
+            <div class="sub-item">• 训练方式：optimizer.minimize() 手动梯度下降</div>
+            <div class="sub-item">• 损失：MSE 损失 + λ×物理约束损失（可切换）</div>
+            <div class="sub-item">• 触发：每轮训练后自动更新界面损失曲线</div>
+
+            <div class="item">🔹 推理细节（predictNextPosition）</div>
+            <div class="sub-item">• 调用频率：动画循环每 50ms 一次</div>
+            <div class="sub-item">• 流程：输入归一化 → 张量预测 → 反归一化 → 范围限制</div>
+            <div class="sub-item">• 兜底：模型未就绪时回退到物理模型</div>
+
+            <div class="item">🔹 可调参数</div>
+            <div class="sub-item">• 网络结构：修改 <span class="code">buildModel()</span></div>
+            <div class="sub-item">• 物理权重 λ：修改 <span class="code">trainModelWithCustomLoss()</span> 内 lambda</div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // 确保 DOM 加载完成后再执行重构，避免破坏原始布局
+            function initFoldableSections() {
+                const sections = document.querySelectorAll('.mind-map .section');
+                if (!sections.length) return;
+
+                // 存储每个section对应的 contentWrapper 和 图标元素，方便批量操作
+                const sectionMap = [];
+
+                sections.forEach(section => {
+                    // 1. 找到当前区域的标题
+                    const title = section.querySelector('.section-title');
+                    if (!title) return;
+
+                    // 2. 创建内容容器 (section-content) 用于包裹标题后面的所有内容节点
+                    const contentWrapper = document.createElement('div');
+                    contentWrapper.className = 'section-content';
+
+                    // 3. 将 title 元素之后的所有子节点 (包括文本节点、元素节点) 移动到 contentWrapper 中
+                    //    注意: 使用 nextSibling 动态移动，直到 section 末尾
+                    let nextNode;
+                    while ((nextNode = title.nextSibling)) {
+                        contentWrapper.appendChild(nextNode);
+                    }
+
+                    // 4. 将 contentWrapper 添加到 section 中 (此时 title 后紧跟 contentWrapper)
+                    section.appendChild(contentWrapper);
+
+                    // 5. 为 section-title 添加折叠图标元素 (放在最左侧)
+                    const iconSpan = document.createElement('span');
+                    iconSpan.className = 'fold-icon';
+                    // 初始状态为展开，使用 ▼ 符号
+                    iconSpan.textContent = '▼';
+                    // 将图标插入到标题文本前面 (保持原有内容)
+                    title.insertBefore(iconSpan, title.firstChild);
+
+                    // 为了让标题内文字与图标对齐，设置flex样式已经在全局样式中定义
+                    // 确保点击图标也会触发折叠 (通过标题的事件委托)
+                    
+                    // 6. 绑定点击事件: 切换 contentWrapper 的显示/隐藏，同时更新图标
+                    const toggleSection = function(e) {
+                        e.stopPropagation();
+                        const isExpanded = contentWrapper.style.display !== 'none';
+                        if (isExpanded) {
+                            // 折叠
+                            contentWrapper.style.display = 'none';
+                            iconSpan.textContent = '▶';
+                        } else {
+                            // 展开
+                            contentWrapper.style.display = 'block';
+                            iconSpan.textContent = '▼';
+                        }
+                    };
+                    
+                    title.addEventListener('click', toggleSection);
+                    
+                    // 确保初始全部可见 (内容容器默认block)
+                    contentWrapper.style.display = 'block';
+                    
+                    // 存储相关信息以便全局展开/折叠调用
+                    sectionMap.push({
+                        contentWrapper: contentWrapper,
+                        icon: iconSpan,
+                        title: title
+                    });
+                });
+                
+                // 返回映射表供全局按钮使用
+                return sectionMap;
+            }
+            
+            // 全局展开/折叠管理器
+            let sectionsControl = [];
+            
+            // 全部展开
+            function expandAllSections() {
+                sectionsControl.forEach(item => {
+                    if (item.contentWrapper) {
+                        item.contentWrapper.style.display = 'block';
+                        if (item.icon) item.icon.textContent = '▼';
+                    }
+                });
+            }
+            
+            // 全部折叠
+            function collapseAllSections() {
+                sectionsControl.forEach(item => {
+                    if (item.contentWrapper) {
+                        item.contentWrapper.style.display = 'none';
+                        if (item.icon) item.icon.textContent = '▶';
+                    }
+                });
+            }
+            
+            // 初始化整个页面，加入重构与折叠逻辑，并绑定全局按钮
+            function setupPage() {
+                // 执行DOM重构，使每个section具备独立内容区
+                const mapArray = initFoldableSections();
+                if (mapArray && mapArray.length) {
+                    sectionsControl = mapArray;
+                } else {
+                    // 降级处理: 如果没有成功重构（极少情况），重新尝试一次
+                    console.warn("重构折叠结构重试一次");
+                    const retryMap = initFoldableSections();
+                    if (retryMap) sectionsControl = retryMap;
+                }
+                
+                // 绑定全局按钮事件 (已经存在按钮则绑定，如果还没渲染则等待)
+                const expandBtn = document.getElementById('expandAllBtn');
+                const collapseBtn = document.getElementById('collapseAllBtn');
+                if (expandBtn) {
+                    // 移除原有监听避免重复绑定
+                    const newExpand = expandBtn.cloneNode(true);
+                    expandBtn.parentNode.replaceChild(newExpand, expandBtn);
+                    newExpand.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        expandAllSections();
+                    });
+                }
+                if (collapseBtn) {
+                    const newCollapse = collapseBtn.cloneNode(true);
+                    collapseBtn.parentNode.replaceChild(newCollapse, collapseBtn);
+                    newCollapse.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        collapseAllSections();
+                    });
+                }
+            }
+            
+            // 确保页面完全加载后执行，避免FOUC过大但重构瞬间完成
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', setupPage);
+            } else {
+                setupPage();
+            }
+        })();
+    </script>
+    <!-- 额外兜底: 确保所有内容样式以及任何隐藏节点的恢复能力，无侵入 -->
+</body>
+</html>
