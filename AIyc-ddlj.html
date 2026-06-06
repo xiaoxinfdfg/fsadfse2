@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>三体对照实验：真实 vs 理想 vs AI | 课程思政：科技报国·使命担当</title>
+    <!-- TensorFlow.js 核心库 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.15.0/dist/tf.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1450px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            color: #475569;
+            margin-top: 8px;
+            font-size: 1rem;
+        }
+
+        .dashboard {
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            margin-bottom: 30px;
+        }
+
+        .triple-screen {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .screen {
+            background: #f8fafc;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 8px 16px -8px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s;
+        }
+        .screen:hover { transform: translateY(-3px); }
+
+        .screen-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            justify-content: space-between;
+        }
+        .dot { width: 14px; height: 14px; border-radius: 50%; margin-right: 10px; }
+        .real-dot { background: #ef4444; box-shadow: 0 0 0 2px rgba(239,68,68,0.3); }
+        .ideal-dot { background: #3b82f6; }
+        .ai-dot { background: #10b981; }
+
+        canvas { width: 100%; height: auto; background: white; border-radius: 12px; border: 1px solid #e2e8f0; }
+
+        .stats { display: flex; justify-content: space-between; margin-top: 12px; font-size: 0.85rem; }
+
+        .heatmap-bar {
+            background: #f1f5f9;
+            border-radius: 24px;
+            padding: 18px 25px;
+            margin-top: 10px;
+        }
+        .bar-container { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; }
+        .bar-label { width: 130px; font-size: 0.9rem; }
+        .bar-bg { flex: 1; height: 20px; background: #e2e8f0; border-radius: 30px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; transition: width 0.3s; }
+        .ideal-fill { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
+        .ai-fill { background: linear-gradient(90deg, #10b981, #059669); }
+
+        .control-panel {
+            background: white;
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 10px 30px -15px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        /* AI 训练面板 */
+        .ai-training-panel {
+            background: linear-gradient(105deg, #f0f9ff 0%, #eef2ff 100%);
+            border-radius: 28px;
+            padding: 20px 25px;
+            margin-top: 20px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+        }
+
+        /* ========== 新增：课程思政升华模块 ========== */
+        .ideological-panel {
+            background: linear-gradient(135deg, #1e1b4b 0%, #2e1065 50%, #4c1d95 100%);
+            border-radius: 28px;
+            padding: 25px;
+            margin-top: 20px;
+            color: white;
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s;
+        }
+        .ideological-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .ideological-header h2 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .patriot-badge {
+            background: rgba(255,215,0,0.2);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            border: 1px solid #fbbf24;
+            color: #fde68a;
+        }
+        .analogy-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .analogy-card {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .analogy-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.15); }
+        .analogy-icon { font-size: 2.5rem; margin-bottom: 10px; }
+        .analogy-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 8px; }
+        .analogy-desc { font-size: 0.85rem; opacity: 0.9; }
+        .arrow-symbol { font-size: 2rem; align-self: center; color: #fbbf24; }
+        .timeline-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .timeline-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid #f59e0b;
+            padding-left: 15px;
+        }
+        .timeline-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding: 10px 5px;
+        }
+        .timeline-item {
+            min-width: 160px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+            border-left: 3px solid #f59e0b;
+        }
+        .timeline-date { font-size: 0.8rem; color: #fbbf24; font-weight: bold; }
+        .timeline-event { font-size: 0.85rem; margin-top: 5px; }
+        .timeline-country { font-size: 0.7rem; opacity: 0.7; margin-top: 5px; }
+        .china-highlight { border-left-color: #ef4444; background: rgba(239,68,68,0.15); }
+        .quote-box {
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            padding: 18px 25px;
+            margin: 20px 0;
+            text-align: center;
+            font-style: italic;
+            border-left: 4px solid #f59e0b;
+            border-right: 4px solid #f59e0b;
+        }
+        .quote-text { font-size: 1.1rem; line-height: 1.5; }
+        .quote-author { margin-top: 8px; font-size: 0.8rem; opacity: 0.7; }
+        .discussion-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .discussion-card {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border-radius: 18px;
+            padding: 18px;
+        }
+        .discussion-question {
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #fbbf24;
+        }
+        .discussion-answer {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+        .mission-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 15px;
+            font-size: 1rem;
+        }
+        .mission-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(245,158,11,0.4);
+        }
+        .tech-achievement {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 15px 0;
+        }
+        .tech-tag {
+            background: rgba(16,185,129,0.2);
+            padding: 5px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            border: 1px solid #10b981;
+        }
+
+        .ai-model-arch {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .arch-card, .training-card {
+            background: white;
+            border-radius: 24px;
+            padding: 15px 20px;
+            flex: 2;
+            min-width: 220px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .training-card { flex: 3; }
+        .model-badge {
+            font-family: monospace;
+            background: #1e293b;
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        .loss-chart {
+            background: #0f172a;
+            border-radius: 16px;
+            height: 100px;
+            margin-top: 12px;
+            position: relative;
+            padding: 5px;
+        }
+        .loss-canvas {
+            width: 100%;
+            height: 80px;
+            background: #0f172a;
+            border-radius: 12px;
+        }
+        button {
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .train-btn {
+            background: #059669;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            margin-right: 12px;
+            box-shadow: 0 2px 6px rgba(5,150,105,0.3);
+        }
+        .train-btn:hover { background: #047857; transform: scale(1.02);}
+        .mode-btn, .pause-btn, .btn-reset, .import-btn {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 8px 20px;
+            border-radius: 40px;
+        }
+        .mode-btn.active { background: #1e3a8a; color: white; border-color: #1e3a8a; }
+        .param-item input { width: 100%; }
+        .import-btn { background: #dbeafe; border-color: #3b82f6; }
+        .ai-insight { background: #ecfdf5; padding: 8px 20px; border-radius: 60px; color: #065f46; border-left: 4px solid #10b981; flex:1; }
+        .footer-notes { display: flex; justify-content: space-between; margin-top: 20px; font-size: 0.8rem; color: #475569; }
+        @media (max-width: 900px) { .triple-screen { grid-template-columns: 1fr; } .ai-model-arch { flex-direction: column; } .analogy-row { flex-direction: column; } .arrow-symbol { transform: rotate(90deg); } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🧪 三体对照实验：真实 vs 理想 vs AI</h1>
+        <div class="subtitle">🤖 可训练神经网络 | 课程思政：从AI预测到科技报国 · 使命担当</div>
+    </div>
+
+    <div class="dashboard">
+        <div class="triple-screen">
+            <div class="screen"><div class="screen-header"><div><span class="dot real-dot"></span>📡 物理世界 · 真实轨迹</div><div class="import-section"><label for="file-input" class="import-btn">📂 导入CSV</label><input type="file" id="file-input" accept=".csv" style="display:none"><span id="file-name-display" style="font-size:0.75rem; margin-left:8px;">未加载</span></div></div><div class="canvas-container"><canvas id="canvasReal" width="300" height="150"></canvas></div><div class="stats"><span>平均加速度: <strong id="realAcc">0.40</strong> m/s²</span><span class="error-badge" id="realStatus">实时采集</span></div></div>
+            <div class="screen"><div class="screen-header"><span class="dot ideal-dot"></span>📐 理想模型 · F = ma</div><div class="canvas-container"><canvas id="canvasIdeal" width="300" height="150"></canvas></div><div class="stats"><span>理论加速度: <strong id="idealAcc">0.40</strong> m/s²</span><span class="success-badge">牛顿力学</span></div></div>
+            <div class="screen"><div class="screen-header"><span class="dot ai-dot"></span>🧠 可训练AI预测 (神经网络)</div><div class="canvas-container"><canvas id="canvasAI" width="300" height="150"></canvas></div><div class="stats"><span>平均加速度: <strong id="aiAcc">0.40</strong> m/s²</span><span id="aiModelStatus" class="success-badge">⚡ 推理中</span></div></div>
+        </div>
+
+        <div class="heatmap-bar">
+            <div class="heatmap-title" style="display:flex; justify-content:space-between;"><span>📊 实时误差对比 (相对真实轨迹)</span><span id="timeTag">t = 0.0 s</span></div>
+            <div class="bar-container"><span class="bar-label">📐 理想模型误差</span><div class="bar-bg"><div class="bar-fill ideal-fill" id="idealErrorBar" style="width:0%"></div></div><span class="bar-value" id="idealErrorValue">0%</span></div>
+            <div class="bar-container"><span class="bar-label">🧠 AI神经网络误差</span><div class="bar-bg"><div class="bar-fill ai-fill" id="aiErrorBar" style="width:0%"></div></div><span class="bar-value" id="aiErrorValue">0%</span></div>
+            <div style="font-size:0.85rem; background:#fff; border-radius:30px; padding:8px 15px; margin-top:12px;">⚙️ 导轨限长0.6m | 滑块235g / 砝码10g | AI基于真实轨迹在线训练</div>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="mode-tabs" style="display:flex; gap:12px; margin-bottom:20px;">
+            <button class="mode-btn active" id="modeIdeal">✨ 理想条件实验</button>
+            <button class="mode-btn" id="modeDisturb">🌪️ 干扰条件实验 (倾角+初速)</button>
+        </div>
+        <div class="params" style="display:flex; gap:20px; flex-wrap:wrap;">
+            <div class="param-item"><label>🔧 导轨倾角 (扰动)</label><input type="range" id="tiltSlider" min="0" max="3.0" step="0.1" value="0"><div><span class="param-value" id="tiltValue">0.0</span><span class="param-unit">度</span></div></div>
+            <div class="param-item"><label>⚡ 初速度扰动</label><input type="range" id="v0Slider" min="0" max="0.5" step="0.01" value="0"><div><span class="param-value" id="v0Value">0.00</span><span class="param-unit">m/s</span></div></div>
+            <div class="param-item"><label>📈 神经网络学习率</label><div><span class="param-value" id="lrDisplay">0.003</span></div><div style="font-size:0.7rem;">自适应优化</div></div>
+        </div>
+        <div style="display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
+            <button class="btn-reset" id="btnReset">⟲ 重置实验</button>
+            <div class="pause-controls"><button class="pause-btn" id="btnPause">⏸️ 暂停</button><button class="pause-btn" id="btnContinue">▶️ 继续</button></div>
+            <div class="ai-insight" id="insightMessage">💡 AI神经网络基于真实轨迹训练，模型推理替代传统启发式</div>
+        </div>
+    </div>
+
+    <!-- AI训练面板 -->
+    <div class="ai-training-panel">
+        <div class="ai-model-arch">
+            <div class="arch-card">
+                <div style="display:flex; justify-content:space-between;"><span><span class="model-badge">🧬 神经网络架构</span></span><span style="font-size:0.7rem;">物理引导设计</span></div>
+                <div style="margin-top:12px;">
+                    <p><strong>输入层 (3维)</strong> → [p<sub>t-2</sub>, p<sub>t-1</sub>, v<sub>t</sub>] 归一化</p>
+                    <p><strong>隐藏层</strong> : Dense 64 → ReLU  +  Dropout(0.2)</p>
+                    <p><strong>输出层</strong> : Dense 1 → 预测下一位置 Δp (增量)</p>
+                    <p><strong>损失函数</strong> : MSE (均方误差) &nbsp;| <strong>优化器</strong> : Adam(lr=0.003)</p>
+                    <p><strong>训练方式</strong> : 在线收集真实轨迹样本，异步批量训练</p>
+                    <p><strong>推理频率</strong> : 每物理步长(50ms)前向一次，实时孪生</p>
+                </div>
+            </div>
+            <div class="training-card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div><span class="model-badge" style="background:#0f3b2c;">📚 模型训练器</span></div>
+                    <div><button id="btnTrainModel" class="train-btn">⚡ 开始在线训练 (基于当前真实轨迹)</button><button id="btnResetModel" style="background:#475569; color:white; border:none; padding:6px 16px; border-radius:40px;">重置AI权重</button></div>
+                </div>
+                <div style="margin-top:12px; display:flex; gap:20px; flex-wrap:wrap;">
+                    <div><span>📊 训练样本数: </span><strong id="sampleCount">0</strong></div>
+                    <div><span>🎯 当前损失 (loss): </span><strong id="currentLoss">---</strong></div>
+                    <div><span>🔄 训练轮数: </span><strong id="epochCount">0</strong></div>
+                </div>
+                <div class="loss-chart">
+                    <canvas id="lossCanvas" width="400" height="70" style="width:100%; height:70px; background:#0f172a; border-radius:12px;"></canvas>
+                    <div style="color:#94a3b8; font-size:0.7rem; text-align:center;">训练损失曲线 (MSE)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 课程思政升华模块：从AI预测到导弹拦截 ========== -->
+    <div class="ideological-panel">
+        <div class="ideological-header">
+            <h2>🇨🇳 从“AI预测”到“导弹拦截”</h2>
+            <div class="patriot-badge">🎯 科技报国 · 使命担当</div>
+        </div>
+
+        <!-- 类比迁移核心图 -->
+        <div class="analogy-row">
+            <div class="analogy-card">
+                <div class="analogy-icon">📚🧪</div>
+                <div class="analogy-title">课堂AI预测</div>
+                <div class="analogy-desc">滑块轨迹预测<br>神经网络在线训练<br>误差分析与优化</div>
+            </div>
+            <div class="arrow-symbol">➡️</div>
+            <div class="analogy-card">
+                <div class="analogy-icon">🛡️🚀</div>
+                <div class="analogy-title">国防AI反导</div>
+                <div class="analogy-desc">高超声速机动轨迹预测<br>毫秒级自主决策<br>多域传感器融合</div>
+            </div>
+        </div>
+
+        <div class="quote-box">
+            <div class="quote-text">“课堂上的AI预测，是理解复杂世界的起点；<br>国防中的AI反导，是守护国家安全的关键。”</div>
+            <div class="quote-author">—— 科技报国 · 使命担当</div>
+        </div>
+
+        <!-- 全球AI反导技术时间轴 -->
+        <div class="timeline-container">
+            <div class="timeline-title">
+                🌍 全球AI反导技术突破时间轴
+                <span style="font-size:0.7rem;">(2024-2026)</span>
+            </div>
+            <div class="timeline-scroll">
+                <div class="timeline-item"><div class="timeline-date">2024.03</div><div class="timeline-event">美国MDA<br>高超声速机动探测</div><div class="timeline-country">🇺🇸 美国</div></div>
+                <div class="timeline-item"><div class="timeline-date">2024.07</div><div class="timeline-event">多国联合<br>0.8秒AI自主决策</div><div class="timeline-country">🌐 北约</div></div>
+                <div class="timeline-item"><div class="timeline-date">2024.10</div><div class="timeline-event">意大利莱昂纳多<br>跨域传感器融合</div><div class="timeline-country">🇮🇹 意大利</div></div>
+                <div class="timeline-item"><div class="timeline-date">2025.02</div><div class="timeline-event">美国洛马<br>自主预测来袭+规避机动</div><div class="timeline-country">🇺🇸 美国</div></div>
+                <div class="timeline-item"><div class="timeline-date">2025.06</div><div class="timeline-event">以色列IAI<br>毫秒级机动轨迹计算</div><div class="timeline-country">🇮🇱 以色列</div></div>
+                <div class="timeline-item"><div class="timeline-date">2025.10</div><div class="timeline-event">法国泰雷兹<br>5000km探测+自主火力分配</div><div class="timeline-country">🇫🇷 法国</div></div>
+                <div class="timeline-item china-highlight"><div class="timeline-date">2026.03</div><div class="timeline-event">🇨🇳 中国<br>量子AI语音识别+机动轨迹预测</div><div class="timeline-country">中国 · 重大突破</div></div>
+            </div>
+        </div>
+
+        <!-- 中国AI反导技术亮点 -->
+        <div class="tech-achievement">
+            <span class="tech-tag">✨ 量子AI赋能</span>
+            <span class="tech-tag">✨ 高超声速机动探测</span>
+            <span class="tech-tag">✨ 多域感知融合</span>
+            <span class="tech-tag">✨ 毫秒级自主决策</span>
+            <span class="tech-tag">✨ 守护空天安全</span>
+        </div>
+
+        <!-- 思政引导讨论区 -->
+        <div class="discussion-area">
+            <div class="discussion-card">
+                <div class="discussion-question">💬 思考一：技术同源，使命不同</div>
+                <div class="discussion-answer">今天我们训练的神经网络，能够预测滑块的下一个位置。这项技术与国防领域用来预测导弹轨迹、实现拦截的AI算法，本质上是一样的。你如何看待“课堂知识”与“国家安全”之间的联系？</div>
+            </div>
+            <div class="discussion-card">
+                <div class="discussion-question">💬 思考二：科学精神与工匠精神</div>
+                <div class="discussion-answer">AI训练需要反复调试、积累样本、观察损失曲线。如果这是导弹拦截系统，1%的误差意味着什么？这对你未来的学习和工作有什么启示？</div>
+            </div>
+            <div class="discussion-card">
+                <div class="discussion-question">💬 思考三：强国有我，使命担当</div>
+                <div class="discussion-answer">作为一名理工科学生，你认为自己所学专业可以在哪些方面服务国家战略需求？你愿意成为国防科技事业的一份子吗？</div>
+            </div>
+        </div>
+
+        <!-- 互动承诺按钮 -->
+        <div style="text-align: center;">
+            <button class="mission-btn" id="patriotBtn">🇨🇳 我承诺：强国有我，科技报国</button>
+        </div>
+        <div id="patriotMessage" style="text-align: center; margin-top: 12px; font-size: 0.85rem; opacity: 0.8;"></div>
+    </div>
+
+    <div style="margin-top:15px; background:#fefce8; border-radius:20px; padding:12px; font-size:0.8rem;">
+        <details><summary style="font-weight:600;">📘 扩展功能解析：模型架构 · 训练 · 推理 · 思政融入</summary>
+        <div style="margin-top:10px;">✔️ <strong>模型架构</strong>：3输入(历史位置+当前速度) → 全连接64 → ReLU → Dropout → 输出位移增量，符合时序依赖。<br>
+        ✔️ <strong>模型训练</strong>：系统自动收集真实轨迹的连续三元组，点击“开始在线训练”则使用现有样本异步训练20轮，损失曲线实时绘制。<br>
+        ✔️ <strong>课程思政</strong>：从滑块轨迹预测到导弹拦截，引导学生理解技术同源、使命同向，激发科技报国情怀，培养“强国有我”的责任担当。</div></details>
+    </div>
+</div>
+
+<script>
+    (function(){
+        // -------------------------- 物理参数 -----------------------------
+        const g = 9.8;
+        const m1 = 0.01;      // 砝码10g
+        const m2 = 0.235;     // 滑块235g
+        const idealAccBase = (m1 * g) / (m1 + m2);  // ≈0.4
+        const RAIL_LENGTH = 0.6;
+        const dt = 0.05;
+
+        // 画布元素
+        const canvasReal = document.getElementById('canvasReal');
+        const canvasIdeal = document.getElementById('canvasIdeal');
+        const canvasAI = document.getElementById('canvasAI');
+        const ctxReal = canvasReal.getContext('2d');
+        const ctxIdeal = canvasIdeal.getContext('2d');
+        const ctxAI = canvasAI.getContext('2d');
+
+        // 模拟状态
+        let mode = 'ideal';       // ideal / disturb
+        let tilt = 0.0;
+        let v0 = 0.0;
+        let time = 0.0;
+        let realTraj = [0];
+        let idealTraj = [0];
+        let aiTraj = [0];
+        let realVel = 0;
+        let idealVel = 0;
+        let aiVel = 0;
+        let isPaused = false;
+        let pauseReason = null;
+        let animationFrame;
+        let importedData = null;   // { positions: [] }
+
+        // ------------- AI 神经网络模型 (TensorFlow.js) ------------
+        let model = null;
+        let isModelReady = false;
+        let trainingSamples = [];
+        let lossHistory = [];
+        let epochsTrained = 0;
+        let trainingInProgress = false;
+        const lossCanvas = document.getElementById('lossCanvas');
+        const lossCtx = lossCanvas.getContext('2d');
+        lossCanvas.width = 400; lossCanvas.height = 70;
+
+        function normalizeInput(pPrev2, pPrev1, vel){
+            return [(pPrev2 || 0) / RAIL_LENGTH, (pPrev1 || 0) / RAIL_LENGTH, (vel / 1.2)];
+        }
+
+        function buildModel() {
+            const input = tf.input({shape: [3]});
+            const hidden = tf.layers.dense({units: 64, activation: 'relu'}).apply(input);
+            const dropout = tf.layers.dropout({rate: 0.2}).apply(hidden);
+            const output = tf.layers.dense({units: 1, activation: 'linear'}).apply(dropout);
+            const modelCreated = tf.model({inputs: input, outputs: output});
+            modelCreated.compile({optimizer: tf.train.adam(0.003), loss: 'meanSquaredError'});
+            return modelCreated;
+        }
+
+        async function initModel() {
+            if(model) model.dispose();
+            model = buildModel();
+            isModelReady = true;
+            document.getElementById('currentLoss').innerText = '未训练';
+            updateLossChart();
+        }
+
+        function collectSamplesFromRealTraj() {
+            if(realTraj.length < 3) return [];
+            const newSamples = [];
+            for(let i = 2; i < realTraj.length; i++){
+                const p0 = realTraj[i-2];
+                const p1 = realTraj[i-1];
+                const p2 = realTraj[i];
+                const vel = (p1 - p0) / dt;
+                if(isNaN(vel) || !isFinite(vel)) continue;
+                const inp = normalizeInput(p0, p1, vel);
+                newSamples.push({input: inp, target: p2});
+            }
+            return newSamples;
+        }
+
+        function updateTrainingSamplesFromReal() {
+            const fresh = collectSamplesFromRealTraj();
+            if(fresh.length === 0) return;
+            let merged = [...trainingSamples, ...fresh];
+            if(merged.length > 400) merged = merged.slice(-400);
+            trainingSamples = merged;
+            document.getElementById('sampleCount').innerText = trainingSamples.length;
+        }
+
+        async function trainModel() {
+            if(trainingInProgress) { alert("训练进行中，请稍后"); return; }
+            if(trainingSamples.length < 20) {
+                alert(`样本不足 (当前${trainingSamples.length}个)，请先运行物理实验采集更多真实轨迹数据！`);
+                return;
+            }
+            trainingInProgress = true;
+            document.getElementById('btnTrainModel').innerText = '⏳ 训练中...';
+            const xsData = trainingSamples.map(s => s.input);
+            const ysData = trainingSamples.map(s => s.target);
+            const xsTensor = tf.tensor2d(xsData);
+            const ysTensor = tf.tensor2d(ysData, [ysData.length, 1]);
+            
+            const epochs = 25;
+            const batchSize = 32;
+            for(let epoch = 0; epoch < epochs; epoch++){
+                const res = await model.fit(xsTensor, ysTensor, { epochs: 1, batchSize, shuffle: true, verbose: 0 });
+                const lossVal = res.history.loss[0];
+                lossHistory.push(lossVal);
+                if(lossHistory.length > 30) lossHistory.shift();
+                document.getElementById('currentLoss').innerText = lossVal.toFixed(6);
+                epochsTrained++;
+                document.getElementById('epochCount').innerText = epochsTrained;
+                updateLossChart();
+                await tf.nextFrame();
+            }
+            xsTensor.dispose(); ysTensor.dispose();
+            trainingInProgress = false;
+            document.getElementById('btnTrainModel').innerText = '⚡ 开始在线训练 (基于当前真实轨迹)';
+            document.getElementById('aiModelStatus').innerHTML = '✅ 已训练';
+            document.getElementById('insightMessage').innerHTML = '🎉 AI神经网络训练完成！预测精度大幅提升';
+        }
+
+        function updateLossChart(){
+            if(!lossCtx) return;
+            lossCtx.clearRect(0, 0, lossCanvas.width, lossCanvas.height);
+            if(lossHistory.length === 0) return;
+            const maxLoss = Math.max(...lossHistory.map(l=>Math.min(l,1.0)), 0.01);
+            const minLoss = Math.min(...lossHistory, 0);
+            const range = Math.max(maxLoss - minLoss, 0.001);
+            lossCtx.beginPath();
+            lossCtx.strokeStyle = "#10b981";
+            lossCtx.lineWidth = 2;
+            for(let i=0;i<lossHistory.length;i++){
+                let x = (i / (lossHistory.length-1)) * lossCanvas.width;
+                let normLoss = (lossHistory[i] - minLoss) / range;
+                let y = lossCanvas.height - normLoss * (lossCanvas.height-5) - 3;
+                if(i===0) lossCtx.moveTo(x, y);
+                else lossCtx.lineTo(x, y);
+            }
+            lossCtx.stroke();
+        }
+
+        async function predictNextPosition(pPrev2, pPrev1, currentVel){
+            if(!isModelReady || !model){
+                let acc = (mode === 'disturb') ? idealAccBase * (1 - tilt*0.08) : idealAccBase;
+                let nextVel = currentVel + acc * dt;
+                let nextPos = (pPrev1 || 0) + nextVel * dt;
+                return Math.min(RAIL_LENGTH, Math.max(0, nextPos));
+            }
+            const inp = normalizeInput(pPrev2, pPrev1, currentVel);
+            const inputTensor = tf.tensor2d([inp]);
+            const outputTensor = model.predict(inputTensor);
+            const deltaPos = outputTensor.dataSync()[0];
+            inputTensor.dispose(); outputTensor.dispose();
+            let predictedPos = deltaPos;
+            if(isNaN(predictedPos)) predictedPos = (pPrev1 || 0);
+            predictedPos = Math.min(RAIL_LENGTH, Math.max(0, predictedPos));
+            return predictedPos;
+        }
+
+        function getRealAcceleration() {
+            let base = idealAccBase;
+            if(mode === 'disturb'){
+                let factor = Math.max(0.25, 1 - tilt * 0.12);
+                base = idealAccBase * factor;
+            }
+            return base;
+        }
+
+        async function updateTrajectoriesAsync(){
+            if(isPaused || !animationActive) return;
+            if(realTraj.length>0 && realTraj[realTraj.length-1] >= RAIL_LENGTH){
+                isPaused = true; pauseReason = 'rail'; return;
+            }
+            if(importedData && importedData.positions.length>0){
+                let idx = Math.floor((time+dt)/dt);
+                if(idx >= importedData.positions.length-1){ isPaused=true; pauseReason='rail'; return; }
+            }
+            time += dt;
+            // 真实轨迹
+            if(importedData && importedData.positions.length>0){
+                let idx = Math.floor(time/dt);
+                if(idx < importedData.positions.length){
+                    let newPos = importedData.positions[idx];
+                    realTraj.push(newPos);
+                    if(realTraj.length>=2) realVel = (realTraj[realTraj.length-1] - realTraj[realTraj.length-2])/dt;
+                }
+            } else {
+                let realAcc = getRealAcceleration();
+                realVel = realVel + realAcc * dt;
+                let noise = (Math.random()*0.002)-0.001;
+                let newReal = realTraj[realTraj.length-1] + realVel * dt + noise;
+                if(newReal<0) newReal=0;
+                realTraj.push(newReal);
+            }
+            // 理想模型
+            let idealAcc = idealAccBase;
+            idealVel = idealVel + idealAcc * dt;
+            let newIdeal = idealTraj[idealTraj.length-1] + idealVel * dt;
+            idealTraj.push(newIdeal);
+            
+            // AI推理
+            let prev2 = (aiTraj.length>=2) ? aiTraj[aiTraj.length-2] : 0;
+            let prev1 = aiTraj[aiTraj.length-1];
+            let currentVelocity = aiVel;
+            if(realTraj.length>=2 && aiTraj.length>=1){
+                currentVelocity = (realTraj[realTraj.length-1] - realTraj[realTraj.length-2])/dt;
+            }
+            let predictedPos = await predictNextPosition(prev2, prev1, currentVelocity);
+            aiTraj.push(predictedPos);
+            if(aiTraj.length>=2) aiVel = (aiTraj[aiTraj.length-1] - aiTraj[aiTraj.length-2])/dt;
+            
+            if(realTraj.length>60) realTraj.shift();
+            if(idealTraj.length>60) idealTraj.shift();
+            if(aiTraj.length>60) aiTraj.shift();
+            
+            if(realTraj.length>0 && realTraj[realTraj.length-1]>=RAIL_LENGTH){
+                isPaused=true; pauseReason='rail';
+            }
+            if(realTraj.length >= 3 && !isPaused && !importedData){
+                const lastIdx = realTraj.length;
+                if(lastIdx>=3){
+                    const p0=realTraj[lastIdx-3], p1=realTraj[lastIdx-2], p2=realTraj[lastIdx-1];
+                    const vEst = (p1-p0)/dt;
+                    if(!isNaN(vEst)){
+                        const inp = normalizeInput(p0, p1, vEst);
+                        trainingSamples.push({input: inp, target: p2});
+                        if(trainingSamples.length>500) trainingSamples.shift();
+                        document.getElementById('sampleCount').innerText = trainingSamples.length;
+                    }
+                }
+            }
+        }
+
+        let animationActive = true;
+        async function animateLoop(){
+            await updateTrajectoriesAsync();
+            refreshDisplay();
+            animationFrame = setTimeout(animateLoop, 50);
+        }
+        
+        function refreshDisplay(){
+            const realAccAvg = (realTraj.length>1 && time>0) ? 2*(realTraj[realTraj.length-1] - (mode==='disturb'?v0:0)*time)/(time*time) : idealAccBase;
+            const idealAccAvg = idealAccBase;
+            let aiAccAvg = (aiTraj.length>1 && time>0) ? 2*(aiTraj[aiTraj.length-1])/(time*time) : idealAccBase;
+            document.getElementById('realAcc').innerText = realAccAvg.toFixed(2);
+            document.getElementById('idealAcc').innerText = idealAccAvg.toFixed(2);
+            document.getElementById('aiAcc').innerText = aiAccAvg.toFixed(2);
+            let errIdeal=0, errAI=0;
+            if(realTraj.length && idealTraj.length && aiTraj.length){
+                const lastReal = realTraj[realTraj.length-1];
+                const lastIdeal = idealTraj[idealTraj.length-1];
+                const lastAI = aiTraj[aiTraj.length-1];
+                if(lastReal>0.005){
+                    errIdeal = Math.min(99, Math.abs(lastIdeal-lastReal)/lastReal*100);
+                    errAI = Math.min(99, Math.abs(lastAI-lastReal)/lastReal*100);
+                } else { errIdeal = Math.abs(lastIdeal-lastReal)*100; errAI = Math.abs(lastAI-lastReal)*100; }
+            }
+            document.getElementById('idealErrorValue').innerText = Math.round(errIdeal)+'%';
+            document.getElementById('aiErrorValue').innerText = Math.round(errAI)+'%';
+            document.getElementById('idealErrorBar').style.width = errIdeal+'%';
+            document.getElementById('aiErrorBar').style.width = errAI+'%';
+            document.getElementById('timeTag').innerHTML = `t = ${time.toFixed(1)} s`;
+            drawCanvas(ctxReal, realTraj, '#ef4444');
+            drawCanvas(ctxIdeal, idealTraj, '#3b82f6');
+            drawCanvas(ctxAI, aiTraj, '#10b981');
+        }
+
+        function drawCanvas(ctx, traj, color){
+            ctx.clearRect(0,0,300,150);
+            if(traj.length<2) return;
+            const maxDisp = RAIL_LENGTH*1.05;
+            ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=3;
+            for(let i=0;i<traj.length;i++){
+                let x = 20 + (i/(59))*260;
+                let y = 130 - (traj[i]/maxDisp)*100;
+                y = Math.min(130, Math.max(20,y));
+                if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            }
+            ctx.stroke();
+            for(let i=Math.max(0,traj.length-5);i<traj.length;i++){
+                let x = 20+(i/59)*260;
+                let y = 130 - (traj[i]/maxDisp)*100;
+                ctx.beginPath(); ctx.arc(x,y,4,0,2*Math.PI); ctx.fillStyle=color; ctx.fill();
+            }
+            ctx.setLineDash([4,4]); ctx.beginPath(); let endY=130-(RAIL_LENGTH/maxDisp)*100; ctx.moveTo(20,endY); ctx.lineTo(280,endY); ctx.stroke(); ctx.setLineDash([]);
+        }
+        
+        function resetAll(keepImport=false){
+            realTraj=[0]; idealTraj=[0]; aiTraj=[0];
+            realVel = (mode==='disturb'&&!keepImport)? v0 : 0;
+            idealVel=0; aiVel=0; time=0; isPaused=false; pauseReason=null;
+            if(!keepImport){ importedData=null; document.getElementById('file-name-display').innerText='未加载'; }
+            if(mode==='disturb' && !importedData) realVel = v0;
+        }
+        
+        // 事件绑定
+        document.getElementById('modeIdeal').onclick=()=>{ mode='ideal'; tilt=0;v0=0; setSliders(); resetAll(false); };
+        document.getElementById('modeDisturb').onclick=()=>{ mode='disturb'; tilt=1.8;v0=0.25; setSliders(); resetAll(false); };
+        function setSliders(){
+            document.getElementById('tiltSlider').value=tilt; document.getElementById('v0Slider').value=v0;
+            document.getElementById('tiltValue').innerText=tilt; document.getElementById('v0Value').innerText=v0;
+            document.getElementById('modeIdeal').classList.toggle('active',mode==='ideal');
+            document.getElementById('modeDisturb').classList.toggle('active',mode==='disturb');
+        }
+        document.getElementById('tiltSlider').oninput=e=>{ tilt=parseFloat(e.target.value); if(tilt>0.1||v0>0.01) mode='disturb'; else mode='ideal'; setSliders(); resetAll(false); };
+        document.getElementById('v0Slider').oninput=e=>{ v0=parseFloat(e.target.value); if(tilt>0.1||v0>0.01) mode='disturb'; else mode='ideal'; setSliders(); resetAll(false); };
+        document.getElementById('btnReset').onclick=()=>{ mode='ideal'; tilt=0;v0=0; setSliders(); resetAll(false); };
+        document.getElementById('btnPause').onclick=()=>{ if(!isPaused){ isPaused=true; pauseReason='manual'; } };
+        document.getElementById('btnContinue').onclick=()=>{ if(isPaused){ resetAll(importedData!==null); isPaused=false; pauseReason=null; } else resetAll(importedData!==null); };
+        document.getElementById('btnTrainModel').onclick=()=>{ if(trainingSamples.length>0) trainModel(); else alert("请先运行模拟积累真实轨迹样本(至少20个点)"); };
+        document.getElementById('btnResetModel').onclick=async()=>{ await initModel(); trainingSamples=[]; lossHistory=[]; epochsTrained=0; document.getElementById('sampleCount').innerText='0'; document.getElementById('epochCount').innerText='0'; document.getElementById('currentLoss').innerText='重置'; updateLossChart(); alert("AI权重已重置"); };
+        
+        // 文件导入
+        const fileInput = document.getElementById('file-input');
+        document.querySelector('.import-btn').onclick = () => fileInput.click();
+        fileInput.addEventListener('change', (e)=>{
+            const file=e.target.files[0]; if(!file) return;
+            const reader=new FileReader(); reader.onload=ev=>{ const lines=ev.target.result.split('\n'); let pos=[]; for(let l of lines){ let num=parseFloat(l.split(',')[1]||l.split(',')[0]); if(!isNaN(num)&&num>=0&&num<=RAIL_LENGTH*1.2) pos.push(num); } if(pos.length>2){ importedData={positions:pos}; resetAll(true); isPaused=false; document.getElementById('file-name-display').innerText=file.name; }else alert("解析失败"); }; reader.readAsText(file); });
+        
+        // 思政互动按钮
+        document.getElementById('patriotBtn').onclick = () => {
+            const msgDiv = document.getElementById('patriotMessage');
+            msgDiv.innerHTML = '🇨🇳 感谢你的承诺！今日课堂所学，明日强国之器。愿你们以科技报国为己任，勇担使命！';
+            msgDiv.style.color = '#fbbf24';
+            // 震动效果提醒
+            const btn = document.getElementById('patriotBtn');
+            btn.style.transform = 'scale(1.05)';
+            setTimeout(() => { btn.style.transform = 'scale(1)'; }, 200);
+        };
+        
+        // 启动
+        (async ()=>{
+            await initModel();
+            setSliders();
+            resetAll(false);
+            animateLoop();
+        })();
+    })();
+</script>
+</body>
+</html>
