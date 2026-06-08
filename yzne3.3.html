@@ -2,621 +2,101 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>验证牛顿第二定律实验</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>验证牛顿第二定律实验 | 智能实验报告</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-            font-weight: 600;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        h2 {
-            color: #34495e;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 10px;
-            margin-top: 30px;
-            font-weight: 500;
-        }
-        h3 {
-            color: #3498db;
-            margin-top: 25px;
-            font-weight: 500;
-        }
-        .basic-info {
-            background: rgba(236, 240, 241, 0.5);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(189, 195, 199, 0.2);
-        }
-        .basic-info table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .basic-info td {
-            padding: 12px;
-            border: none;
-        }
-        .basic-info td:first-child {
-            font-weight: 600;
-            color: #2c3e50;
-            width: 15%;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 12px;
-            text-align: center;
-            border: 1px solid #ecf0f1;
-        }
-        th {
-            background: linear-gradient(to bottom, #4CAF50, #388E3C);
-            color: white;
-            font-weight: 500;
-        }
-        tr:nth-child(even) {
-            background-color: rgba(236, 240, 241, 0.3);
-        }
-        tr:hover {
-            background-color: rgba(76, 175, 80, 0.1);
-        }
-        .fill-blank {
-            border: none;
-            border-bottom: 2px solid #3498db;
-            background: rgba(52, 152, 219, 0.1);
-            padding: 4px 8px;
-            text-align: center;
-            min-width: 80px;
-            font-family: inherit;
-            color: #2c3e50;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .fill-blank:focus {
-            outline: none;
-            background: rgba(52, 152, 219, 0.2);
-            border-bottom: 2px solid #2980b9;
-        }
-        .data-input {
-            width: 70px;
-            text-align: center;
-            border: 1px solid #bdc3c7;
-            border-radius: 4px;
-            padding: 6px;
-            transition: all 0.3s ease;
-        }
-        .data-input:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-        }
-        .formula {
-            background: rgba(255, 245, 157, 0.3);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-family: 'Cambria Math', 'Times New Roman', serif;
-            border-left: 4px solid #f1c40f;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        .experiment-content {
-            background: rgba(200, 230, 201, 0.3);
-            padding: 20px;
-            border-radius: 12px;
-            margin: 25px 0;
-            border: 1px solid rgba(76, 175, 80, 0.1);
-        }
-        .experiment-content ol {
-            margin-left: 20px;
-        }
-        .experiment-content li {
-            margin: 12px 0;
-            line-height: 1.7;
-        }
-        .calculation-section {
-            background: rgba(179, 229, 252, 0.3);
-            padding: 20px;
-            border-radius: 12px;
-            margin: 25px 0;
-            border: 1px solid rgba(33, 150, 243, 0.1);
-        }
-        .score-section {
-            background: rgba(255, 255, 255, 0.7);
-            border: 2px solid #4CAF50;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 25px 0;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .score-btn {
-            background: linear-gradient(to bottom, #4CAF50, #388E3C);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            border-radius: 30px;
-            cursor: pointer;
-            margin: 10px;
-            font-weight: 500;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-        .score-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-        }
-        .chart-btn {
-            background: linear-gradient(to bottom, #3498db, #2980b9);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            border-radius: 30px;
-            cursor: pointer;
-            margin: 10px;
-            font-weight: 500;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-        .chart-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-        }
-        .score-display {
-            font-size: 24px;
-            color: #2e7d32;
-            margin: 15px 0;
-            font-weight: bold;
-        }
-        .correct {
-            color: #2e7d32 !important;
-            border-bottom: 2px solid #4CAF50 !important;
-            background-color: rgba(76, 175, 80, 0.1) !important;
-        }
-        .incorrect {
-            color: #c62828 !important;
-            border-bottom: 2px solid #f44336 !important;
-            background-color: rgba(244, 67, 54, 0.1) !important;
-        }
-        .empty {
-            color: #757575 !important;
-            border-bottom: 2px dashed #bdbdbd !important;
-            background-color: rgba(189, 189, 189, 0.1) !important;
-        }
-        .info-input {
-            border: none;
-            border-bottom: 2px solid #3498db;
-            background: rgba(52, 152, 219, 0.1);
-            padding: 6px 8px;
-            text-align: left;
-            min-width: 150px;
-            font-family: inherit;
-            color: #2c3e50;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .info-input:focus {
-            outline: none;
-            background: rgba(52, 152, 219, 0.2);
-            border-bottom: 2px solid #2980b9;
-        }
-        .chart-container {
-            width: 80%;
-            margin: 30px auto;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .summary-box {
-            min-height: 150px;
-            border: 1px solid rgba(52, 152, 219, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.6);
-            width: 100%;
-            box-sizing: border-box;
-            font-family: inherit;
-            font-size: 14px;
-            resize: vertical;
-        }
-        .comment-section {
-            background: rgba(255, 243, 224, 0.7);
-            border: 2px solid #ff9800;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 25px 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .comment-title {
-            color: #e65100;
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .comment-content {
-            color: #bf360c;
-            font-size: 16px;
-            line-height: 1.8;
-            text-align: justify;
-        }
-        .auto-grade-btn {
-            background: linear-gradient(to bottom, #ff9800, #f57c00);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            border-radius: 30px;
-            cursor: pointer;
-            margin: 10px;
-            font-weight: 500;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-        .auto-grade-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-        }
-        .comment-footer {
-            margin-top: 25px;
-            padding-top: 15px;
-            border-top: 1px dashed #ff9800;
-            text-align: right;
-            font-size: 14px;
-            color: #e65100;
-            font-weight: 500;
-        }
-        .section-title {
-            background: rgba(76, 175, 80, 0.1);
-            padding: 10px 15px;
-            border-radius: 6px;
-            margin: 20px 0 10px 0;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        .calculation-result {
-            font-weight: bold;
-            color: #2c3e50;
-            padding: 8px;
-            background: rgba(52, 152, 219, 0.1);
-            border-radius: 4px;
-            display: inline-block;
-            margin: 5px 0;
-        }
-        .warning-box {
-            background: rgba(255, 193, 7, 0.2);
-            border: 2px solid #ff9800;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: center;
-            font-weight: bold;
-            color: #e65100;
-        }
-        .reference-btn {
-            background: linear-gradient(to bottom, #9c27b0, #7b1fa2);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            margin: 5px;
-            font-weight: 500;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-        .reference-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-        }
-        .question-item {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-        .apparatus-img {
-            max-width: 80%;
-            margin: 20px auto;
-            display: block;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .math-formula {
-            font-family: 'Cambria Math', 'Times New Roman', serif;
-            font-size: 16px;
-            margin: 10px 0;
-        }
-        .symbol {
-            font-style: italic;
-            font-weight: bold;
-        }
-        .experiment-step {
-            background: rgba(255, 255, 255, 0.5);
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border-left: 3px solid #3498db;
-        }
-        .thought-answer {
-            display: none;
-            background: rgba(76, 175, 80, 0.1);
-            border-left: 3px solid #4CAF50;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 4px;
-            font-size: 14px;
-            color: #2e7d32;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-        .thought-answer-btn {
-            background: linear-gradient(to bottom, #2196f3, #1976d2);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 15px;
-            cursor: pointer;
-            margin: 5px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .thought-answer-btn:hover {
-            transform: translateY(-1px);
-        }
-        .thought-input {
-            width: 100%;
-            min-height: 80px;
-            border: 1px solid #bdc3c7;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 10px 0;
-            font-family: inherit;
-            font-size: 14px;
-            resize: vertical;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-        .thought-input:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-        }
-        .answer-status {
-            display: inline-block;
-            margin-left: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            vertical-align: middle;
-            transition: all 0.3s ease;
-        }
-        .answer-status.correct-icon {
-            color: #4CAF50;
-        }
-        .answer-status.incorrect-icon {
-            color: #f44336;
-        }
-        .answer-status.empty-icon {
-            color: #9e9e9e;
-        }
-        .fill-blank-container {
-            position: relative;
-            display: inline-block;
-        }
-        .table-header-row {
-            height: 40px;
-        }
-        .table-subheader-row {
-            height: 30px;
-        }
-        .table-data-row td {
-            height: 35px;
-            vertical-align: middle;
-        }
-        .col-1 { width: 5%; }
-        .col-2 { width: 8%; }
-        .col-3 { width: 6%; }
-        .col-4 { width: 6%; }
-        .col-5 { width: 6%; }
-        .col-6 { width: 8%; }
-        .col-7 { width: 10%; }
-        .col-8 { width: 6%; }
-        .col-9 { width: 6%; }
-        .col-10 { width: 6%; }
-        .col-11 { width: 8%; }
-        .col-12 { width: 10%; }
-        .col-13 { width: 10%; }
-        .mass-input {
-            width: 80px;
-            text-align: center;
-            border: 1px solid #ff9800;
-            border-radius: 4px;
-            padding: 6px;
-            background: rgba(255, 152, 0, 0.1);
-            font-weight: bold;
-            font-size: 12px;
-        }
-        .mass-input:focus {
-            outline: none;
-            border-color: #f57c00;
-            box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
-        }
-        .grading-standard {
-            background: rgba(179, 229, 252, 0.3);
-            border: 2px solid #3498db;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-        .grading-standard h4 {
-            color: #2c3e50;
-            margin-top: 0;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .grading-standard ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-        .grading-standard li {
-            margin: 8px 0;
-            line-height: 1.5;
-        }
-        
-        /* 保存工具栏样式 */
-        .save-toolbar {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .save-btn {
-            background: linear-gradient(to bottom, #6c5ce7, #5649c0);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 500;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
-        }
-        .save-btn.danger {
-            background: linear-gradient(to bottom, #e74c3c, #c0392b);
-        }
-        .save-btn.success {
-            background: linear-gradient(to bottom, #27ae60, #229954);
-        }
-        .save-time {
-            font-size: 12px;
-            color: #7f8c8d;
-            margin-right: auto;
-            align-self: center;
-        }
-        .auto-save-indicator {
-            font-size: 12px;
-            color: #27ae60;
-            margin-right: 15px;
-            align-self: center;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-        .force-label {
-            font-weight: bold;
-            background: rgba(76, 175, 80, 0.2);
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; margin: 0; padding: 20px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; background: rgba(255,255,255,0.96); backdrop-filter: blur(2px); padding: 30px 20px; border-radius: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+        h1 { color: #1e466e; text-align: center; margin-bottom: 20px; font-size: 1.9rem; }
+        h2 { color: #2c5a2e; border-left: 6px solid #4CAF50; padding-left: 15px; margin-top: 30px; font-size: 1.5rem; }
+        h3 { color: #1565C0; margin: 20px 0 10px 0; }
+        .fill-blank { border: none; border-bottom: 2px solid #3498db; background: #f0f8ff; padding: 4px 10px; text-align: center; min-width: 110px; border-radius: 8px; font-weight: 500; font-size: 0.9rem; transition: 0.1s; }
+        .fill-blank:focus { outline: none; background: #e3f2fd; }
+        .fill-blank-container { position: relative; display: inline-block; white-space: nowrap; }
+        .answer-status { margin-left: 6px; font-size: 1.1rem; font-weight: bold; display: inline-block; width: 20px; text-align: left; }
+        .correct-icon { color: #2e7d32; }
+        .incorrect-icon { color: #c62828; }
+        .empty-icon { color: #757575; }
+        .data-input, .mass-input, .force-input { width: 75px; text-align: center; border: 1px solid #b0bec5; border-radius: 8px; padding: 5px; background: white; font-size: 0.85rem; }
+        .mass-input { background: #fff6e0; border-color: #ff9800; font-weight: bold; }
+        .force-input { background: #e8f0fe; border-color: #1e88e5; }
+        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 20px 0; border-radius: 20px; border: 1px solid #e0e0e0; background: white; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 0.85rem; }
+        th { background: #2c5a2e; color: white; padding: 10px 6px; font-weight: 600; white-space: nowrap; text-align: center; }
+        td { border: 1px solid #cfd8dc; padding: 8px 5px; text-align: center; vertical-align: middle; }
+        td:first-child, th:first-child { width: 50px; }
+        td:nth-child(2), th:nth-child(2) { width: 80px; }
+        td:nth-child(3), th:nth-child(3) { width: 80px; }
+        td:nth-child(4), th:nth-child(4), td:nth-child(5), th:nth-child(5), td:nth-child(6), th:nth-child(6),
+        td:nth-child(9), th:nth-child(9), td:nth-child(10), th:nth-child(10), td:nth-child(11), th:nth-child(11) { width: 55px; }
+        td:nth-child(7), th:nth-child(7), td:nth-child(8), th:nth-child(8),
+        td:nth-child(12), th:nth-child(12), td:nth-child(13), th:nth-child(13),
+        td:nth-child(14), th:nth-child(14), td:nth-child(15), th:nth-child(15) { width: 70px; }
+        .score-btn, .chart-btn, .auto-grade-btn, .save-btn, .upload-btn { background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; padding: 8px 18px; border-radius: 40px; cursor: pointer; margin: 5px; font-weight: 600; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .chart-btn { background: linear-gradient(135deg, #1565C0, #0d47a1); }
+        .auto-grade-btn { background: linear-gradient(135deg, #e65100, #bf360c); }
+        .submit-report-btn { background: linear-gradient(135deg, #0f4c5c, #0b3b48); color: white; border: none; padding: 8px 18px; border-radius: 40px; cursor: pointer; margin: 5px 0 0 0; font-weight: 600; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .submit-report-btn:hover { transform: translateY(-2px); background: linear-gradient(135deg, #1a6f85, #0f4c5c); }
+        .thought-input { width: 100%; min-height: 80px; border: 1px solid #cfd8dc; border-radius: 16px; padding: 10px; margin: 8px 0; font-family: inherit; font-size: 0.9rem; resize: vertical; }
+        .summary-box { width: 100%; min-height: 80px; border: 1px solid #cfd8dc; border-radius: 16px; padding: 10px; margin: 8px 0; font-family: inherit; font-size: 0.9rem; resize: vertical; background: white; }
+        .score-details { background: #f1f8e9; border-radius: 24px; padding: 20px; margin-top: 20px; border: 1px solid #a5d6a7; }
+        .score-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #c8e6c9; padding: 8px; }
+        .operator-panel { background: #e0f2f1; border-radius: 24px; padding: 18px; margin: 20px 0; border: 1px solid #00897b; }
+        .student-error-input { width: 95px; text-align: center; border: 1px solid #ff9800; border-radius: 8px; padding: 6px; background: #fff8e1; margin-left: 12px; font-weight: bold; }
+        .evidence-area { background: #f3e5f5; border-radius: 28px; padding: 20px; margin: 25px 0; border: 1px dashed #ab47bc; }
+        .image-preview { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 15px; }
+        .img-card { position: relative; width: 130px; border-radius: 16px; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 6px; text-align: center; }
+        .img-card img { width: 100%; height: 90px; object-fit: cover; border-radius: 12px; }
+        .del-img { position: absolute; top: -8px; right: -8px; background: #c62828; color: white; border-radius: 30px; width: 26px; height: 26px; cursor: pointer; font-weight: bold; line-height: 24px; text-align: center; font-size: 18px; }
+        .chart-container { margin: 30px 0; background: white; padding: 15px; border-radius: 28px; box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
+        .calculation-result { background: #e8f0fe; padding: 5px 12px; border-radius: 24px; display: inline-block; margin: 6px 0; font-size: 0.85rem; }
+        .thought-answer { display: none; background: #e8f5e9; padding: 12px; border-radius: 16px; margin: 6px 0; font-size: 0.9rem; }
+        .save-toolbar { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .info-input { border: none; border-bottom: 2px solid #90a4ae; background: #fafafa; padding: 6px 12px; min-width: 130px; border-radius: 8px; }
+        .info-input:read-only { background: #e9ecef; cursor: default; color: #2c3e50; }
+        /* 专业班级输入框长度设置为原来的3倍 */
+        #class { width: 300px; }
+        button:hover { transform: translateY(-2px); filter: brightness(1.02); }
+        .experiment-step { background: rgba(240,248,255,0.7); padding: 8px 12px; border-left: 4px solid #3498db; margin: 10px 0; border-radius: 12px; }
+        .question-item { margin: 12px 0; line-height: 1.8; }
+        .hidden-error { display: none; }
+        .report-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1e466e; color: white; padding: 12px 28px; border-radius: 60px; z-index: 2000; font-weight: bold; box-shadow: 0 6px 14px rgba(0,0,0,0.25); animation: fadeOut 2.2s ease forwards; font-size: 0.95rem; }
+        @keyframes fadeOut { 0% { opacity: 1; transform: translateX(-50%) translateY(0); } 70% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(20px); visibility: hidden; } }
+        @media (max-width: 700px) { .container { padding: 20px 12px; } th, td { font-size: 0.75rem; padding: 5px 3px; } .fill-blank { min-width: 80px; font-size: 0.8rem; } #class { width: 200px; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>验证牛顿第二定律实验</h1>
-        
-        <!-- 保存工具栏 -->
-        <div class="save-toolbar">
-            <div class="auto-save-indicator" id="autoSaveIndicator">⚡ 自动保存已开启</div>
-            <div class="save-time" id="lastSaveTime">上次保存：未保存</div>
-            <button class="save-btn" onclick="manualSave()">💾 手动保存</button>
-            <button class="save-btn" onclick="manualLoad()">📂 加载上次保存</button>
-            <button class="save-btn success" onclick="exportData()">📥 导出备份</button>
-            <button class="save-btn" onclick="importData()">📤 导入备份</button>
-            <button class="save-btn danger" onclick="clearSavedData()">🗑️ 清除数据</button>
+<div class="container">
+    <h1>⚛️ 验证牛顿第二定律 · 智能实验报告</h1>
+    
+    <div class="save-toolbar">
+        <div class="save-time" id="lastSaveTime">📁 上次保存：未保存</div>
+        <button class="save-btn" onclick="manualSave()">💾 手动保存报告</button>
+        <button class="save-btn" onclick="manualLoad()">📂 加载上次数据</button>
+        <button class="save-btn" onclick="exportData()">📎 导出备份(JSON)</button>
+        <button class="save-btn" onclick="importData()">📤 导入备份</button>
+        <button class="save-btn danger" onclick="clearSavedData()" style="background:#c62828;">🗑️ 重置所有数据</button>
+    </div>
+    
+    <div class="basic-info" style="background: #f8f9fa; padding: 15px; border-radius: 24px; margin-bottom: 20px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+            <div>实验名称：<input type="text" class="info-input" id="expName" value="验证牛顿第二定律实验" readonly></div>
+            <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-01"></div>
+            <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名"></div>
+            <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号"></div>
+            <div>指导教师：<input type="text" class="info-input" id="instructor" value="马厂"></div>
+            <div>专业班级：<input type="text" class="info-input" id="class" placeholder="专业班级" style="width:400px"></div>
         </div>
-        
-        <div class="basic-info">
-            <table>
-                <tr>
-                    <td>实验名称</td>
-                    <td><input type="text" class="info-input" id="expName" placeholder="实验名称" value="验证牛顿第二定律实验"></td>
-                    <td>实验时间</td>
-                    <td><input type="text" class="info-input" id="expDate" placeholder="实验时间"></td>
-                </tr>
-                <tr>
-                    <td>专业</td>
-                    <td><input type="text" class="info-input" id="major" placeholder="专业"></td>
-                    <td>实验地点</td>
-                    <td><input type="text" class="info-input" id="location" placeholder="实验地点"></td>
-                </tr>
-                <tr>
-                    <td>班级</td>
-                    <td><input type="text" class="info-input" id="class" placeholder="班级"></td>
-                    <td>指导教师</td>
-                    <td><input type="text" class="info-input" id="instructor" placeholder="指导教师" value="马厂"></td>
-                </tr>
-                <tr>
-                    <td>学号</td>
-                    <td><input type="text" class="info-input" id="studentId" placeholder="学号"></td>
-                    <td>同组人</td>
-                    <td><input type="text" class="info-input" id="partner" placeholder="同组人"></td>
-                </tr>
-                <tr>
-                    <td>姓名</td>
-                    <td><input type="text" class="info-input" id="studentName" placeholder="姓名"></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </table>
-        </div>
-        
-        <h2>一、实验目的</h2>
-        <div class="question-item">
-            1．熟悉 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose1" data-answer="气垫导轨" placeholder="请填写"><span class="answer-status"></span></span> 和数字毫秒计的使用方法；
-        </div>
-        <div class="question-item">
-            2．学会测量滑块速度和加速度的方法；
-        </div>
-        <div class="question-item">
-            3．研究力、质量和加速度之间的关系，通过测滑块 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose2" data-answer="加速度" placeholder="请填写"><span class="answer-status"></span></span> 验证牛顿第二定律；
-        </div>
+    </div>
+
+    <!-- 预习填空 -->
+    <h2>一、实验目的</h2>
+    <div class="question-item">1．熟悉 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose1" data-answer="气垫导轨"><span class="answer-status"></span></span> 和数字毫秒计的使用方法；</div>
+    <div class="question-item">2．学会测量滑块速度和加速度的方法；</div>
+    <div class="question-item">3．研究力、质量和加速度之间的关系，通过测滑块 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose2" data-answer="加速度"><span class="answer-status"></span></span> 验证牛顿第二定律；</div>
 
         <h2>二、实验仪器</h2>
         <img src="https://xiaoxinfdfg.github.io/fsadfse2/yznetu1.png" 
@@ -626,956 +106,636 @@
         <div class="question-item">
             本实验仪器包括气垫导轨、滑块、 <span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument1" data-answer="数字毫秒计" placeholder="请填写"><span class="answer-status"></span></span> 、砝码、天平。
         </div>
-        <div class="question-item">
-            本实验中，用数字毫秒计测量时间。利用它的测加速度程序，可同时测量出滑块通过两个光电门的时间及滑块通过两光电门之间的时间间隔。
-        </div>
 
-        <h2>三、实验原理</h2>
-        
-        <h3>1．速度的测量</h3>
-        <div class="question-item">
-            悬浮在水平气垫导轨上的滑块，当它所受合外力为零时，滑块将在导轨上静止或 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory1" data-answer="作匀速直线运动" placeholder="请填写"><span class="answer-status"></span></span> 。
-        </div>
-        <div class="question-item">
-            在滑块上装两个挡光杆，当滑块通过某一光电门时，第一个挡光杆挡住照在光电管上的光，数字毫秒计 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory2" data-answer="开始计时" placeholder="请填写"><span class="answer-status"></span></span> ；当另一挡光杆再次挡光时，数字毫秒计 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory3" data-answer="停止计时" placeholder="请填写"><span class="answer-status"></span></span> 。
-        </div>
-        <div class="formula">
-            若两挡光杆轴线之间距离为 ΔL ，则可计算滑块通过光电门的平均速度 v̄ = ΔL / Δt
-        </div>
-        <div class="question-item">
-            由于 ΔL 较小（约 1 cm），在 ΔL 范围内滑块速度变化很小，故可把 v̄ 视为滑块经过光电门的 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory4" data-answer="瞬时速度" placeholder="请填写"><span class="answer-status"></span></span> 。
-        </div>
+    <h2>三、实验原理</h2>
+    <h3>1．速度的测量</h3>
+    <div class="question-item">悬浮在水平气垫导轨上的滑块，当它所受合外力为零时，滑块将在导轨上静止或 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory1" data-answer="作匀速直线运动"><span class="answer-status"></span></span> 。</div>
+    <div class="question-item">在滑块上装两个挡光杆，当滑块通过某一光电门时，第一个挡光杆挡住照在光电管上的光，数字毫秒计 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory2" data-answer="开始计时"><span class="answer-status"></span></span> ；当另一挡光杆再次挡光时，数字毫秒计 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory3" data-answer="停止计时"><span class="answer-status"></span></span> 。</div>
+    <div class="question-item">由于 ΔL 较小（约 1 cm），在 ΔL 范围内滑块速度变化很小，故可把 v̄ 视为滑块经过光电门的 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory4" data-answer="瞬时速度"><span class="answer-status"></span></span> 。</div>
+    <h3>2．加速度的测量</h3>
+    <div class="question-item">在气垫导轨上设置两个光电门，其间距为 S 。使受到 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory5" data-answer="水平恒力"><span class="answer-status"></span></span> 作用的滑块（作匀加速直线运动）依次通过这两个光电门。</div>
+    <h3>3．验证牛顿第二定律</h3>
+    <div class="question-item">验证可分两步：</div>
+    <div class="question-item">① 物体质量 M 一定时，验证其所受合外力 F合 与加速度 a 成 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory6" data-answer="正比"><span class="answer-status"></span></span> ；</div>
+    <div class="question-item">② 合外力 F合 一定时，验证物体加速度 a 与其质量 M 成 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory7" data-answer="反比"><span class="answer-status"></span></span> 。</div>
 
-        <h3>2．加速度的测量</h3>
-        <div class="question-item">
-            在气垫导轨上设置两个光电门，其间距为 S 。使受到 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory5" data-answer="水平恒力" placeholder="请填写"><span class="answer-status"></span></span> 作用的滑块（作匀加速直线运动）依次通过这两个光电门。
-        </div>
-        <div class="formula">
-            滑块滑过第一光电门的初速度为 v₁ = ΔL / Δt₁，滑过第二光电门的末速度为 v₂ = ΔL / Δt₂，则滑块加速度为
-        </div>
-        <div class="formula" style="font-size: 18px;">
-            a = (v₂² – v₁²) / (2S)
-        </div>
-
+    <h2>四、实验内容</h2>
+    <div class="experiment-content">
+        <h3>1．调节光电计时系统</h3>
+        <div class="experiment-step">将气垫导轨上两个光电门引线接入数字毫秒计后面板对应插口，打开 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure1" data-answer="数字毫秒计"><span class="answer-status"></span></span> 电源开关，接通气源。</div>
+        <div class="experiment-step">轻推滑块，使其 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure2" data-answer="依次通过"><span class="answer-status"></span></span> 两光电门，检查毫秒计是否正常记录时间。</div>
+        <h3>2．调节气垫导轨水平</h3>
+        <div class="experiment-step">（1）静态调平（粗调）：调节导轨底脚螺丝，使滑块可在导轨上 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure3" data-answer="无定向"><span class="answer-status"></span></span> 地自然运动（即能静止），认为导轨已 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure4" data-answer="初步调平"><span class="answer-status"></span></span> 。</div>
+        <div class="experiment-step">（2）动态调平（细调）：轻推滑块，使其依次通过两光电门，要求两挡光杆通过时间 Δt₁ 与 Δt₂ 相差小于 1%，否则继续调节 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure5" data-answer="底脚螺丝"><span class="answer-status"></span></span> 。</div>
         <h3>3．验证牛顿第二定律</h3>
-        <div class="formula">
-            按牛顿第二定律，对于质量为 M 的物体，其所受合外力 F合 与加速度 a 关系为 F合 = M a
-        </div>
-        <div class="question-item">
-            验证可分两步：
-        </div>
-        <div class="question-item">
-            ① 物体质量 M 一定时，验证其所受合外力 F合 与加速度 a 成 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory6" data-answer="正比" placeholder="请填写"><span class="answer-status"></span></span> ；
-        </div>
-        <div class="question-item">
-            ② 合外力 F合 一定时，验证物体加速度 a 与其质量 M 成 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory7" data-answer="反比" placeholder="请填写"><span class="answer-status"></span></span> 。
-        </div>
-        <div class="question-item">
-            若滑块质量为 m₁，砝码盘及砝码总质量为 m₂，则系统总质量 M = m₁ + m₂，所受合外力大小 F合 = m₂ g。
-        </div>
-
-        <h2>四、实验内容</h2>
-        <div class="experiment-content">
-            <h3>1．调节光电计时系统</h3>
-            <div class="experiment-step">
-                将气垫导轨上两个光电门引线接入数字毫秒计后面板对应插口，打开 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure1" data-answer="数字毫秒计" placeholder="请填写"><span class="answer-status"></span></span> 电源开关，接通气源。
-            </div>
-            <div class="experiment-step">
-                轻推滑块，使其 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure2" data-answer="依次通过" placeholder="请填写"><span class="answer-status"></span></span> 两光电门，检查毫秒计是否正常记录时间。
-            </div>
-
-            <h3>2．调节气垫导轨水平</h3>
-            <div class="experiment-step">
-                （1）静态调平（粗调）：调节导轨底脚螺丝，使滑块可在导轨上 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure3" data-answer="无定向" placeholder="请填写"><span class="answer-status"></span></span> 地自然运动（即能静止），认为导轨已 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure4" data-answer="初步调平" placeholder="请填写"><span class="answer-status"></span></span> 。
-            </div>
-            <div class="experiment-step">
-                （2）动态调平（细调）：轻推滑块，使其依次通过两光电门，要求两挡光杆通过时间 Δt₁ 与 Δt₂ 相差小于 1%，否则继续调节 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure5" data-answer="底脚螺丝" placeholder="请填写"><span class="answer-status"></span></span> 。
-            </div>
-
-            <h3>3．验证牛顿第二定律</h3>
-            <div class="experiment-step">
-                （1）系统总质量 M 不变，验证外力与加速度成正比
-            </div>
-            <div class="experiment-step">
-                ① 在导轨上固定两光电门，将 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure6" data-answer="细线" placeholder="请填写"><span class="answer-status"></span></span> 一端系于滑块，另一端经 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure7" data-answer="气垫滑轮" placeholder="请填写"><span class="answer-status"></span></span> 与砝码盘相连。
-            </div>
-            <div class="experiment-step">
-                滑块上先放 50 g 铁片，砝码盘自重 5 g。滑块置于远离滑轮端，由静止释放，在砝码盘 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure8" data-answer="自身重力" placeholder="请填写"><span class="answer-status"></span></span> 作用下作匀加速运动。
-            </div>
-            <div class="experiment-step">
-                注意：滑块释放 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure9" data-answer="初始位置" placeholder="请填写"><span class="answer-status"></span></span> 必须一致；近滑轮光电门位置须合适，防止滑块未通过而砝码盘已落到 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure10" data-answer="地面" placeholder="请填写"><span class="answer-status"></span></span> 上。
-            </div>
-            <div class="experiment-step">
-                ② 将铁片移入砝码盘，再测一次加速度。
-            </div>
-            <div class="experiment-step">
-                ③ 记录两种情况外力 F₁、F₂，比较 F₁/a₁ 与 F₂/a₂ 是否相等，数据记入表 1。
-            </div>
-
-            <div class="experiment-step">
-                （2）外力 F 不变，验证系统质量与加速度成反比
-            </div>
-            <div class="experiment-step">
-                ① 砝码盘放两枚 5 g 砝码，测滑块加速度 a₃。
-            </div>
-            <div class="experiment-step">
-                ② 保持砝码不变（外力一定），将 50 g 铁片放回滑块，测此时加速度 a₄。
-            </div>
-            <div class="experiment-step">
-                ③ 记录两组系统总质量 M₁、M₂，比较 M₁a₃ 与 M₂a₄ 是否相等，数据记入表 2。
-            </div>
-        </div>
-
-        <div class="warning-box">
-            ⚠️ 警告：以下表格数据需根据实际实验测量填写！若直接搬用参考数据，数据部分将计0分！
-            <div style="margin-top: 10px;">
-                <button class="reference-btn" onclick="fillReferenceData()">填入参考数据（仅供对照）</button>
-            </div>
-        </div>
-
-        <h2>五、实验数据记录</h2>
-        <div class="question-item">
-            ΔL = 1.00 cm；S = 50.0 cm
-        </div>
-        
-        <div class="section-title">表1 验证质量不变时外力与加速度成正比</div>
+        <div class="experiment-step">（1）系统总质量 M 不变，验证外力与加速度成正比</div>
+        <div class="experiment-step">① 在导轨上固定两光电门，将 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure6" data-answer="细线"><span class="answer-status"></span></span> 一端系于滑块，另一端经 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure7" data-answer="气垫滑轮"><span class="answer-status"></span></span> 与砝码盘相连。</div>
+        <div class="experiment-step">滑块上先放 50 g 铁片，砝码盘自重 5 g。滑块置于远离滑轮端，由静止释放，在砝码盘 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure8" data-answer="自身重力"><span class="answer-status"></span></span> 作用下作匀加速运动。</div>
+        <div class="experiment-step">注意：滑块释放 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure9" data-answer="初始位置"><span class="answer-status"></span></span> 必须一致；近滑轮光电门位置须合适，防止滑块未通过而砝码盘已落到 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure10" data-answer="地面"><span class="answer-status"></span></span> 上。</div>
+        <div class="experiment-step">② 将铁片移入砝码盘，再测一次加速度。</div>
+        <div class="experiment-step">③ 记录两种情况外力 F₁、F₂，比较 F₁/a₁ 与 F₂/a₂ 是否相等，数据记入表 1。</div>
+        <div class="experiment-step">（2）外力 F 不变，验证系统质量与加速度成反比</div>
+        <div class="experiment-step">① 砝码盘放两枚 5 g 砝码，测滑块加速度 a₃。</div>
+        <div class="experiment-step">② 保持砝码不变（外力一定），将 50 g 铁片放回滑块，测此时加速度 a₄。</div>
+        <div class="experiment-step">③ 记录两组系统总质量 M₁、M₂，比较 M₁a₃ 与 M₂a₄ 是否相等，数据记入表 2。</div>
+    </div>
+    
+    <!-- 五、原始数据记录 -->
+    <h2>五、原始数据记录</h2>
+    <div class="section-title" style="font-weight: bold; font-size: 1.1rem; margin: 10px 0 5px 0;">表1 验证质量不变时外力与加速度成正比（ΔL=1cm, S=0.5m)</div>
+    <div class="table-wrapper">
         <table id="table1">
             <thead>
-                <tr class="table-header-row">
-                    <th rowspan="2" class="col-1">序号</th>
-                    <th rowspan="2" class="col-2">系统总质量<br>M/kg</th>
-                    <th rowspan="2" class="col-2">外力<br>F/N</th>
-                    <th colspan="3" class="col-3">t₁ / ms</th>
-                    <th rowspan="2" class="col-6">t̄₁<br>/ ms</th>
-                    <th rowspan="2" class="col-7">v̄₁ = ΔL/t̄₁<br>/ m·s⁻¹</th>
-                    <th colspan="3" class="col-8">t₂ / ms</th>
-                    <th rowspan="2" class="col-11">t̄₂<br>/ ms</th>
-                    <th rowspan="2" class="col-12">v̄₂ = ΔL/t̄₂<br>/ m·s⁻¹</th>
-                    <th rowspan="2" class="col-13">a = (v̄₂²–v̄₁²)/(2S)<br>/ m·s⁻²</th>
-                    <th rowspan="2" class="col-13">F/a<br>/ kg</th>
-                 </tr>
-                <tr class="table-subheader-row">
-                    <th class="col-3">1</th>
-                    <th class="col-4">2</th>
-                    <th class="col-5">3</th>
-                    <th class="col-8">1</th>
-                    <th class="col-9">2</th>
-                    <th class="col-10">3</th>
-                 </tr>
+                <tr><th rowspan="2">序号</th><th rowspan="2">M (kg)</th><th rowspan="2">F (N)</th><th colspan="3">t₁ (ms)</th><th rowspan="2">t̄₁ (ms)</th><th rowspan="2">v₁ (m/s)</th><th colspan="3">t₂ (ms)</th><th rowspan="2">t̄₂ (ms)</th><th rowspan="2">v₂ (m/s)</th><th rowspan="2">a (m/s²)</th><th rowspan="2">F/a (kg)</th></tr>
+                <tr><th>1</th><th>2</th><th>3</th><th>1</th><th>2</th><th>3</th></tr>
             </thead>
             <tbody>
-                <tr class="table-data-row">
-                    <td class="col-1">1</td>
-                    <td class="col-2"><input type="text" class="mass-input" id="mass1" placeholder="kg" value="0.155"></td>
-                    <td class="col-2"><span class="force-label">0.098</span></td>
-                    <td class="col-3"><input type="text" class="data-input t1-11" id="t1_11" placeholder="ms"></td>
-                    <td class="col-4"><input type="text" class="data-input t1-12" id="t1_12" placeholder="ms"></td>
-                    <td class="col-5"><input type="text" class="data-input t1-13" id="t1_13" placeholder="ms"></td>
-                    <td class="col-6" id="t1-1avg">-</td>
-                    <td class="col-7" id="v1-1">-</td>
-                    <td class="col-8"><input type="text" class="data-input t2-11" id="t2_11" placeholder="ms"></td>
-                    <td class="col-9"><input type="text" class="data-input t2-12" id="t2_12" placeholder="ms"></td>
-                    <td class="col-10"><input type="text" class="data-input t2-13" id="t2_13" placeholder="ms"></td>
-                    <td class="col-11" id="t2-1avg">-</td>
-                    <td class="col-12" id="v2-1">-</td>
-                    <td class="col-13" id="a1">-</td>
-                    <td class="col-13" id="f_a1">-</td>
-                </tr>
-                <tr class="table-data-row">
-                    <td class="col-1">2</td>
-                    <td class="col-2"><input type="text" class="mass-input" id="mass2" placeholder="kg" value="0.155"></td>
-                    <td class="col-2"><span class="force-label">0.147</span></td>
-                    <td class="col-3"><input type="text" class="data-input t1-21" id="t1_21" placeholder="ms"></td>
-                    <td class="col-4"><input type="text" class="data-input t1-22" id="t1_22" placeholder="ms"></td>
-                    <td class="col-5"><input type="text" class="data-input t1-23" id="t1_23" placeholder="ms"></td>
-                    <td class="col-6" id="t1-2avg">-</td>
-                    <td class="col-7" id="v1-2">-</td>
-                    <td class="col-8"><input type="text" class="data-input t2-21" id="t2_21" placeholder="ms"></td>
-                    <td class="col-9"><input type="text" class="data-input t2-22" id="t2_22" placeholder="ms"></td>
-                    <td class="col-10"><input type="text" class="data-input t2-23" id="t2_23" placeholder="ms"></td>
-                    <td class="col-11" id="t2-2avg">-</td>
-                    <td class="col-12" id="v2-2">-</td>
-                    <td class="col-13" id="a2">-</td>
-                    <td class="col-13" id="f_a2">-</td>
-                </tr>
+                <tr><td style="text-align:center">1</td>
+                    <td><input type="text" class="mass-input" id="mass1" placeholder="kg"></td>
+                    <td><input type="text" class="force-input" id="F1" placeholder="N"></td>
+                    <td><input class="data-input" id="t1_11" placeholder="ms"></td>
+                    <td><input class="data-input" id="t1_12" placeholder="ms"></td>
+                    <td><input class="data-input" id="t1_13" placeholder="ms"></td>
+                    <td id="t1-1avg">—</td><td id="v1-1">—</td>
+                    <td><input class="data-input" id="t2_11" placeholder="ms"></td>
+                    <td><input class="data-input" id="t2_12" placeholder="ms"></td>
+                    <td><input class="data-input" id="t2_13" placeholder="ms"></td>
+                    <td id="t2-1avg">—</td><td id="v2-1">—</td>
+                    <td id="a1">—</td><td id="f_a1">—</td>
+                  </tr>
+                <tr><td style="text-align:center">2</td>
+                    <td><input type="text" class="mass-input" id="mass2" placeholder="kg"></td>
+                    <td><input type="text" class="force-input" id="F2" placeholder="N"></td>
+                    <td><input class="data-input" id="t1_21" placeholder="ms"></td>
+                    <td><input class="data-input" id="t1_22" placeholder="ms"></td>
+                    <td><input class="data-input" id="t1_23" placeholder="ms"></td>
+                    <td id="t1-2avg">—</td><td id="v1-2">—</td>
+                    <td><input class="data-input" id="t2_21" placeholder="ms"></td>
+                    <td><input class="data-input" id="t2_22" placeholder="ms"></td>
+                    <td><input class="data-input" id="t2_23" placeholder="ms"></td>
+                    <td id="t2-2avg">—</td><td id="v2-2">—</td>
+                    <td id="a2">—</td><td id="f_a2">—</td>
+                  </tr>
             </tbody>
-        </table>
-        
-        <div class="section-title">表2 验证外力不变时质量与加速度成反比</div>
+         </table>
+    </div>
+    
+    <div class="section-title" style="font-weight: bold; font-size: 1.1rem; margin: 10px 0 5px 0;">表2 验证外力不变时质量与加速度成反比</div>
+    <div class="table-wrapper">
         <table id="table2">
             <thead>
-                <tr class="table-header-row">
-                    <th rowspan="2" class="col-1">序号</th>
-                    <th rowspan="2" class="col-2">总质量<br>M/kg</th>
-                    <th rowspan="2" class="col-2">外力<br>F/N</th>
-                    <th colspan="3" class="col-3">t₁ / ms</th>
-                    <th rowspan="2" class="col-6">t̄₁<br>/ ms</th>
-                    <th rowspan="2" class="col-7">v̄₁ = ΔL/t̄₁<br>/ m·s⁻¹</th>
-                    <th colspan="3" class="col-8">t₂ / ms</th>
-                    <th rowspan="2" class="col-11">t̄₂<br>/ ms</th>
-                    <th rowspan="2" class="col-12">v̄₂ = ΔL/t̄₂<br>/ m·s⁻¹</th>
-                    <th rowspan="2" class="col-13">a = (v̄₂²–v̄₁²)/(2S)<br>/ m·s⁻²</th>
-                    <th rowspan="2" class="col-13">Ma<br>/ N</th>
-                 </tr>
-                <tr class="table-subheader-row">
-                    <th class="col-3">1</th>
-                    <th class="col-4">2</th>
-                    <th class="col-5">3</th>
-                    <th class="col-8">1</th>
-                    <th class="col-9">2</th>
-                    <th class="col-10">3</th>
-                 </tr>
+                <tr><th rowspan="2">序号</th><th rowspan="2">M (kg)</th><th rowspan="2">F (N)</th><th colspan="3">t₁ (ms)</th><th rowspan="2">t̄₁ (ms)</th><th rowspan="2">v₁ (m/s)</th><th colspan="3">t₂ (ms)</th><th rowspan="2">t̄₂ (ms)</th><th rowspan="2">v₂ (m/s)</th><th rowspan="2">a (m/s²)</th><th rowspan="2">M·a (N)</th> </tr>
+                <tr><th>1</th><th>2</th><th>3</th><th>1</th><th>2</th><th>3</th> </tr>
             </thead>
             <tbody>
-                <tr class="table-data-row">
-                    <td class="col-1">3</td>
-                    <td class="col-2"><input type="text" class="mass-input" id="mass3" placeholder="kg" value="0.105"></td>
-                    <td class="col-2">0.098</td>
-                    <td class="col-3"><input type="text" class="data-input t1-31" id="t1_31" placeholder="ms"></td>
-                    <td class="col-4"><input type="text" class="data-input t1-32" id="t1_32" placeholder="ms"></td>
-                    <td class="col-5"><input type="text" class="data-input t1-33" id="t1_33" placeholder="ms"></td>
-                    <td class="col-6" id="t1-3avg">-</td>
-                    <td class="col-7" id="v1-3">-</td>
-                    <td class="col-8"><input type="text" class="data-input t2-31" id="t2_31" placeholder="ms"></td>
-                    <td class="col-9"><input type="text" class="data-input t2-32" id="t2_32" placeholder="ms"></td>
-                    <td class="col-10"><input type="text" class="data-input t2-33" id="t2_33" placeholder="ms"></td>
-                    <td class="col-11" id="t2-3avg">-</td>
-                    <td class="col-12" id="v2-3">-</td>
-                    <td class="col-13" id="a3">-</td>
-                    <td class="col-13" id="ma3">-</td>
-                </tr>
-                <tr class="table-data-row">
-                    <td class="col-1">4</td>
-                    <td class="col-2"><input type="text" class="mass-input" id="mass4" placeholder="kg" value="0.155"></td>
-                    <td class="col-2">0.098</td>
-                    <td class="col-3"><input type="text" class="data-input t1-41" id="t1_41" placeholder="ms"></td>
-                    <td class="col-4"><input type="text" class="data-input t1-42" id="t1_42" placeholder="ms"></td>
-                    <td class="col-5"><input type="text" class="data-input t1-43" id="t1_43" placeholder="ms"></td>
-                    <td class="col-6" id="t1-4avg">-</td>
-                    <td class="col-7" id="v1-4">-</td>
-                    <td class="col-8"><input type="text" class="data-input t2-41" id="t2_41" placeholder="ms"></td>
-                    <td class="col-9"><input type="text" class="data-input t2-42" id="t2_42" placeholder="ms"></td>
-                    <td class="col-10"><input type="text" class="data-input t2-43" id="t2_43" placeholder="ms"></td>
-                    <td class="col-11" id="t2-4avg">-</td>
-                    <td class="col-12" id="v2-4">-</td>
-                    <td class="col-13" id="a4">-</td>
-                    <td class="col-13" id="ma4">-</td>
-                </tr>
+                <tr><td style="text-align:center">3</td>
+                    <td><input class="mass-input" id="mass3" placeholder="kg"></td>
+                    <td><input type="text" class="force-input" id="F3" placeholder="N"></td>
+                    <td><input class="data-input" id="t1_31" placeholder="ms"></td>
+                    <td><input class="data-input" id="t1_32" placeholder="ms"></td>
+                    <td><input class="data-input" id="t1_33" placeholder="ms"></td>
+                    <td id="t1-3avg">—</td><td id="v1-3">—</td>
+                    <td><input class="data-input" id="t2_31" placeholder="ms"></td>
+                    <td><input class="data-input" id="t2_32" placeholder="ms"></td>
+                    <td><input class="data-input" id="t2_33" placeholder="ms"></td>
+                    <td id="t2-3avg">—</td><td id="v2-3">—</td>
+                    <td id="a3">—</td><td id="ma3">—</td>
+                  </tr>
+                <tr><td style="text-align:center">4</td>
+                    <td><input class="mass-input" id="mass4" placeholder="kg"></td>
+                    <td><input type="text" class="force-input" id="F4" placeholder="N"></td>
+                    <td><input class="data-input" id="t1_41" placeholder="ms"></td>
+                    <td><input class="data-input" id="t1_42" placeholder="ms"></td>
+                    <td><input class="data-input" id="t1_43" placeholder="ms"></td>
+                    <td id="t1-4avg">—</td><td id="v1-4">—</td>
+                    <td><input class="data-input" id="t2_41" placeholder="ms"></td>
+                    <td><input class="data-input" id="t2_42" placeholder="ms"></td>
+                    <td><input class="data-input" id="t2_43" placeholder="ms"></td>
+                    <td id="t2-4avg">—</td><td id="v2-4">—</td>
+                    <td id="a4">—</td><td id="ma4">—</td>
+                  </tr>
             </tbody>
-        </table>
-        
-        <div style="margin: 15px 0; text-align: center;">
-            <button class="chart-btn" onclick="calculateData()">计算 v̄ 与 a</button>
-            <button class="chart-btn" onclick="drawFvsAChart()">绘制F-a关系图</button>
-            <button class="chart-btn" onclick="drawMvsAChart()">绘制M-a关系图</button>
-        </div>
-
-        <h2>六、数据处理与分析</h2>
-        <div class="calculation-section">
-            <h3>1. 验证质量不变时外力与加速度成正比</h3>
-            <div class="formula">理论关系：F ∝ a，即F/a应为常数</div>
-            
-            <div style="margin: 15px 0;">
-                <button class="chart-btn" onclick="calculateErrors()">计算验证结果</button>
-            </div>
-            
-            <p>系统总质量 M = <span id="mass1-display" class="calculation-result">待输入</span> kg</p>
-            <p>F₁/a₁ = <span id="ratio1" class="calculation-result">待计算</span></p>
-            <p>F₂/a₂ = <span id="ratio2" class="calculation-result">待计算</span></p>
-            <p>相对误差 = <span id="error1" class="calculation-result">待计算</span>%</p>
-            <p>验证结果：<span id="result1" class="calculation-result">待验证</span></p>
-            
-            <h3>2. 验证外力不变时质量与加速度成反比</h3>
-            <div class="formula">理论关系：a ∝ 1/M，即M×a应为常数</div>
-            
-            <p>外力 F = <span id="force-display" class="calculation-result">待输入</span> N</p>
-            <p>M₃a₃ = <span id="product1" class="calculation-result">待计算</span></p>
-            <p>M₄a₄ = <span id="product2" class="calculation-result">待计算</span></p>
-            <p>相对误差 = <span id="error2" class="calculation-result">待计算</span>%</p>
-            <p>验证结果：<span id="result2" class="calculation-result">待验证</span></p>
-            
-            <h3>3. 实验结论</h3>
-            <div id="conclusion" class="formula" style="min-height: 80px;">
-                根据以上数据分析，可以得出实验结论...
-            </div>
-        </div>
-
-        <div class="section-title">图表绘制</div>
-        <div style="text-align: center; margin: 20px 0;">
-            <button class="chart-btn" onclick="drawFvsAChart()">绘制F-a关系图</button>
-            <button class="chart-btn" onclick="drawMvsAChart()">绘制M-1/a关系图</button>
-        </div>
-        <div class="chart-container">
-            <canvas id="fvsAChart"></canvas>
-        </div>
-        <div class="chart-container">
-            <canvas id="mvsAChart"></canvas>
-        </div>
-
-        <h2>七、思考题</h2>
-        <div class="question-item">
-            1．验证物体质量不变，物体的加速度和所受作用力成正比时，为什么要在滑块上放置砝码？
-            <textarea class="thought-input" id="thought1" placeholder="请简要回答"></textarea>
-            <button class="thought-answer-btn" onclick="toggleAnswer(1)">显示参考答案</button>
-            <div id="answer1" class="thought-answer">
-                答：在滑块上放置砝码的主要目的是为了改变外力而不改变系统总质量。实验中通过将滑块上的砝码转移到砝码盘中，可以改变外力（砝码盘的总重量改变），而系统总质量（滑块+砝码+砝码盘）保持不变。这样就能在保持质量M不变的情况下，研究外力F与加速度a的关系，验证F ∝ a。
-            </div>
-        </div>
-        <div class="question-item">
-            2．为了使滑块在气垫导轨上作匀速运动，是否应调节导轨完全水平？应怎样调节才能使滑块受到的合外力近似等于零？
-            <textarea class="thought-input" id="thought2" placeholder="请简要回答"></textarea>
-            <button class="thought-answer-btn" onclick="toggleAnswer(2)">显示参考答案</button>
-            <div id="answer2" class="thought-answer">
-                答：是的，要使滑块在气垫导轨上作匀速运动，必须调节导轨完全水平。调节方法：先进行静态调平（粗调），调节导轨底脚螺丝，使滑块在导轨上任意位置都能静止；再进行动态调平（细调），轻推滑块使其通过两个光电门，测量通过两个光电门的时间Δt₁和Δt₂，调节底脚螺丝直到Δt₁和Δt₂相差小于1%。这样滑块在导轨上运动时，重力沿导轨方向的分力近似为零，空气阻力和滑轮摩擦力极小，滑块受到的合外力近似等于零，从而可作匀速运动。
-            </div>
-        </div>
-        <div class="question-item">
-            3．在验证牛顿第二定律的实验中，如果气垫导轨未完全调平，对实验结果会产生什么影响？应该如何修正？
-            <textarea class="thought-input" id="thought3" placeholder="请简要回答"></textarea>
-            <button class="thought-answer-btn" onclick="toggleAnswer(3)">显示参考答案</button>
-            <div id="answer3" class="thought-answer">
-                答：如果气垫导轨未完全调平，会对实验结果产生以下影响：<br>
-                1) 滑块会受到重力沿导轨方向的分力，使合外力F合 = m₂g ± mgsinθ（θ为倾角），导致F-a关系偏离理论值；<br>
-                2) 滑块运动过程中会存在附加加速度，影响a的测量精度；<br>
-                3) 验证质量与加速度成反比时，不同质量下滑块受到的附加力不同，导致M-a关系出现偏差。<br>
-                修正方法：<br>
-                1) 严格按照实验步骤进行静态和动态调平；<br>
-                2) 在数据处理时，可以通过测量导轨倾角θ，修正合外力F合 = m₂g ± mgsinθ；<br>
-                3) 多次测量取平均值，减小偶然误差。
-            </div>
-        </div>
-
-        <h2>八、实验小结</h2>
-        <textarea id="summary" class="summary-box" placeholder="请在此处填写实验小结，包括实验结论、误差分析、心得体会等..."></textarea>
-
-        <h2>九、计算预习分数</h2>
-        <div class="score-section">
-            <p>请填写所有填空题后，点击计算分数</p>
-            <button class="score-btn" onclick="calculatePreScore()">计算预习分数</button>
-            <div class="score-display" id="scoreDisplay"></div>
-        </div>
-
-        <h2>十、自动评分并生成评语</h2>
-        <div class="comment-section" id="commentSection">
-            <div class="comment-title">实验评语</div>
-            <div class="comment-content" id="commentContent">
-                <p style="text-align: center; color: #999;">点击"自动评分并生成评语"按钮生成实验评语和报告得分</p>
-            </div>
-            <div id="scoreDetails" class="score-details" style="display: none;">
-                <div class="score-item">
-                    <span class="score-item-name">预习填空（25%）</span>
-                    <span class="score-item-value" id="detailPreScore">0/25</span>
-                </div>
-                <div class="score-item">
-                    <span class="score-item-name">数据记录（25%）</span>
-                    <span class="score-item-value" id="detailDataScore">0/25</span>
-                </div>
-                <div class="score-item">
-                    <span class="score-item-name">数据处理与误差分析（20%）</span>
-                    <span class="score-item-value" id="detailCalcScore">0/20</span>
-                </div>
-                <div class="score-item">
-                    <span class="score-item-name">思考题（15%）</span>
-                    <span class="score-item-value" id="detailThoughtScore">0/15</span>
-                </div>
-                <div class="score-item">
-                    <span class="score-item-name">实验小结（15%）</span>
-                    <span class="score-item-value" id="detailSummaryScore">0/15</span>
-                </div>
-                <div class="score-item" style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #4CAF50; font-size: 1.1em;">
-                    <span class="score-item-name" style="font-weight: bold;">总分</span>
-                    <span class="score-item-value" id="detailTotalScore" style="font-size: 1.2em; color: #2e7d32;">0/100</span>
-                </div>
-            </div>
-            <div class="comment-footer" id="commentFooter" style="display: none;">
-                <div>指导教师：<span id="teacherName"></span></div>
-                <div>评语日期：<span id="currentDate"></span></div>
-            </div>
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="auto-grade-btn" onclick="autoGrade()">自动评分并生成评语</button>
-            </div>
-        </div>
+         </table>
+    </div>
+    
+    <div style="text-align:center; margin: 10px 0 20px;">
+        <button class="chart-btn" onclick="calculateData()">📐 计算速度 & 加速度</button>
     </div>
 
-    <script>
-        // 填空题答案
-        const answers = {
-            "气垫导轨": ["气垫导轨"],
-            "加速度": ["加速度"],
-            "数字毫秒计": ["数字毫秒计", "毫秒计"],
-            "作匀速直线运动": ["作匀速直线运动", "匀速直线运动", "匀速运动"],
-            "开始计时": ["开始计时", "计时开始"],
-            "停止计时": ["停止计时", "计时停止"],
-            "瞬时速度": ["瞬时速度", "瞬时速率"],
-            "水平恒力": ["水平恒力", "恒力"],
-            "正比": ["正比", "成正比"],
-            "反比": ["反比", "成反比"],
-            "依次通过": ["依次通过", "通过"],
-            "无定向": ["无定向", "任意"],
-            "初步调平": ["初步调平", "基本水平"],
-            "底脚螺丝": ["底脚螺丝", "螺丝", "调节螺丝"],
-            "细线": ["细线", "线", "绳子"],
-            "气垫滑轮": ["气垫滑轮", "滑轮"],
-            "自身重力": ["自身重力", "重力"],
-            "初始位置": ["初始位置", "起点", "开始位置"],
-            "地面": ["地面", "地上", "地板"]
-        };
-
-        // 参考数据
-        const referenceData = {
-            t1_11: 24.8, t1_12: 24.6, t1_13: 24.7,
-            t2_11: 14.5, t2_12: 14.6, t2_13: 14.4,
-            t1_21: 17.2, t1_22: 17.3, t1_23: 17.1,
-            t2_21: 10.8, t2_22: 10.7, t2_23: 10.9,
-            t1_31: 19.5, t1_32: 19.4, t1_33: 19.6,
-            t2_31: 12.2, t2_32: 12.1, t2_33: 12.3,
-            t1_41: 24.8, t1_42: 24.7, t1_43: 24.9,
-            t2_41: 14.5, t2_42: 14.4, t2_43: 14.6,
-            mass1: 0.155,
-            mass2: 0.155,
-            mass3: 0.105,
-            mass4: 0.155
-        };
-
-        // 图表实例
-        let fvsAChartInstance = null;
-        let mvsAChartInstance = null;
+    <!-- 六、数据处理与分析 -->
+    <h2>六、数据处理与分析</h2>
+    <div class="calculation-section" style="background:#eef2fc; padding: 20px; border-radius: 24px;">
+        <h3>1. 验证质量不变时外力与加速度成正比</h3>
+        <p>系统计算值（相对误差值已隐藏）：F₁/a₁ = <span id="ratio1_disp" class="calculation-result">—</span> , F₂/a₂ = <span id="ratio2_disp" class="calculation-result">—</span></p>
+        <p class="hidden-error">系统真实相对误差 δ₁ = <span id="true_error1">—</span> %</p>
+        <p>✏️ 请你计算本实验相对误差 δ₁ = |(F₂/a₂ - F₁/a₁)/(F₁/a₁)| × 100% = 
+        <input type="number" id="student_error1" class="student-error-input" step="0.1" placeholder="填入数值%"> %</p>
         
-        // 自动保存定时器
-        let autoSaveTimer = null;
-        let lastSaveTime = null;
-
-        // ========== 保存功能 ==========
+        <h3>2. 验证外力不变时质量与加速度成反比</h3>
+        <p>系统计算值（相对误差值已隐藏）：M₃·a₃ = <span id="ma3_disp" class="calculation-result">—</span> , M₄·a₄ = <span id="ma4_disp" class="calculation-result">—</span></p>
+        <p class="hidden-error">系统真实相对误差 δ₂ = <span id="true_error2">—</span> %</p>
+        <p>✏️ 请你计算本实验相对误差 δ₂ = |(M₄a₄ - M₃a₃)/M₃a₃| × 100% = 
+        <input type="number" id="student_error2" class="student-error-input" step="0.1" placeholder="填入数值%"> %</p>
+        <div style="margin-top: 10px; font-style:italic;">※ 数据处理评分标准：误差越接近真实值、绝对值越小得分越高。满分25分。</div>
         
-        function loadAllSavedData() {
-            try {
-                document.querySelectorAll('.info-input').forEach(input => {
-                    const savedValue = localStorage.getItem(input.id);
-                    if (savedValue !== null) input.value = savedValue;
-                });
-                document.querySelectorAll('.fill-blank').forEach(input => {
-                    const savedValue = localStorage.getItem(input.id);
-                    if (savedValue !== null) input.value = savedValue;
-                });
-                document.querySelectorAll('.mass-input').forEach(input => {
-                    const savedValue = localStorage.getItem(input.id);
-                    if (savedValue !== null) input.value = savedValue;
-                });
-                document.querySelectorAll('.data-input').forEach(input => {
-                    const savedValue = localStorage.getItem(input.id);
-                    if (savedValue !== null) input.value = savedValue;
-                });
-                document.querySelectorAll('.thought-input').forEach(input => {
-                    const savedValue = localStorage.getItem(input.id);
-                    if (savedValue !== null) input.value = savedValue;
-                });
-                const savedSummary = localStorage.getItem('summary');
-                if (savedSummary !== null) document.getElementById('summary').value = savedSummary;
-                const savedTime = localStorage.getItem('lastSaveTime');
-                if (savedTime) {
-                    lastSaveTime = new Date(parseInt(savedTime));
-                    updateLastSaveTime();
-                }
-                console.log('数据加载完成');
-            } catch (e) {
-                console.error('加载数据失败:', e);
-            }
-        }
+        <div style="margin-top: 30px; text-align:center;">
+            <button class="chart-btn" onclick="drawFvsAChart()">📈 绘制F-a关系图</button>
+            <button class="chart-btn" onclick="drawMvsAChart()">📉 绘制M-1/a关系图</button>
+        </div>
+        <div class="chart-container"><canvas id="fvsAChart" style="width:100%; height:auto; max-width:800px; margin:0 auto; display:block;"></canvas></div>
+        <div class="chart-container"><canvas id="mvsAChart" style="width:100%; height:auto; max-width:800px; margin:0 auto; display:block;"></canvas></div>
+        <div id="conclusionText" style="margin-top:20px; font-weight:bold;"></div>
+    </div>
+    
+    <h2>七、思考题</h2>
+    <div>1．验证物体质量不变，物体的加速度和所受作用力成正比时，为什么要在滑块上放置砝码？<textarea id="thought1" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(1)">显示参考答案</button><div id="answer1" class="thought-answer">答：在滑块上放置砝码的主要目的是为了改变外力而不改变系统总质量。实验中通过将滑块上的砝码转移到砝码盘中，可以改变外力（砝码盘的总重量改变），而系统总质量（滑块+砝码+砝码盘）保持不变。这样就能在保持质量M不变的情况下，研究外力F与加速度a的关系，验证F ∝ a。</div></div>
+    <div>2．为了使滑块在气垫导轨上作匀速运动，是否应调节导轨完全水平？应怎样调节才能使滑块受到的合外力近似等于零？<textarea id="thought2" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(2)">显示参考答案</button><div id="answer2" class="thought-answer">答：是的，要使滑块在气垫导轨上作匀速运动，必须调节导轨完全水平。调节方法：先进行静态调平（粗调），调节导轨底脚螺丝，使滑块在导轨上任意位置都能静止；再进行动态调平（细调），轻推滑块使其通过两个光电门，测量通过两个光电门的时间Δt₁和Δt₂，调节底脚螺丝直到Δt₁和Δt₂相差小于1%。</div></div>
+    <div>3．在验证牛顿第二定律的实验中，如果气垫导轨未完全调平，对实验结果会产生什么影响？应该如何修正？<textarea id="thought3" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(3)">显示参考答案</button><div id="answer3" class="thought-answer">答：如果气垫导轨未完全调平，会对实验结果产生以下影响：1) 滑块会受到重力沿导轨方向的分力，使合外力F合 = m₂g ± mgsinθ，导致F-a关系偏离理论值；2) 滑块运动过程中会存在附加加速度，影响a的测量精度；3) 验证质量与加速度成反比时，不同质量下滑块受到的附加力不同，导致M-a关系出现偏差。修正方法：严格按照实验步骤进行静态和动态调平；在数据处理时，可以通过测量导轨倾角θ，修正合外力F合 = m₂g ± mgsinθ。</div></div>
 
-        function saveAllData() {
-            try {
-                document.querySelectorAll('.info-input').forEach(input => {
-                    localStorage.setItem(input.id, input.value);
-                });
-                document.querySelectorAll('.fill-blank').forEach(input => {
-                    localStorage.setItem(input.id, input.value);
-                });
-                document.querySelectorAll('.mass-input').forEach(input => {
-                    localStorage.setItem(input.id, input.value);
-                });
-                document.querySelectorAll('.data-input').forEach(input => {
-                    localStorage.setItem(input.id, input.value);
-                });
-                document.querySelectorAll('.thought-input').forEach(input => {
-                    localStorage.setItem(input.id, input.value);
-                });
-                localStorage.setItem('summary', document.getElementById('summary').value);
-                lastSaveTime = new Date();
-                localStorage.setItem('lastSaveTime', lastSaveTime.getTime().toString());
-                updateLastSaveTime();
-                console.log('数据保存成功');
-                return true;
-            } catch (e) {
-                console.error('保存数据失败:', e);
-                return false;
-            }
-        }
+    <h2>八、实验小结</h2>
+    <textarea id="summary" class="summary-box" placeholder="总结实验结论、误差来源、改进建议..."></textarea>
+    
+    <!-- 实验证据图片上传 -->
+    <div class="evidence-area">
+        <strong>📸 实验证据图片上传（权重5%）</strong>
+        <div style="margin: 12px 0;"><input type="file" id="evidenceUpload" accept="image/*" multiple><button class="upload-btn" onclick="uploadEvidenceImages()" style="background:#7b1fa2;">➕ 添加图片</button></div>
+        <div id="imagePreviewContainer" class="image-preview"></div>
+        <small style="color: #4a148c;">* 上传实验现场照片（仪器数据与人同框且与表格数据相同），至少上传一张可获得5%分数。</small>
+    </div>
+    
+    <!-- 实验操作分 + 一键数据上报（教师密码验证后显示） -->
+    <div class="operator-panel">
+        <strong>🔐 实验操作分 (权重20%，仅教师可操作) & 一键数据上报</strong><br>
+        <input type="password" id="opPwd" placeholder="教师密码" autocomplete="off">
+        <button onclick="unlockOpScore()" class="chart-btn">验证并解锁</button>
+        <span id="opLockMsg" style="color:#b71c1c;"></span>
+        <div id="opScoreDiv" style="display:none; margin-top: 12px;">
+            <label>操作分数 (0~20): </label>
+            <input type="number" id="operationScore" min="0" max="20" step="1" value="0">
+            <button onclick="saveOpScore()" class="save-btn">💾 保存操作分</button>
+            <button id="oneClickReportBtn" class="submit-report-btn" style="margin-left: 12px;">📤 一键数据上报</button>
+        </div>
+        <div>📋 当前操作分：<span id="currentOpScore">0</span> 分</div>
+        <div style="margin-top: 8px; font-size:0.85rem; color:#00695c;">🔔 教师验证密码后，上方将显示“一键数据上报”按钮，可导出专业班级、学号、姓名、预习得分、操作得分、综合得分及日期（预习和操作已换算为百分制）。</div>
+    </div>
 
-        function updateLastSaveTime() {
-            if (lastSaveTime) {
-                const timeStr = lastSaveTime.toLocaleTimeString();
-                document.getElementById('lastSaveTime').textContent = `上次保存：${timeStr}`;
-            }
-        }
+    <h2>九、自动评分 & 实验评语</h2>
+    <div class="score-section" style="text-align:center;">
+        <button class="auto-grade-btn" onclick="autoGrade()">✨ 自动评分并生成评语</button>
+        <div id="scoreDetails" class="score-details" style="display:none;">
+            <div class="score-item"><span>📖 预习填空 (10%)</span><span id="detailPreScore">0/10</span></div>
+            <div class="score-item"><span>📝 数据记录 (15%)</span><span id="detailDataScore">0/15</span></div>
+            <div class="score-item"><span>📐 数据处理&误差分析 (25%)</span><span id="detailCalcScore">0/25</span></div>
+            <div class="score-item"><span>📊 图形绘制 (5%)</span><span id="detailPlotScore">0/5</span></div>
+            <div class="score-item"><span>💡 思考题 (10%)</span><span id="detailThoughtScore">0/10</span></div>
+            <div class="score-item"><span>📄 实验小结 (10%)</span><span id="detailSummaryScore">0/10</span></div>
+            <div class="score-item"><span>📸 实验证据 (5%)</span><span id="detailEvidenceScore">0/5</span></div>
+            <div class="score-item"><span>🔧 实验操作 (20%)</span><span id="detailOpScore">0/20</span></div>
+            <div class="score-item" style="font-weight:bold; border-top:2px solid #4caf50;"><span>🏆 总分</span><span id="detailTotalScore">0/100</span></div>
+        </div>
+        <div id="commentContent" style="background:#fff8e7; border-radius: 28px; padding: 20px; margin-top: 20px; text-align: left;"></div>
+    </div>
+</div>
 
-        function manualSave() { if (saveAllData()) alert('✅ 数据已成功保存到本地！'); else alert('❌ 保存失败，请重试'); }
-        function manualLoad() { loadAllSavedData(); calculateData(); calculateErrors(); updateAllAnswerStatusIcons(); alert('📂 已加载上次保存的数据！'); }
-        function clearSavedData() { if (confirm('⚠️ 确定要清除所有已保存的数据吗？')) { localStorage.clear(); lastSaveTime = null; document.getElementById('lastSaveTime').textContent = '上次保存：未保存'; alert('🗑️ 已清除所有保存的数据'); } }
-        function exportData() {
-            const data = { info: {}, fillBlanks: {}, massInputs: {}, dataInputs: {}, thoughts: {}, summary: document.getElementById('summary').value, timestamp: new Date().toISOString(), version: '1.0' };
-            document.querySelectorAll('.info-input').forEach(input => { data.info[input.id] = input.value; });
-            document.querySelectorAll('.fill-blank').forEach(input => { data.fillBlanks[input.id] = input.value; });
-            document.querySelectorAll('.mass-input').forEach(input => { data.massInputs[input.id] = input.value; });
-            document.querySelectorAll('.data-input').forEach(input => { data.dataInputs[input.id] = input.value; });
-            document.querySelectorAll('.thought-input').forEach(input => { data.thoughts[input.id] = input.value; });
-            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const dateStr = new Date().toLocaleDateString().replace(/\//g, '-');
-            a.download = `牛顿第二定律实验_${dateStr}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            alert('📥 数据已导出为JSON文件');
+<script>
+    // ==================== 完全保留文件1原有所有逻辑 ====================
+    window.onbeforeunload = null;
+    window.addEventListener('beforeunload', function(e) { delete e.returnValue; });
+    
+    const answers = {
+        "气垫导轨":["气垫导轨"], "加速度":["加速度"], "数字毫秒计":["数字毫秒计","毫秒计"],
+        "作匀速直线运动":["作匀速直线运动","匀速直线运动","匀速运动"],
+        "开始计时":["开始计时","计时开始"], "停止计时":["停止计时","计时停止"],
+        "瞬时速度":["瞬时速度","瞬时速率"], "水平恒力":["水平恒力","恒力"],
+        "正比":["正比","成正比"], "反比":["反比","成反比"],
+        "依次通过":["依次通过","通过"], "无定向":["无定向","任意"], "初步调平":["初步调平","基本水平"],
+        "底脚螺丝":["底脚螺丝","螺丝"], "细线":["细线","线"], "气垫滑轮":["气垫滑轮","滑轮"],
+        "自身重力":["自身重力","重力"], "初始位置":["初始位置","起点"], "地面":["地面","地板"]
+    };
+    
+    let fvsAChartInstance = null, mvsAChartInstance = null;
+    let opScoreLocked = false;
+    let imageList = [];
+    let hasDrawnFvsA = false, hasDrawnMvsA = false;
+    
+    function updateAnswerStatusIcon(inputElement) {
+        const container = inputElement.parentElement;
+        const statusSpan = container.querySelector('.answer-status');
+        if (!statusSpan) return;
+        const userAnswer = inputElement.value.trim();
+        const correctAnswers = answers[inputElement.dataset.answer];
+        let status = 'empty';
+        if (userAnswer === '') status = 'empty';
+        else if (correctAnswers && correctAnswers.some(ans => {
+            const user = userAnswer.toLowerCase().replace(/\s+/g, '');
+            const correct = ans.toLowerCase().replace(/\s+/g, '');
+            return user === correct || user.includes(correct) || correct.includes(user);
+        })) status = 'correct';
+        else status = 'incorrect';
+        statusSpan.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
+        if (status === 'correct') { statusSpan.textContent = '✓'; statusSpan.classList.add('correct-icon'); }
+        else if (status === 'incorrect') { statusSpan.textContent = '✗'; statusSpan.classList.add('incorrect-icon'); }
+        else { statusSpan.textContent = '○'; statusSpan.classList.add('empty-icon'); }
+    }
+    function updateAllAnswerStatusIcons() { document.querySelectorAll('.fill-blank').forEach(inp => updateAnswerStatusIcon(inp)); }
+    
+    function avg3(a,b,c) { let x=parseFloat(a)||0, y=parseFloat(b)||0, z=parseFloat(c)||0; if(x===0||y===0||z===0) return 0; return (x+y+z)/3; }
+    function calcV(tBar) { let t=parseFloat(tBar); if(t===0) return 0; return (0.01/(t*0.001)).toFixed(4); }
+    function calcA(v1,v2) { let v1n=parseFloat(v1)||0, v2n=parseFloat(v2)||0; if(v1n===0||v2n===0) return 0; return ((v2n*v2n - v1n*v1n)/(2*0.5)).toFixed(5); }
+    
+    function calculateData() {
+        let F1 = parseFloat(document.getElementById('F1').value) || 0;
+        let F2 = parseFloat(document.getElementById('F2').value) || 0;
+        for(let i=1;i<=2;i++){
+            let t1avg = avg3(document.getElementById(`t1_${i}1`).value, document.getElementById(`t1_${i}2`).value, document.getElementById(`t1_${i}3`).value).toFixed(2);
+            let t2avg = avg3(document.getElementById(`t2_${i}1`).value, document.getElementById(`t2_${i}2`).value, document.getElementById(`t2_${i}3`).value).toFixed(2);
+            document.getElementById(`t1-${i}avg`).innerText = t1avg; document.getElementById(`t2-${i}avg`).innerText = t2avg;
+            let v1 = calcV(t1avg), v2 = calcV(t2avg);
+            document.getElementById(`v1-${i}`).innerText = v1; document.getElementById(`v2-${i}`).innerText = v2;
+            let a = calcA(v1,v2); document.getElementById(`a${i}`).innerText = a;
+            let F = i===1 ? F1 : F2;
+            let fa = (parseFloat(a)>0 && F>0) ? (F/parseFloat(a)) : 0;
+            document.getElementById(`f_a${i}`).innerText = fa.toFixed(4);
         }
-        function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        Object.entries(data.info || {}).forEach(([id, value]) => { const inputEl = document.getElementById(id); if (inputEl) inputEl.value = value; });
-                        Object.entries(data.fillBlanks || {}).forEach(([id, value]) => { const inputEl = document.getElementById(id); if (inputEl) inputEl.value = value; });
-                        Object.entries(data.massInputs || {}).forEach(([id, value]) => { const inputEl = document.getElementById(id); if (inputEl) inputEl.value = value; });
-                        Object.entries(data.dataInputs || {}).forEach(([id, value]) => { const inputEl = document.getElementById(id); if (inputEl) inputEl.value = value; });
-                        Object.entries(data.thoughts || {}).forEach(([id, value]) => { const inputEl = document.getElementById(id); if (inputEl) inputEl.value = value; });
-                        if (data.summary) document.getElementById('summary').value = data.summary;
-                        calculateData(); calculateErrors(); updateAllAnswerStatusIcons();
-                        alert('✅ 数据导入成功！');
-                    } catch (error) { console.error(error); alert('❌ 文件格式错误，导入失败'); }
-                };
-                reader.readAsText(file);
+        for(let i=3;i<=4;i++){
+            let t1avg = avg3(document.getElementById(`t1_${i}1`).value, document.getElementById(`t1_${i}2`).value, document.getElementById(`t1_${i}3`).value).toFixed(2);
+            let t2avg = avg3(document.getElementById(`t2_${i}1`).value, document.getElementById(`t2_${i}2`).value, document.getElementById(`t2_${i}3`).value).toFixed(2);
+            document.getElementById(`t1-${i}avg`).innerText = t1avg; document.getElementById(`t2-${i}avg`).innerText = t2avg;
+            let v1 = calcV(t1avg), v2 = calcV(t2avg);
+            document.getElementById(`v1-${i}`).innerText = v1; document.getElementById(`v2-${i}`).innerText = v2;
+            let a = calcA(v1,v2); document.getElementById(`a${i}`).innerText = a;
+            let mass = parseFloat(document.getElementById(`mass${i}`).value) || 0;
+            let ma = (parseFloat(a)>0) ? (mass*parseFloat(a)) : 0;
+            document.getElementById(`ma${i}`).innerText = ma.toFixed(5);
+        }
+        let fa1 = parseFloat(document.getElementById('f_a1').innerText)||0, fa2 = parseFloat(document.getElementById('f_a2').innerText)||0;
+        let ma3 = parseFloat(document.getElementById('ma3').innerText)||0, ma4 = parseFloat(document.getElementById('ma4').innerText)||0;
+        document.getElementById('ratio1_disp').innerText = fa1.toFixed(4);
+        document.getElementById('ratio2_disp').innerText = fa2.toFixed(4);
+        document.getElementById('ma3_disp').innerText = ma3.toFixed(5);
+        document.getElementById('ma4_disp').innerText = ma4.toFixed(5);
+        let trueErr1 = (fa1>0 && fa2>0) ? (Math.abs(fa2-fa1)/fa1*100) : 0;
+        let trueErr2 = (ma3>0 && ma4>0) ? (Math.abs(ma4-ma3)/ma3*100) : 0;
+        document.getElementById('true_error1').innerText = trueErr1.toFixed(2);
+        document.getElementById('true_error2').innerText = trueErr2.toFixed(2);
+        window.trueErr1 = trueErr1; window.trueErr2 = trueErr2;
+    }
+    
+    function isReasonableValue(value, type) {
+        let num = parseFloat(value);
+        if (isNaN(num)) return false;
+        if (type === 'time') return num >= 5 && num <= 50;
+        if (type === 'mass') return num >= 0.2 && num <= 0.35;
+        if (type === 'force') return num >= 0.08 && num <= 0.3;
+        return false;
+    }
+    function checkT1GtT2() {
+        for(let i=1;i<=4;i++){
+            let t1avg = parseFloat(document.getElementById(`t1-${i}avg`).innerText);
+            let t2avg = parseFloat(document.getElementById(`t2-${i}avg`).innerText);
+            if(!isNaN(t1avg) && !isNaN(t2avg) && t1avg <= t2avg) return false;
+        }
+        return true;
+    }
+    
+    function gradeDataRecord() {
+        let validCount = 0;
+        let totalCount = 0;
+        document.querySelectorAll('.data-input').forEach(inp => { totalCount++; if (isReasonableValue(inp.value, 'time')) validCount++; });
+        document.querySelectorAll('.mass-input').forEach(inp => { totalCount++; if (isReasonableValue(inp.value, 'mass')) validCount++; });
+        document.querySelectorAll('.force-input').forEach(inp => { totalCount++; if (isReasonableValue(inp.value, 'force')) validCount++; });
+        let tCondition = checkT1GtT2();
+        let score = totalCount > 0 ? (validCount / totalCount) * 15 : 0;
+        if(tCondition) score = Math.min(15, score + 2);
+        else score = score * 0.8;
+        return Math.round(score);
+    }
+    
+    function gradePre() {
+        let inputs = document.querySelectorAll('.fill-blank');
+        let correct=0;
+        inputs.forEach(inp=>{
+            let ans=answers[inp.dataset.answer];
+            let val=inp.value.trim().toLowerCase();
+            if(val && ans.some(a=>a.toLowerCase()===val||val.includes(a)||a.includes(val))) correct++;
+        });
+        return Math.round((correct/inputs.length)*10);
+    }
+    
+    function gradeDataProcess() {
+        let stuErr1 = parseFloat(document.getElementById('student_error1').value);
+        let stuErr2 = parseFloat(document.getElementById('student_error2').value);
+        let real1 = window.trueErr1 || 0, real2 = window.trueErr2 || 0;
+        function singleScore(stu, real) {
+            if(isNaN(stu)) return 0;
+            let diff = Math.abs(stu - real);
+            let accScore = 0;
+            if(diff <= 1) accScore = 12;
+            else if(diff <= 3) accScore = 9;
+            else if(diff <= 5) accScore = 6;
+            else if(diff <= 8) accScore = 3;
+            else accScore = 0;
+            let absErr = Math.abs(stu);
+            let magScore = 0;
+            if(absErr <= 5) magScore = 5;
+            else if(absErr <= 10) magScore = 4;
+            else if(absErr <= 15) magScore = 3;
+            else if(absErr <= 20) magScore = 2;
+            else if(absErr <= 30) magScore = 1;
+            else magScore = 0;
+            return accScore + magScore;
+        }
+        let s1 = singleScore(stuErr1, real1);
+        let s2 = singleScore(stuErr2, real2);
+        let total = s1 + s2;
+        return Math.min(25, Math.round(total));
+    }
+    
+    function gradePlot() {
+        let score = 0;
+        if(hasDrawnFvsA) score += 2.5;
+        if(hasDrawnMvsA) score += 2.5;
+        return Math.round(score);
+    }
+    
+    function gradeThought() {
+        let t1=document.getElementById('thought1').value.trim();
+        let t2=document.getElementById('thought2').value.trim();
+        let t3=document.getElementById('thought3').value.trim();
+        let score=0;
+        if(t1.length>20) score+=3; else if(t1.length>5) score+=1;
+        if(t2.length>25) score+=3; else if(t2.length>8) score+=1;
+        if(t3.length>35) score+=4; else if(t3.length>15) score+=2;
+        return Math.min(10,score);
+    }
+    function gradeSummary() {
+        let sum=document.getElementById('summary').value.trim();
+        if(sum.length>150 && (sum.includes("牛顿")||sum.includes("误差"))) return 10;
+        if(sum.length>90) return 8;
+        if(sum.length>50) return 6;
+        if(sum.length>20) return 4;
+        return 0;
+    }
+    function gradeEvidence() { return imageList.length > 0 ? 5 : 0; }
+    
+    function autoGrade() {
+        calculateData();
+        let preSc = gradePre();
+        let dataSc = gradeDataRecord();
+        let calcSc = gradeDataProcess();
+        let plotSc = gradePlot();
+        let thoughtSc = gradeThought();
+        let summarySc = gradeSummary();
+        let evidenceSc = gradeEvidence();
+        let opScore = parseFloat(document.getElementById('operationScore').value);
+        if(isNaN(opScore)) opScore = 0;
+        opScore = Math.min(20, Math.max(0, opScore));
+        let total = preSc + dataSc + calcSc + plotSc + thoughtSc + summarySc + evidenceSc + opScore;
+        document.getElementById('detailPreScore').innerText = `${preSc}/10`;
+        document.getElementById('detailDataScore').innerText = `${dataSc}/15`;
+        document.getElementById('detailCalcScore').innerText = `${calcSc}/25`;
+        document.getElementById('detailPlotScore').innerText = `${plotSc}/5`;
+        document.getElementById('detailThoughtScore').innerText = `${thoughtSc}/10`;
+        document.getElementById('detailSummaryScore').innerText = `${summarySc}/10`;
+        document.getElementById('detailEvidenceScore').innerText = `${evidenceSc}/5`;
+        document.getElementById('detailOpScore').innerText = `${opScore}/20`;
+        document.getElementById('detailTotalScore').innerText = `${total}/100`;
+        document.getElementById('scoreDetails').style.display = 'block';
+        let teacher = document.getElementById('instructor').value.trim() || "马厂";
+        let now = new Date();
+        let dateTimeStr = `${now.toLocaleDateString('zh-CN')} ${now.toLocaleTimeString('zh-CN', {hour12: false})}`;
+        let comment = `📊 实验报告得分 ${total}/100。预习${preSc}/10，数据记录${dataSc}/15，数据处理${calcSc}/25，图形绘制${plotSc}/5，思考题${thoughtSc}/10，小结${summarySc}/10，实验证据${evidenceSc}/5，操作分${opScore}/20。<br><br>教师签名：${teacher}<br>评语日期：${dateTimeStr}`;
+        if(total>=90) comment+="<br>⭐ 优秀！实验严谨，分析透彻。";
+        else if(total>=75) comment+="<br>👍 良好，可进一步提升精度。";
+        else if(total>=60) comment+="<br>⚠️ 合格，注意数据处理与误差分析。";
+        else comment+="<br>❌ 需重做实验或补充数据，认真分析误差。";
+        document.getElementById('commentContent').innerHTML = comment;
+        document.getElementById('conclusionText').innerHTML = `实验结论：通过实验验证牛顿第二定律。质量不变时F与a成正比，外力不变时a与M成反比。${total>=60?"验证成立，数据合理。":"误差较大，建议检查实验操作。"}`;
+        manualSave();
+    }
+    
+    function uploadEvidenceImages() {
+        let files = document.getElementById('evidenceUpload').files;
+        if(!files.length) return;
+        for(let file of files){
+            if(!file.type.startsWith('image/')) continue;
+            let reader = new FileReader();
+            reader.onload = function(e){
+                imageList.push(e.target.result);
+                displayImages();
             };
-            input.click();
+            reader.readAsDataURL(file);
         }
-
-        function toggleAnswer(questionNum) {
-            const answerDiv = document.getElementById(`answer${questionNum}`);
-            const button = event.target;
-            if (answerDiv.style.display === 'block') { answerDiv.style.display = 'none'; button.textContent = '显示参考答案'; }
-            else { answerDiv.style.display = 'block'; button.textContent = '隐藏参考答案'; }
+        document.getElementById('evidenceUpload').value = '';
+    }
+    function displayImages() {
+        let container = document.getElementById('imagePreviewContainer');
+        container.innerHTML = '';
+        imageList.forEach((imgSrc, idx)=>{
+            let div = document.createElement('div');
+            div.className = 'img-card';
+            div.innerHTML = `<img src="${imgSrc}" alt="实验证据"><div class="del-img" onclick="removeImage(${idx})">✕</div>`;
+            container.appendChild(div);
+        });
+        localStorage.setItem('evidenceImages', JSON.stringify(imageList));
+    }
+    function removeImage(idx) { imageList.splice(idx,1); displayImages(); }
+    
+    function unlockOpScore() {
+        let pwd = document.getElementById('opPwd').value;
+        if(pwd === "52501314") {
+            document.getElementById('opScoreDiv').style.display = 'block';
+            document.getElementById('opLockMsg').innerHTML = "✅ 密码正确，可评分及上报";
+            opScoreLocked = true;
+        } else { document.getElementById('opLockMsg').innerHTML = "❌ 密码错误"; opScoreLocked=false; }
+    }
+    function saveOpScore() {
+        if(!opScoreLocked) { alert("请先输入教师密码解锁"); return; }
+        let val = parseFloat(document.getElementById('operationScore').value);
+        if(isNaN(val)) val=0; val = Math.min(20,Math.max(0,val));
+        document.getElementById('operationScore').value = val;
+        localStorage.setItem('operationScore', val);
+        document.getElementById('currentOpScore').innerText = val;
+        let msgSpan = document.getElementById('opSavedMsg');
+        if(msgSpan) { msgSpan.innerText = "操作分已保存"; setTimeout(()=>msgSpan.innerText="",1500); }
+    }
+    
+    // ==================== 一键数据上报功能（预习和操作已换算为百分制） ====================
+    async function oneClickDataReport() {
+        if(!opScoreLocked) { alert("请先输入教师密码解锁后再执行上报"); return; }
+        autoGrade();
+        const className = document.getElementById('class')?.value.trim() || "未填专业班级";
+        const studentId = document.getElementById('studentId')?.value.trim() || "未填学号";
+        const studentName = document.getElementById('studentName')?.value.trim() || "未填姓名";
+        const expDate = document.getElementById('expDate')?.value.trim() || new Date().toLocaleDateString('zh-CN');
+        let preScoreRaw = parseFloat(document.getElementById('detailPreScore')?.innerText?.split('/')[0]) || 0;
+        let opScoreRaw = parseFloat(document.getElementById('currentOpScore')?.innerText) || 0;
+        let totalScoreRaw = parseFloat(document.getElementById('detailTotalScore')?.innerText?.split('/')[0]) || 0;
+        // 换算为百分制：预习满分10分 → 百分制 = 原始分 × 10；操作满分20分 → 百分制 = 原始分 × 5
+        let preScorePercent = preScoreRaw * 10;
+        let opScorePercent = opScoreRaw * 5;
+        const now = new Date();
+        const fullDateTime = `${expDate} ${now.toLocaleTimeString('zh-CN', {hour12: false})}`;
+        const reportLines = [
+            "验证牛顿第二定律",
+            `专业班级: ${className}`,
+            `学号: ${studentId}`,
+            `姓名: ${studentName}`,
+            `预习得分: ${preScoreRaw.toFixed(1)} `,
+            `操作得分: ${opScoreRaw.toFixed(1)} `,
+            `综合得分: ${totalScoreRaw.toFixed(1)} `,
+            `实验日期: ${fullDateTime}`,
+            `指导教师: ${document.getElementById('instructor')?.value || "马厂"}`,
+        ];
+        const reportText = reportLines.join("\n");
+        try {
+            await navigator.clipboard.writeText(reportText);
+            showReportToast("✅ 实验数据已复制（预习/操作已换算百分制）！可粘贴至表单");
+        } catch(err) {
+            const textarea = document.createElement('textarea');
+            textarea.value = reportText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showReportToast("✅ 已复制 (传统方式，含百分制换算)");
         }
-
-        function updateAnswerStatusIcon(inputElement, status) {
-            const statusIcon = inputElement.nextElementSibling;
-            if (statusIcon && statusIcon.classList.contains('answer-status')) {
-                statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
-                if (status === 'correct') { statusIcon.textContent = '✓'; statusIcon.classList.add('correct-icon'); }
-                else if (status === 'incorrect') { statusIcon.textContent = '✗'; statusIcon.classList.add('incorrect-icon'); }
-                else if (status === 'empty') { statusIcon.textContent = '○'; statusIcon.classList.add('empty-icon'); }
-                else { statusIcon.textContent = ''; }
-            }
+        if(confirm("📋 详细数据已复制到剪贴板（预习/操作已换算为百分制）。\n即将打开统计平台表单，请在表单中粘贴(Ctrl+V)并提交。\n是否继续打开表单页面？")) {
+            window.open("https://qrbgda8w.jsjform.com/f/uJfvvZ", '_blank');
         }
-
-        function updateAllAnswerStatusIcons() {
-            const inputs = document.querySelectorAll('.fill-blank');
-            inputs.forEach(input => {
-                const userAnswer = input.value.trim();
-                const correctAnswers = answers[input.dataset.answer];
-                if (userAnswer === '') updateAnswerStatusIcon(input, 'empty');
-                else if (correctAnswers && correctAnswers.some(ans => {
-                    const userAns = userAnswer.toLowerCase().replace(/\s+/g, '');
-                    const correctAns = ans.toLowerCase().replace(/\s+/g, '');
-                    return userAns === correctAns || userAns.includes(correctAns) || correctAns.includes(userAns);
-                })) updateAnswerStatusIcon(input, 'correct');
-                else updateAnswerStatusIcon(input, 'incorrect');
-            });
-        }
-
-        function fillReferenceData() {
-            if (confirm("警告：参考数据仅供对照使用！若直接搬用参考数据，数据部分将计0分！\n\n是否继续填入参考数据？")) {
-                document.getElementById('t1_11').value = referenceData.t1_11;
-                document.getElementById('t1_12').value = referenceData.t1_12;
-                document.getElementById('t1_13').value = referenceData.t1_13;
-                document.getElementById('t2_11').value = referenceData.t2_11;
-                document.getElementById('t2_12').value = referenceData.t2_12;
-                document.getElementById('t2_13').value = referenceData.t2_13;
-                document.getElementById('t1_21').value = referenceData.t1_21;
-                document.getElementById('t1_22').value = referenceData.t1_22;
-                document.getElementById('t1_23').value = referenceData.t1_23;
-                document.getElementById('t2_21').value = referenceData.t2_21;
-                document.getElementById('t2_22').value = referenceData.t2_22;
-                document.getElementById('t2_23').value = referenceData.t2_23;
-                document.getElementById('t1_31').value = referenceData.t1_31;
-                document.getElementById('t1_32').value = referenceData.t1_32;
-                document.getElementById('t1_33').value = referenceData.t1_33;
-                document.getElementById('t2_31').value = referenceData.t2_31;
-                document.getElementById('t2_32').value = referenceData.t2_32;
-                document.getElementById('t2_33').value = referenceData.t2_33;
-                document.getElementById('t1_41').value = referenceData.t1_41;
-                document.getElementById('t1_42').value = referenceData.t1_42;
-                document.getElementById('t1_43').value = referenceData.t1_43;
-                document.getElementById('t2_41').value = referenceData.t2_41;
-                document.getElementById('t2_42').value = referenceData.t2_42;
-                document.getElementById('t2_43').value = referenceData.t2_43;
-                document.getElementById('mass1').value = referenceData.mass1;
-                document.getElementById('mass2').value = referenceData.mass2;
-                document.getElementById('mass3').value = referenceData.mass3;
-                document.getElementById('mass4').value = referenceData.mass4;
-                calculateData();
-                alert("参考数据已填入。请注意：这些数据仅供对照，实际实验必须使用自己测量的数据！");
-            }
-        }
-
-        function avg3(a, b, c) {
-            const x = parseFloat(a) || 0;
-            const y = parseFloat(b) || 0;
-            const z = parseFloat(c) || 0;
-            if (x === 0 || y === 0 || z === 0) return 0;
-            return (x + y + z) / 3;
-        }
-
-        function calcV(tBar) {
-            const t = parseFloat(tBar);
-            if (t === 0) return 0;
-            return (0.01 / (t * 0.001)).toFixed(2);
-        }
-
-        function calcA(v1, v2) {
-            const a = parseFloat(v1) || 0;
-            const b = parseFloat(v2) || 0;
-            if (a === 0 || b === 0) return 0;
-            return ((b * b - a * a) / (2 * 0.5)).toFixed(2);
-        }
-
-        function calculateData() {
-            const mass1 = parseFloat(document.getElementById('mass1').value) || 0.155;
-            const mass2 = parseFloat(document.getElementById('mass2').value) || 0.155;
-            const mass3 = parseFloat(document.getElementById('mass3').value) || 0.105;
-            const mass4 = parseFloat(document.getElementById('mass4').value) || 0.155;
-            
-            document.getElementById('mass1-display').textContent = mass1.toFixed(3);
-            document.getElementById('force-display').textContent = "0.098";
-            
-            const t1_1avg = avg3(document.getElementById('t1_11').value, document.getElementById('t1_12').value, document.getElementById('t1_13').value).toFixed(1);
-            const t2_1avg = avg3(document.getElementById('t2_11').value, document.getElementById('t2_12').value, document.getElementById('t2_13').value).toFixed(1);
-            document.getElementById('t1-1avg').textContent = t1_1avg;
-            document.getElementById('t2-1avg').textContent = t2_1avg;
-            const v1_1 = calcV(t1_1avg);
-            const v2_1 = calcV(t2_1avg);
-            document.getElementById('v1-1').textContent = v1_1;
-            document.getElementById('v2-1').textContent = v2_1;
-            const a1 = parseFloat(calcA(v1_1, v2_1));
-            document.getElementById('a1').textContent = a1.toFixed(2);
-            const fa1 = a1 > 0 ? (0.098 / a1) : 0;
-            document.getElementById('f_a1').textContent = fa1.toFixed(3);
-
-            const t1_2avg = avg3(document.getElementById('t1_21').value, document.getElementById('t1_22').value, document.getElementById('t1_23').value).toFixed(1);
-            const t2_2avg = avg3(document.getElementById('t2_21').value, document.getElementById('t2_22').value, document.getElementById('t2_23').value).toFixed(1);
-            document.getElementById('t1-2avg').textContent = t1_2avg;
-            document.getElementById('t2-2avg').textContent = t2_2avg;
-            const v1_2 = calcV(t1_2avg);
-            const v2_2 = calcV(t2_2avg);
-            document.getElementById('v1-2').textContent = v1_2;
-            document.getElementById('v2-2').textContent = v2_2;
-            const a2 = parseFloat(calcA(v1_2, v2_2));
-            document.getElementById('a2').textContent = a2.toFixed(2);
-            const fa2 = a2 > 0 ? (0.147 / a2) : 0;
-            document.getElementById('f_a2').textContent = fa2.toFixed(3);
-
-            const t1_3avg = avg3(document.getElementById('t1_31').value, document.getElementById('t1_32').value, document.getElementById('t1_33').value).toFixed(1);
-            const t2_3avg = avg3(document.getElementById('t2_31').value, document.getElementById('t2_32').value, document.getElementById('t2_33').value).toFixed(1);
-            document.getElementById('t1-3avg').textContent = t1_3avg;
-            document.getElementById('t2-3avg').textContent = t2_3avg;
-            const v1_3 = calcV(t1_3avg);
-            const v2_3 = calcV(t2_3avg);
-            document.getElementById('v1-3').textContent = v1_3;
-            document.getElementById('v2-3').textContent = v2_3;
-            const a3 = parseFloat(calcA(v1_3, v2_3));
-            document.getElementById('a3').textContent = a3.toFixed(2);
-            const ma3 = a3 > 0 ? (mass3 * a3) : 0;
-            document.getElementById('ma3').textContent = ma3.toFixed(3);
-
-            const t1_4avg = avg3(document.getElementById('t1_41').value, document.getElementById('t1_42').value, document.getElementById('t1_43').value).toFixed(1);
-            const t2_4avg = avg3(document.getElementById('t2_41').value, document.getElementById('t2_42').value, document.getElementById('t2_43').value).toFixed(1);
-            document.getElementById('t1-4avg').textContent = t1_4avg;
-            document.getElementById('t2-4avg').textContent = t2_4avg;
-            const v1_4 = calcV(t1_4avg);
-            const v2_4 = calcV(t2_4avg);
-            document.getElementById('v1-4').textContent = v1_4;
-            document.getElementById('v2-4').textContent = v2_4;
-            const a4 = parseFloat(calcA(v1_4, v2_4));
-            document.getElementById('a4').textContent = a4.toFixed(2);
-            const ma4 = a4 > 0 ? (mass4 * a4) : 0;
-            document.getElementById('ma4').textContent = ma4.toFixed(3);
-
-            calculateErrors();
-        }
-
-        function calculateErrors() {
-            const mass1 = parseFloat(document.getElementById('mass1').value) || 0.155;
-            const mass3 = parseFloat(document.getElementById('mass3').value) || 0.105;
-            const mass4 = parseFloat(document.getElementById('mass4').value) || 0.155;
-            const fa1 = parseFloat(document.getElementById('f_a1').textContent) || 0;
-            const fa2 = parseFloat(document.getElementById('f_a2').textContent) || 0;
-            if (fa1 && fa2) {
-                const err = Math.abs(fa2 - fa1) / fa1 * 100;
-                document.getElementById('error1').textContent = err.toFixed(1);
-                document.getElementById('ratio1').textContent = fa1.toFixed(3);
-                document.getElementById('ratio2').textContent = fa2.toFixed(3);
-                if (err < 20) { document.getElementById('result1').textContent = "验证通过！F与a成正比关系成立"; document.getElementById('result1').style.color = "#2e7d32"; }
-                else if (err < 30) { document.getElementById('result1').textContent = "基本符合！存在一定误差"; document.getElementById('result1').style.color = "#ff9800"; }
-                else { document.getElementById('result1').textContent = "验证失败！请检查实验数据"; document.getElementById('result1').style.color = "#c62828"; }
-            }
-            const ma3 = parseFloat(document.getElementById('ma3').textContent) || 0;
-            const ma4 = parseFloat(document.getElementById('ma4').textContent) || 0;
-            if (ma3 && ma4) {
-                const err = Math.abs(ma4 - ma3) / ma3 * 100;
-                document.getElementById('error2').textContent = err.toFixed(1);
-                document.getElementById('product1').textContent = ma3.toFixed(3);
-                document.getElementById('product2').textContent = ma4.toFixed(3);
-                if (err < 20) { document.getElementById('result2').textContent = "验证通过！a与M成反比关系成立"; document.getElementById('result2').style.color = "#2e7d32"; }
-                else if (err < 30) { document.getElementById('result2').textContent = "基本符合！存在一定误差"; document.getElementById('result2').style.color = "#ff9800"; }
-                else { document.getElementById('result2').textContent = "验证失败！请检查实验数据"; document.getElementById('result2').style.color = "#c62828"; }
-            }
-        }
-
-        function drawFvsAChart() {
-            calculateData();
-            const a1 = parseFloat(document.getElementById('a1').textContent) || 0;
-            const a2 = parseFloat(document.getElementById('a2').textContent) || 0;
-            if (a1 === 0 || a2 === 0) { alert("请先输入并计算表1数据！"); return; }
-            const ctx = document.getElementById('fvsAChart').getContext('2d');
-            if (fvsAChartInstance) fvsAChartInstance.destroy();
-            fvsAChartInstance = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: '实验数据点',
-                        data: [{x: a1, y: 0.098}, {x: a2, y: 0.147}],
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1,
-                        pointRadius: 8
-                    }, {
-                        label: '理论直线（过原点）',
-                        data: [{x: 0, y: 0}, {x: Math.max(a1, a2) * 1.2, y: 0.147 * Math.max(a1, a2) * 1.2 / a2}],
-                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        type: 'line',
-                        fill: false,
-                        tension: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { title: { display: true, text: '外力F与加速度a的关系图（验证F ∝ a）' }, tooltip: { callbacks: { label: function(context) { if (context.datasetIndex === 0) return `F = ${context.parsed.y.toFixed(3)}N, a = ${context.parsed.x.toFixed(2)}m/s²`; return context.dataset.label; } } } },
-                    scales: { x: { title: { display: true, text: '加速度 a (m/s²)' }, beginAtZero: true }, y: { title: { display: true, text: '外力 F (N)' }, beginAtZero: true } }
-                }
-            });
-        }
-
-        function drawMvsAChart() {
-            calculateData();
-            const mass3 = parseFloat(document.getElementById('mass3').value) || 0.105;
-            const mass4 = parseFloat(document.getElementById('mass4').value) || 0.155;
-            const a3 = parseFloat(document.getElementById('a3').textContent) || 0;
-            const a4 = parseFloat(document.getElementById('a4').textContent) || 0;
-            if (a3 === 0 || a4 === 0) { alert("请先输入并计算表2数据！"); return; }
-            const ctx = document.getElementById('mvsAChart').getContext('2d');
-            if (mvsAChartInstance) mvsAChartInstance.destroy();
-            mvsAChartInstance = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: '实验数据点',
-                        data: [{x: 1/a3, y: mass3}, {x: 1/a4, y: mass4}],
-                        backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1,
-                        pointRadius: 8
-                    }, {
-                        label: '理论直线',
-                        data: [{x: 0, y: 0}, {x: Math.max(1/a3, 1/a4) * 1.2, y: 0.098 * Math.max(1/a3, 1/a4) * 1.2}],
-                        backgroundColor: 'rgba(153, 102, 255, 0.1)',
-                        borderColor: 'rgba(153, 102, 255, 1)',
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        type: 'line',
-                        fill: false,
-                        tension: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: { title: { display: true, text: '质量M与加速度倒数1/a的关系图（验证a ∝ 1/M）' }, tooltip: { callbacks: { label: function(context) { if (context.datasetIndex === 0) return `M = ${context.parsed.y.toFixed(3)}kg, 1/a = ${context.parsed.x.toFixed(3)}s²/m`; return context.dataset.label; } } } },
-                    scales: { x: { title: { display: true, text: '加速度倒数 1/a (s²/m)' }, beginAtZero: true }, y: { title: { display: true, text: '质量 M (kg)' }, beginAtZero: true } }
-                }
-            });
-        }
-
-        function checkReferenceDataUsage() {
-            let referenceCount = 0, totalCount = 0;
-            const dataInputIds = ['t1_11', 't1_12', 't1_13', 't2_11', 't2_12', 't2_13', 't1_21', 't1_22', 't1_23', 't2_21', 't2_22', 't2_23', 't1_31', 't1_32', 't1_33', 't2_31', 't2_32', 't2_33', 't1_41', 't1_42', 't1_43', 't2_41', 't2_42', 't2_43'];
-            dataInputIds.forEach(id => { const value = parseFloat(document.getElementById(id)?.value) || 0; if (value > 0) { totalCount++; const refValue = referenceData[id]; if (refValue && Math.abs(value - refValue) < 0.3) referenceCount++; } });
-            const massIds = ['mass1', 'mass2', 'mass3', 'mass4'];
-            massIds.forEach(id => { const value = parseFloat(document.getElementById(id)?.value) || 0; if (value > 0) { totalCount++; const refValue = referenceData[id]; if (refValue && Math.abs(value - refValue) < 0.003) referenceCount++; } });
-            if (totalCount > 5 && (referenceCount / totalCount) > 0.85) return true;
-            return false;
-        }
-
-        function calculatePreScore() {
-            const inputs = document.querySelectorAll('.fill-blank');
-            let correct = 0, total = inputs.length, emptyCount = 0;
-            inputs.forEach(input => {
-                const userAnswer = input.value.trim();
-                const correctAnswers = answers[input.dataset.answer];
-                input.classList.remove('correct', 'incorrect', 'empty');
-                if (userAnswer === '') { emptyCount++; input.classList.add('empty'); updateAnswerStatusIcon(input, 'empty'); }
-                else if (correctAnswers && correctAnswers.some(ans => { const userAns = userAnswer.toLowerCase().replace(/\s+/g, ''); const correctAns = ans.toLowerCase().replace(/\s+/g, ''); return userAns === correctAns || userAns.includes(correctAns) || correctAns.includes(userAns); })) { correct++; input.classList.add('correct'); updateAnswerStatusIcon(input, 'correct'); }
-                else { input.classList.add('incorrect'); updateAnswerStatusIcon(input, 'incorrect'); }
-            });
-            const score = Math.round((correct / total) * 100);
-            let scoreText = `预习分数：${score}分（答对${correct}/${total}题）`;
-            if (emptyCount > 0) scoreText += `，未答：${emptyCount}题`;
-            if (correct === total) scoreText += " 🎉 满分！";
-            else if (correct === 0) scoreText += " 😢 请认真预习后再作答！";
-            document.getElementById('scoreDisplay').innerHTML = scoreText;
-            return {score, correct, total, emptyCount};
-        }
-
-        function autoGrade() {
-            const preScoreResult = calculatePreScore();
-            const preScore = preScoreResult.score;
-            calculateData();
-            calculateErrors();
-            const fa1 = parseFloat(document.getElementById('f_a1').textContent) || 0;
-            const fa2 = parseFloat(document.getElementById('f_a2').textContent) || 0;
-            const ma3 = parseFloat(document.getElementById('ma3').textContent) || 0;
-            const ma4 = parseFloat(document.getElementById('ma4').textContent) || 0;
-            const error1 = parseFloat(document.getElementById('error1').textContent) || 0;
-            const error2 = parseFloat(document.getElementById('error2').textContent) || 0;
-            const summary = document.getElementById('summary').value.trim();
-            const chart1Drawn = fvsAChartInstance !== null;
-            const chart2Drawn = mvsAChartInstance !== null;
-            const usedReferenceData = checkReferenceDataUsage();
-            let totalScore = 0;
-            const preScoreWeighted = Math.round(preScore * 0.25);
-            totalScore += preScoreWeighted;
-            document.getElementById('detailPreScore').textContent = `${preScoreWeighted}/25`;
-            let dataScore = 0;
-            if (usedReferenceData) dataScore = 0;
-            else { let filledCount = 0; const dataInputs = document.querySelectorAll('.data-input, .mass-input'); dataInputs.forEach(input => { if (input.value.trim() !== '') filledCount++; }); dataScore = Math.round((filledCount / dataInputs.length) * 25); }
-            totalScore += dataScore;
-            document.getElementById('detailDataScore').textContent = `${dataScore}/25`;
-            let calculationScore = 0;
-            if (fa1 > 0 && fa2 > 0 && ma3 > 0 && ma4 > 0) {
-                const faError = Math.abs(fa2 - fa1) / fa1 * 100;
-                const maError = Math.abs(ma4 - ma3) / ma3 * 100;
-                let score1 = 0, score2 = 0;
-                if (faError < 15) score1 = 100; else if (faError < 20) score1 = 90; else if (faError < 25) score1 = 80; else if (faError < 30) score1 = 70; else if (faError < 40) score1 = 60; else score1 = 40;
-                if (maError < 15) score2 = 100; else if (maError < 20) score2 = 90; else if (maError < 25) score2 = 80; else if (maError < 30) score2 = 70; else if (maError < 40) score2 = 60; else score2 = 40;
-                calculationScore = Math.round(((score1 + score2) / 2) * 0.2);
-            } else if (fa1 > 0 && fa2 > 0) calculationScore = Math.round(60 * 0.2);
-            else if (ma3 > 0 && ma4 > 0) calculationScore = Math.round(60 * 0.2);
-            else calculationScore = Math.round(30 * 0.2);
-            totalScore += calculationScore;
-            document.getElementById('detailCalcScore').textContent = `${calculationScore}/20`;
-            let thoughtScore = 0;
-            const thoughtInputs = document.querySelectorAll('.thought-input');
-            let thoughtFilled = 0, thoughtTotalLength = 0;
-            thoughtInputs.forEach(input => { const answer = input.value.trim(); if (answer !== '') { thoughtFilled++; thoughtTotalLength += answer.length; } });
-            const fillRate = thoughtFilled / thoughtInputs.length;
-            const avgLength = thoughtFilled > 0 ? thoughtTotalLength / thoughtFilled : 0;
-            if (fillRate === 1 && avgLength > 60) thoughtScore = 100;
-            else if (fillRate === 1 && avgLength > 40) thoughtScore = 90;
-            else if (fillRate >= 0.8 && avgLength > 30) thoughtScore = 80;
-            else if (fillRate >= 0.7 && avgLength > 25) thoughtScore = 70;
-            else if (fillRate >= 0.6 && avgLength > 20) thoughtScore = 60;
-            else if (fillRate >= 0.5) thoughtScore = 50;
-            else if (fillRate >= 0.4) thoughtScore = 40;
-            else if (fillRate >= 0.3) thoughtScore = 30;
-            else if (fillRate >= 0.2) thoughtScore = 20;
-            else thoughtScore = 0;
-            const thoughtScoreWeighted = Math.round(thoughtScore * 0.15);
-            totalScore += thoughtScoreWeighted;
-            document.getElementById('detailThoughtScore').textContent = `${thoughtScoreWeighted}/15`;
-            let summaryScore = 0;
-            const summaryLength = summary.length;
-            const keywords = ['牛顿第二定律', '加速度', '外力', '质量', '误差分析', '实验', '收获', '问题', '解决', '改进'];
-            let keywordCount = 0;
-            keywords.forEach(keyword => { if (summary.includes(keyword)) keywordCount++; });
-            if (summaryLength > 150 && keywordCount >= 5) summaryScore = 100;
-            else if (summaryLength > 120 && keywordCount >= 4) summaryScore = 85;
-            else if (summaryLength > 100 && keywordCount >= 3) summaryScore = 70;
-            else if (summaryLength > 80 && keywordCount >= 2) summaryScore = 55;
-            else if (summaryLength > 50) summaryScore = 40;
-            else if (summaryLength > 30) summaryScore = 25;
-            else if (summaryLength > 10) summaryScore = 15;
-            else summaryScore = 0;
-            const summaryScoreWeighted = Math.round(summaryScore * 0.15);
-            totalScore += summaryScoreWeighted;
-            document.getElementById('detailSummaryScore').textContent = `${summaryScoreWeighted}/15`;
-            document.getElementById('detailTotalScore').textContent = `${totalScore}/100`;
-            document.getElementById('scoreDetails').style.display = 'block';
-            let comment = "";
-            let grade = "不及格";
-            let gradeColor = "#c62828";
-            if (usedReferenceData) { grade = "不及格"; gradeColor = "#c62828"; comment = `❌ 实验报告不合格！检测到直接搬用参考数据，数据部分计0分！综合得分${totalScore}分。必须使用实际实验测量数据完成报告！`; }
-            else if (totalScore >= 90) { grade = "优秀"; gradeColor = "#2e7d32"; comment = `🎉 实验报告非常出色！综合得分${totalScore}分。预习扎实（${preScore}分），数据记录完整准确，实验验证成功（F/a误差: ${error1.toFixed(1)}%，M×a误差: ${error2.toFixed(1)}%），分析深入，图表规范。`; }
-            else if (totalScore >= 80) { grade = "良好"; gradeColor = "#388e3c"; comment = `👍 实验报告质量较高！综合得分${totalScore}分。预习较好（${preScore}分），数据记录较为完整，实验验证基本成功，分析较为充分。`; }
-            else if (totalScore >= 70) { grade = "中等"; gradeColor = "#f57c00"; comment = `✊ 实验报告基本合格！综合得分${totalScore}分。预习一般（${preScore}分），数据记录和计算存在一定误差，分析较为简单。`; }
-            else if (totalScore >= 60) { grade = "及格"; gradeColor = "#ff9800"; comment = `⚠️ 实验报告勉强及格！综合得分${totalScore}分。预习不足（${preScore}分），数据记录或计算存在明显问题，分析不足。`; }
-            else { grade = "不及格"; gradeColor = "#d32f2f"; comment = `❌ 实验报告未达到基本要求！报告得分${totalScore}分。请重新认真学习实验原理，补充完整实验记录！`; }
-            let suggestions = [];
-            if (preScore < 70) suggestions.push("预习部分需要加强");
-            if (usedReferenceData) suggestions.push("必须使用实际测量数据");
-            if (dataScore < 15) suggestions.push("数据记录需要更加完整准确");
-            if (calculationScore < 14) suggestions.push("数据处理和误差分析需要更加认真仔细");
-            if (thoughtScoreWeighted < 10) suggestions.push("思考题回答需要更加充分详细");
-            if (summaryScoreWeighted < 10) suggestions.push("实验小结需要更加详实");
-            if (!chart1Drawn || !chart2Drawn) suggestions.push("请完成图表的绘制");
-            if (suggestions.length > 0) comment += ` 改进建议：${suggestions.join('；')}。`;
-            comment += ` 总评：${grade}（${totalScore}分）。`;
-            let conclusionText = `实验结论：`;
-            if (fa1 > 0 && fa2 > 0 && ma3 > 0 && ma4 > 0) {
-                conclusionText += `通过实验验证了牛顿第二定律F=Ma。 1) 当系统质量M≈${document.getElementById('mass1').value}kg不变时，外力F与加速度a成正比，F₁/a₁=${fa1.toFixed(3)}，F₂/a₂=${fa2.toFixed(3)}，相对误差${error1.toFixed(1)}%； 2) 当外力F≈0.098N不变时，加速度a与系统质量M成反比，M₃a₃=${ma3.toFixed(3)}，M₄a₄=${ma4.toFixed(3)}，相对误差${error2.toFixed(1)}%。 实验结果验证了牛顿第二定律的正确性。`;
-            } else conclusionText += `根据数据分析，可以验证牛顿第二定律F=Ma。请根据计算结果填写具体结论。`;
-            document.getElementById('conclusion').textContent = conclusionText;
-            const teacherName = document.getElementById('instructor').value || '马厂';
-            const currentDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('commentContent').innerHTML = comment;
-            document.getElementById('commentContent').style.color = gradeColor;
-            document.getElementById('teacherName').textContent = teacherName;
-            document.getElementById('currentDate').textContent = currentDate;
-            document.getElementById('commentFooter').style.display = 'block';
-            if (window.MathJax) MathJax.typesetPromise();
-        }
-
-        window.onload = function() {
-            loadAllSavedData();
-            document.addEventListener('input', function(e) {
-                if (e.target.matches('.info-input, .fill-blank, .data-input, .mass-input, .thought-input, #summary')) {
-                    if (autoSaveTimer) clearTimeout(autoSaveTimer);
-                    autoSaveTimer = setTimeout(() => { saveAllData(); }, 1000);
-                }
-            });
-            setInterval(() => { saveAllData(); }, 60000);
-            document.querySelectorAll('.data-input, .mass-input').forEach(input => { input.addEventListener('change', function() { setTimeout(calculateData, 100); }); });
-            document.querySelectorAll('.fill-blank').forEach(input => { input.addEventListener('change', function() { this.classList.remove('correct', 'incorrect', 'empty'); const statusIcon = this.nextElementSibling; if (statusIcon && statusIcon.classList.contains('answer-status')) { statusIcon.textContent = ''; statusIcon.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon'); } }); });
-            const today = new Date().toISOString().split('T')[0];
-            const dateInput = document.getElementById('expDate');
-            if (dateInput && !dateInput.value) dateInput.value = today;
-            calculateData();
-            if (window.MathJax) MathJax.typesetPromise();
-        };
-    </script>
+    }
+    
+    function showReportToast(msg) {
+        let toast = document.createElement('div');
+        toast.className = 'report-toast';
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2200);
+    }
+    
+    // 保存功能：保存所有数据（包括操作分，用于教师保存评分结果）
+    function manualSave() {
+        let data = { info:{}, blanks:{}, masses:{}, forces:{}, datafields:{}, thoughts:{}, summary:document.getElementById('summary').value, opScore:document.getElementById('operationScore').value, stuErr1:document.getElementById('student_error1').value, stuErr2:document.getElementById('student_error2').value, images:imageList, hasDrawnFvsA, hasDrawnMvsA };
+        document.querySelectorAll('.info-input').forEach(i=>data.info[i.id]=i.value);
+        document.querySelectorAll('.fill-blank').forEach(i=>data.blanks[i.id]=i.value);
+        document.querySelectorAll('.mass-input').forEach(i=>data.masses[i.id]=i.value);
+        document.querySelectorAll('.force-input').forEach(i=>data.forces[i.id]=i.value);
+        document.querySelectorAll('.data-input').forEach(i=>data.datafields[i.id]=i.value);
+        document.querySelectorAll('.thought-input').forEach(i=>data.thoughts[i.id]=i.value);
+        localStorage.setItem('fullReport', JSON.stringify(data));
+        document.getElementById('lastSaveTime').innerText = `📁 上次保存：${new Date().toLocaleTimeString()}`;
+        alert("报告已手动保存");
+    }
+    
+    // 加载功能：加载除操作分和密码状态外的所有数据，防止学生绕过密码
+    function manualLoad() {
+        let raw = localStorage.getItem('fullReport');
+        if(!raw) return alert("无保存记录");
+        let data = JSON.parse(raw);
+        // 加载除实验名称(固定)、操作分、密码相关的所有字段
+        Object.entries(data.info||{}).forEach(([id,val])=>{ 
+            let e = document.getElementById(id); 
+            if(e && id !== 'expName' && id !== 'operationScore') e.value = val; 
+        });
+        Object.entries(data.blanks||{}).forEach(([id,val])=>{ let e=document.getElementById(id); if(e) e.value=val; });
+        Object.entries(data.masses||{}).forEach(([id,val])=>{ let e=document.getElementById(id); if(e) e.value=val; });
+        Object.entries(data.forces||{}).forEach(([id,val])=>{ let e=document.getElementById(id); if(e) e.value=val; });
+        Object.entries(data.datafields||{}).forEach(([id,val])=>{ let e=document.getElementById(id); if(e) e.value=val; });
+        Object.entries(data.thoughts||{}).forEach(([id,val])=>{ let e=document.getElementById(id); if(e) e.value=val; });
+        if(data.summary) document.getElementById('summary').value = data.summary;
+        if(data.stuErr1) document.getElementById('student_error1').value = data.stuErr1;
+        if(data.stuErr2) document.getElementById('student_error2').value = data.stuErr2;
+        if(data.images) { imageList = data.images; displayImages(); }
+        if(data.hasDrawnFvsA !== undefined) hasDrawnFvsA = data.hasDrawnFvsA;
+        if(data.hasDrawnMvsA !== undefined) hasDrawnMvsA = data.hasDrawnMvsA;
+        
+        // 关键：加载后强制重置操作分相关状态，防止学生绕过密码
+        document.getElementById('operationScore').value = '0';
+        document.getElementById('currentOpScore').innerText = '0';
+        document.getElementById('opScoreDiv').style.display = 'none';
+        document.getElementById('opLockMsg').innerHTML = '';
+        opScoreLocked = false;
+        // 清空教师密码输入框，密码不自动保存
+        document.getElementById('opPwd').value = '';
+        // 清除本地存储中可能残留的操作分记录
+        localStorage.removeItem('operationScore');
+        
+        calculateData();
+        updateAllAnswerStatusIcons();
+        alert("加载完成（操作分已重置，需教师重新验证密码）");
+    }
+    
+    function loadSavedDataWithoutOpScore() { /* 兼容原有调用，不做任何自动加载操作分的行为 */ }
+    function exportData() {
+        let d = localStorage.getItem('fullReport');
+        if(d){ let blob = new Blob([d],{type:'application/json'}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='exp_backup.json'; a.click(); } else alert("无数据");
+    }
+    function importData() {
+        let inp=document.createElement('input'); inp.type='file'; inp.accept='.json'; inp.onchange=e=>{ let f=e.target.files[0]; let reader=new FileReader(); reader.onload=ev=>{ localStorage.setItem('fullReport', ev.target.result); alert("导入成功，即将刷新页面"); location.reload(); }; reader.readAsText(f); }; inp.click();
+    }
+    function clearSavedData() { if(confirm("清除所有本地数据 (包括图片)？")) { localStorage.clear(); location.reload(); } }
+    function toggleAnswer(n) { let ansDiv=document.getElementById(`answer${n}`); if(ansDiv.style.display==='block') ansDiv.style.display='none'; else ansDiv.style.display='block'; }
+    
+    function drawFvsAChart() {
+        calculateData();
+        let a1 = parseFloat(document.getElementById('a1').innerText) || 0;
+        let a2 = parseFloat(document.getElementById('a2').innerText) || 0;
+        let F1 = parseFloat(document.getElementById('F1').value) || 0;
+        let F2 = parseFloat(document.getElementById('F2').value) || 0;
+        if (a1 === 0 || a2 === 0 || F1===0 || F2===0) { alert("请先填写完整数据（包括F值）并计算"); return; }
+        let ctx = document.getElementById('fvsAChart').getContext('2d');
+        if (fvsAChartInstance) fvsAChartInstance.destroy();
+        fvsAChartInstance = new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets: [ { label: '实验数据点', data: [{x: a1, y: F1}, {x: a2, y: F2}], backgroundColor: '#1e88e5', pointRadius: 8 }, { label: '理论直线 (过原点)', data: [{x: 0, y: 0}, {x: Math.max(a1, a2) * 1.2, y: F2 * Math.max(a1, a2) * 1.2 / a2}], type: 'line', borderColor: '#e91e63', borderWidth: 2, pointRadius: 0, fill: false } ] },
+            options: { responsive: true, maintainAspectRatio: true, scales: { x: { title: { display: true, text: '加速度 a (m/s²)' }, beginAtZero: true }, y: { title: { display: true, text: '外力 F (N)' }, beginAtZero: true } } }
+        });
+        hasDrawnFvsA = true;
+        manualSave();
+    }
+    function drawMvsAChart() {
+        calculateData();
+        let a3 = parseFloat(document.getElementById('a3').innerText) || 0;
+        let a4 = parseFloat(document.getElementById('a4').innerText) || 0;
+        if (a3 === 0 || a4 === 0) { alert("请先填写完整数据并计算"); return; }
+        let inv3 = 1 / a3, inv4 = 1 / a4;
+        let m3 = parseFloat(document.getElementById('mass3').value) || 0;
+        let m4 = parseFloat(document.getElementById('mass4').value) || 0;
+        let ctx = document.getElementById('mvsAChart').getContext('2d');
+        if (mvsAChartInstance) mvsAChartInstance.destroy();
+        mvsAChartInstance = new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets: [ { label: '实验数据点', data: [{x: inv3, y: m3}, {x: inv4, y: m4}], backgroundColor: '#43a047', pointRadius: 8 }, { label: '理论直线', data: [{x: 0, y: 0}, {x: Math.max(inv3, inv4) * 1.2, y: 0.098 * Math.max(inv3, inv4) * 1.2}], type: 'line', borderColor: '#ff6d00', borderWidth: 2, pointRadius: 0, fill: false } ] },
+            options: { responsive: true, maintainAspectRatio: true, scales: { x: { title: { display: true, text: '加速度倒数 1/a (s²/m)' }, beginAtZero: true }, y: { title: { display: true, text: '质量 M (kg)' }, beginAtZero: true } } }
+        });
+        hasDrawnMvsA = true;
+        manualSave();
+    }
+    
+    function bindFillBlankEvents() {
+        document.querySelectorAll('.fill-blank').forEach(inp => {
+            inp.removeEventListener('input', fillBlankHandler);
+            inp.addEventListener('input', fillBlankHandler);
+        });
+    }
+    function fillBlankHandler(e) { updateAnswerStatusIcon(e.target); }
+    
+    window.onload = function() {
+        loadSavedDataWithoutOpScore();
+        bindFillBlankEvents();
+        updateAllAnswerStatusIcons();
+        if(fvsAChartInstance) { fvsAChartInstance.destroy(); fvsAChartInstance = null; }
+        if(mvsAChartInstance) { mvsAChartInstance.destroy(); mvsAChartInstance = null; }
+        let expNameInput = document.getElementById('expName');
+        if(expNameInput) expNameInput.readOnly = true;
+        const reportBtn = document.getElementById('oneClickReportBtn');
+        if(reportBtn) reportBtn.addEventListener('click', oneClickDataReport);
+        let classInput = document.getElementById('class');
+        if(classInput) classInput.style.width = '300px';
+        if(document.getElementById('opPwd')) document.getElementById('opPwd').value = '';
+        document.getElementById('opScoreDiv').style.display = 'none';
+        opScoreLocked = false;
+    };
+</script>
 </body>
 </html>
-```
