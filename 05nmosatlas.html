@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>NMOS器件ATLAS仿真 | 电学特性模拟</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #eef2f7 0%, #cfdee9 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1450px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(2px);
+            padding: 28px 24px;
+            border-radius: 38px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+        h1 {
+            color: #1e466e;
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: 1.9rem;
+        }
+        h2 {
+            color: #1b4f6e;
+            border-left: 6px solid #0d6efd;
+            padding-left: 15px;
+            margin-top: 32px;
+            font-size: 1.45rem;
+            background: linear-gradient(90deg, #e3f2fd, transparent);
+            border-radius: 12px 0 0 12px;
+        }
+        .fill-blank {
+            border: none;
+            border-bottom: 2px solid #0d6efd;
+            background: #f0f8ff;
+            padding: 4px 12px;
+            text-align: center;
+            min-width: 120px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .fill-blank:focus {
+            outline: none;
+            background: #e3f2fd;
+        }
+        .fill-blank-container {
+            position: relative;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .answer-status {
+            margin-left: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            display: inline-block;
+            width: 22px;
+        }
+        .correct-icon {
+            color: #2e7d32;
+        }
+        .incorrect-icon {
+            color: #c62828;
+        }
+        .empty-icon {
+            color: #757575;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 24px;
+            border: 1px solid #e0e4e8;
+            background: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+            font-size: 0.85rem;
+        }
+        th {
+            background: #0a4b6e;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+        }
+        td {
+            border: 1px solid #cfd8dc;
+            padding: 8px 6px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .btn {
+            background: linear-gradient(135deg, #2c7da0, #1f5068);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0d6efd, #0a58ca);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #198754, #157347);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #2c3e50;
+        }
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #c62828, #b71c1c);
+        }
+        .process-panel {
+            background: #eef2fa;
+            border-radius: 28px;
+            padding: 18px 24px;
+            margin: 22px 0;
+            border-left: 8px solid #0d6efd;
+        }
+        .evidence-area {
+            background: #f3e5f5;
+            border-radius: 28px;
+            padding: 20px;
+            margin: 25px 0;
+            border: 1px dashed #ab47bc;
+        }
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 15px;
+        }
+        .img-card {
+            position: relative;
+            width: 130px;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 6px;
+            text-align: center;
+        }
+        .img-card img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 14px;
+        }
+        .del-img {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #c62828;
+            color: white;
+            border-radius: 30px;
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            line-height: 24px;
+        }
+        .score-details {
+            background: #fef9e6;
+            border-radius: 28px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #ffecb3;
+        }
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #ffe0b2;
+            padding: 10px;
+        }
+        .calc-badge {
+            background: #e8f0fe;
+            padding: 5px 14px;
+            border-radius: 40px;
+            display: inline-block;
+            margin: 6px 8px;
+            font-weight: 500;
+        }
+        .info-input {
+            border: none;
+            border-bottom: 2px solid #90a4ae;
+            background: #fafafa;
+            padding: 6px 12px;
+            min-width: 130px;
+            border-radius: 10px;
+        }
+        .info-input[readonly] {
+            background: #e8edf2;
+            color: #1e466e;
+            font-weight: 600;
+            border-bottom-color: #0d6efd;
+            cursor: default;
+        }
+        .report-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e466e;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            z-index: 2000;
+            font-weight: bold;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            animation: toastFade 2.2s ease forwards;
+            white-space: nowrap;
+            max-width: 90vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        @keyframes toastFade {
+            0% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            70% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+                visibility: hidden;
+            }
+        }
+        .teacher-panel {
+            background: #e8eaf6;
+            border-radius: 28px;
+            padding: 16px 24px;
+            margin: 20px 0;
+            border-left: 8px solid #3f51b5;
+        }
+        .thought-answer {
+            display: none;
+            background: #e8f5e9;
+            padding: 12px 18px;
+            border-radius: 20px;
+            margin: 10px 0;
+            border-left: 5px solid #4caf50;
+        }
+        .res-input {
+            width: 100px;
+            text-align: center;
+            border: 2px solid #ff9800;
+            border-radius: 12px;
+            padding: 6px;
+            font-weight: bold;
+            background: #fff8e1;
+        }
+        .code-snippet {
+            background: #1e2a3a;
+            color: #d4d4dc;
+            padding: 10px 15px;
+            border-radius: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.78rem;
+            margin: 10px 0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            max-width: 700px;
+        }
+        .question-item {
+            margin: 10px 0;
+            padding: 6px 0;
+            font-size: 0.95rem;
+        }
+        .question-item textarea {
+            border-radius: 16px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        .flex-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .exp-name-fixed {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e3f2fd;
+            padding: 4px 16px 4px 12px;
+            border-radius: 30px;
+            border: 1px solid #90caf9;
+        }
+        .exp-name-fixed .label {
+            color: #0d47a1;
+            font-weight: 500;
+        }
+        .exp-name-fixed .value {
+            color: #1e466e;
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: 0.3px;
+        }
+        .apparatus-img {
+            max-width: 80%;
+            margin: 20px auto;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .svg-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            background: #fafafa;
+            border-radius: 16px;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+        }
+        .svg-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 16px 12px;
+            }
+            .fill-blank {
+                min-width: 80px;
+                font-size: 0.8rem;
+                padding: 2px 8px;
+            }
+            .btn {
+                padding: 6px 14px;
+                font-size: 0.8rem;
+            }
+            h1 {
+                font-size: 1.4rem;
+            }
+            h2 {
+                font-size: 1.15rem;
+            }
+            .report-toast {
+                font-size: 0.85rem;
+                padding: 10px 18px;
+                white-space: normal;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 NMOS器件ATLAS仿真 · 电学特性模拟</h1>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+            <div id="lastSaveTime" style="background:#eceff1; padding: 5px 16px; border-radius: 50px;">📁 未保存</div>
+            <button class="btn" onclick="manualSave()">💾 保存进度</button>
+            <button class="btn" onclick="manualLoad()">📂 加载记录</button>
+            <button class="btn" onclick="exportData()">📎 导出备份</button>
+            <button class="btn btn-danger" onclick="clearSavedData()">🗑️ 重置所有</button>
+        </div>
+
+        <!-- 基本信息 -->
+        <div style="background: #f8f9fa; padding: 18px; border-radius: 32px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+            <div class="exp-name-fixed">
+                <span class="label">🧪 实验名称</span>
+                <span class="value">NMOS器件ATLAS仿真 (电学特性模拟)</span>
+            </div>
+            <input type="hidden" id="expName" value="NMOS器件ATLAS仿真 (电学特性模拟)">
+            <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-27"></div>
+            <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名"></div>
+            <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号"></div>
+            <div>指导教师：<input type="text" class="info-input" id="instructor" value="马厂"></div>
+            <div>专业班级：<input type="text" class="info-input" id="class" placeholder="微电子/集成电路" style="width:260px"></div>
+        </div>
+
+        <!-- ========== 一、加载结构与模型定义 ========== -->
+        <h2>📌 一、加载结构与模型定义</h2>
+        <div class="process-panel">
+            <div class="code-snippet">go atlas
+                # 载入ATHENA生成的结构
+                mesh read from file nmos.str
+                # 模型定义
+                models cvt print srh
+                # 接触定义 (栅极用n+多晶硅)
+                contact name=gate n.poly
+                # 界面固定电荷
+                interface qf=3e10</div>
+            <div class="question-item">🔸 载入的结构文件名为 <span class="fill-blank-container"><input type="text" class="fill-blank" id="meshFile" data-answer="nmos.str"><span class="answer-status"></span></span>。</div>
+            <div class="question-item">🔸 <code>cvt</code> 模型表示 <span class="fill-blank-container"><input type="text" class="fill-blank" id="model1" data-answer="Lombardi迁移率"><span class="answer-status"></span></span> 模型，<code>srh</code> 表示 <span class="fill-blank-container"><input type="text" class="fill-blank" id="model2" data-answer="Shockley-Read-Hall复合"><span class="answer-status"></span></span> 模型。</div>
+            <div class="question-item">🔸 栅极接触类型为 <span class="fill-blank-container"><input type="text" class="fill-blank" id="contactGate" data-answer="n+多晶硅"><span class="answer-status"></span></span>（<code>n.poly</code>）。</div>
+            <div class="question-item">🔸 Si-SiO2界面固定电荷密度 Qf = <span class="fill-blank-container"><input type="text" class="fill-blank" id="qfVal" data-answer="3e10"><span class="answer-status"></span></span> cm⁻²。</div>
+        </div>
+
+        <!-- ========== 二、数值方法与初始解 ========== -->
+        <h2>⚙️ 二、数值方法与初始解</h2>
+        <div class="process-panel">
+            <div class="code-snippet"># 数值方法 (先Gummel后Newton)
+                method gummel newton
+                # 初始解 (零偏)
+                solve init</div>
+            <div class="question-item">🔸 数值方法组合为 <span class="fill-blank-container"><input type="text" class="fill-blank" id="method1" data-answer="Gummel+Newton"><span class="answer-status"></span></span>，默认先 <span class="fill-blank-container"><input type="text" class="fill-blank" id="method2" data-answer="Gummel"><span class="answer-status"></span></span> 循环，若不收敛再使用 <span class="fill-blank-container"><input type="text" class="fill-blank" id="method3" data-answer="Newton"><span class="answer-status"></span></span> 全耦合。</div>
+            <div class="question-item">🔸 <code>solve init</code> 用于获得 <span class="fill-blank-container"><input type="text" class="fill-blank" id="initSol" data-answer="零偏初始解"><span class="answer-status"></span></span>（热平衡状态）。</div>
+        </div>
+
+        <!-- ========== 三、Id-Vgs特性扫描 ========== -->
+        <h2>📈 三、Id-Vgs特性扫描 (Vds=0.1V)</h2>
+        <div class="process-panel">
+            <div class="code-snippet"># 设置漏极偏压
+                solve vdrain=0.1
+                # 打开log文件
+                log out=nmos1_0.log
+                # 扫描栅压
+                solve name=gate vgate=0 vfinal=3.3 vstep=0.1</div>
+            <div class="question-item">🔸 漏极偏压 Vds = <span class="fill-blank-container"><input type="text" class="fill-blank" id="vdVal" data-answer="0.1"><span class="answer-status"></span></span> V。</div>
+            <div class="question-item">🔸 栅压扫描范围从 <span class="fill-blank-container"><input type="text" class="fill-blank" id="vgStart" data-answer="0"><span class="answer-status"></span></span> V 到 <span class="fill-blank-container"><input type="text" class="fill-blank" id="vgEnd" data-answer="3.3"><span class="answer-status"></span></span> V，步长 <span class="fill-blank-container"><input type="text" class="fill-blank" id="vgStep" data-answer="0.1"><span class="answer-status"></span></span> V。</div>
+            <div class="question-item">🔸 日志文件名 <span class="fill-blank-container"><input type="text" class="fill-blank" id="logFile" data-answer="nmos1_0.log"><span class="answer-status"></span></span>。</div>
+            <div class="chart-container">
+                <canvas id="ivChart1" width="600" height="350"></canvas>
+            </div>
+        </div>
+
+        <!-- ========== 四、参数提取 (Vt, Beta, Theta) ========== -->
+        <h2>📊 四、参数提取 (Vt, Beta, Theta)</h2>
+        <div class="process-panel">
+            <div class="code-snippet"># 提取阈值电压
+                extract name="vt" (xintercept(maxslope(curve(v."gate", i."drain"))))
+                # 提取Beta (跨导系数)
+                extract name="beta" (maxslope(curve(v."gate", i."drain")))
+                # 提取Theta (迁移率退化系数)
+                extract name="theta" (linreg(1/sqrt(i."drain"), v."gate"))</div>
+            <div class="question-item">🔸 阈值电压 Vt 通过 <span class="fill-blank-container"><input type="text" class="fill-blank" id="vtMethod" data-answer="最大斜率外推"><span class="answer-status"></span></span> 方法提取（<code>maxslope</code> 线性外推至零电流）。</div>
+            <div class="question-item">🔸 Beta 表示 <span class="fill-blank-container"><input type="text" class="fill-blank" id="betaDef" data-answer="跨导系数"><span class="answer-status"></span></span>，Theta 表示 <span class="fill-blank-container"><input type="text" class="fill-blank" id="thetaDef" data-answer="迁移率退化系数"><span class="answer-status"></span></span>。</div>
+            <div class="question-item">🔸 提取语句中 <code>v."gate"</code> 表示 <span class="fill-blank-container"><input type="text" class="fill-blank" id="varSyntax" data-answer="栅极电压"><span class="answer-status"></span></span>，<code>i."drain"</code> 表示 <span class="fill-blank-container"><input type="text" class="fill-blank" id="varSyntax2" data-answer="漏极电流"><span class="answer-status"></span></span>。</div>
+        </div>
+
+        <!-- ========== 五、输出特性曲线族 (Id-Vds) ========== -->
+        <h2>📈 五、输出特性曲线族 (Id-Vds)</h2>
+        <div class="process-panel">
+            <div class="code-snippet"># 关闭当前log
+                log off
+                # 设置不同栅压并保存解文件
+                solve vgate=1.1 outf=solve1
+                solve vgate=2.2 outf=solve2
+                solve vgate=3.3 outf=solve3
+                # 载入各解文件并扫描漏压
+                load inf=solve1 master
+                log out=nmos2_1.log
+                solve vdrain=0 vfinal=3.3 vstep=0.3
+                load inf=solve2 master
+                log out=nmos2_2.log
+                solve vdrain=0 vfinal=3.3 vstep=0.3
+                load inf=solve3 master
+                log out=nmos2_3.log
+                solve vdrain=0 vfinal=3.3 vstep=0.3</div>
+            <div class="question-item">🔸 栅压分别设为 <span class="fill-blank-container"><input type="text" class="fill-blank" id="vg1" data-answer="1.1"><span class="answer-status"></span></span> V、<span class="fill-blank-container"><input type="text" class="fill-blank" id="vg2" data-answer="2.2"><span class="answer-status"></span></span> V、<span class="fill-blank-container"><input type="text" class="fill-blank" id="vg3" data-answer="3.3"><span class="answer-status"></span></span> V。</div>
+            <div class="question-item">🔸 每个栅压下漏压从 <span class="fill-blank-container"><input type="text" class="fill-blank" id="vdStart" data-answer="0"><span class="answer-status"></span></span> V 到 <span class="fill-blank-container"><input type="text" class="fill-blank" id="vdEnd" data-answer="3.3"><span class="answer-status"></span></span> V，步长 <span class="fill-blank-container"><input type="text" class="fill-blank" id="vdStep" data-answer="0.3"><span class="answer-status"></span></span> V。</div>
+            <div class="question-item">🔸 <code>load</code> 语句用于 <span class="fill-blank-container"><input type="text" class="fill-blank" id="loadDef" data-answer="载入之前保存的解文件"><span class="answer-status"></span></span>，作为后续扫描的初始解。</div>
+            <div class="chart-container">
+                <canvas id="ivChart2" width="600" height="350"></canvas>
+            </div>
+        </div>
+
+        <!-- ========== 六、思考题 ========== -->
+        <h2>💡 六、思考题</h2>
+        <div class="question-item">1. 在NMOS仿真中，为什么使用CVT迁移率模型？它考虑了哪些物理效应？<br>
+            <textarea id="thought1" rows="2" style="width:100%; border-radius:16px; padding:10px;"></textarea>
+            <button class="btn btn-info" onclick="toggleAnswer(1)">参考答案</button>
+            <div id="answer1" class="thought-answer">答：CVT（Lombardi）模型是通用迁移率模型，综合考虑了浓度（掺杂）、温度、平行电场和垂直电场对迁移率的影响，特别适用于MOSFET反型层沟道中载流子迁移率的模拟，能准确反映表面散射和库仑散射等效应。</div>
+        </div>
+        <div class="question-item">2. 阈值电压Vt的提取方法是什么？为什么采用最大斜率外推法？<br>
+            <textarea id="thought2" rows="2" style="width:100%; border-radius:16px; padding:10px;"></textarea>
+            <button class="btn btn-info" onclick="toggleAnswer(2)">参考答案</button>
+            <div id="answer2" class="thought-answer">答：Vt通过线性区Id-Vgs曲线最大斜率处的切线外推至电流为零（或某一小电流）得到。这种方法能消除弱反型区的影响，准确反映强反型开始时的栅压，且对串联电阻不敏感，是工业界标准提取方法。</div>
+        </div>
+        <div class="question-item">3. 在输出特性曲线族中，为何不同栅压下的Id-Vds曲线在饱和区电流会趋于恒定？这反映了MOSFET的什么特性？<br>
+            <textarea id="thought3" rows="2" style="width:100%; border-radius:16px; padding:10px;"></textarea>
+            <button class="btn btn-info" onclick="toggleAnswer(3)">参考答案</button>
+            <div id="answer3" class="thought-answer">答：饱和区沟道夹断，漏极电流主要由栅压控制，受漏压影响较小，表现为恒流特性。这反映了MOSFET的压控电流源特性，是模拟电路设计中的重要基础。实际中由于沟道长度调制效应，饱和区电流略有增加。</div>
+        </div>
+
+        <!-- ========== 七、实验小结 ========== -->
+        <h2>📝 七、实验小结</h2>
+        <textarea id="summary" rows="3" style="width:100%; border-radius:20px; padding:12px; border:1px solid #ccc;" placeholder="总结NMOS ATLAS仿真流程、模型选择、参数提取方法、IV特性分析等..."></textarea>
+
+        <!-- ========== 证据图片上传 ========== -->
+        <div class="evidence-area">
+            <strong>📸 实验证据图片上传（权重30%：仿真结构截图/IV曲线/提取参数结果等）</strong>
+            <div><input type="file" id="evidenceUpload" accept="image/*" multiple><button class="btn btn-success" onclick="uploadEvidenceImages()">➕ 上传图片证据</button></div>
+            <div id="imagePreviewContainer" class="image-preview"></div>
+            <div style="margin-top: 12px; font-size:0.85rem;">⭐ 至少上传一张有效照片证明你来了且真实做了实验（你与代码的合照）。</div>
+        </div>
+
+        <!-- ========== 教师评分面板 ========== -->
+        <div class="teacher-panel">
+            <strong>🔐 教师评分与数据上报（仅限教师操作）</strong><br>
+            <input type="password" id="teacherPwd" placeholder="教师密码" autocomplete="off" style="padding:8px; border-radius:20px; border:1px solid #aaa;">
+            <button class="btn" onclick="verifyTeacher()" style="background:#3f51b5;">🔑 验证并解锁</button>
+            <span id="teacherMsg" style="color:#b71c1c; margin-left:12px;"></span>
+            <div id="teacherPanelLocked" style="display:none; margin-top: 16px;">
+                <div>📸 证据图片得分 (0~30分)：<input type="number" id="evidenceScore" min="0" max="30" step="1" value="0" style="width:80px; padding:5px;">
+                    <button class="btn btn-primary" onclick="saveEvidenceScore()">✅ 保存证据分</button>
+                </div>
+                <div style="margin-top: 12px;">当前证据得分：<span id="currentEvidenceScoreSpan">0</span> / 30</div>
+                <button id="reportBtnForTeacher" class="btn btn-success" style="margin-top: 12px;">📤 一键数据上报（教师权限）</button>
+            </div>
+            <div class="score-item" style="margin-top: 10px;"><span>⚠️ 未验证教师密码前，无法评分和上报。</span></div>
+        </div>
+
+        <!-- ========== 自动评分 ========== -->
+        <h2>⭐ 八、自动评分（基于填空+思考+小结+证据分）</h2>
+        <div style="text-align:center; margin: 15px 0;">
+            <button class="btn btn-primary" onclick="runAutoGrade()">📊 自动评分（教师密码验证后方可计入证据分）</button>
+        </div>
+        <div id="scoreDetails" class="score-details" style="display:none;">
+            <div class="score-item"><span>📖 填空与参数 (40%)</span><span id="detailBlankScore">0/40</span></div>
+            <div class="score-item"><span>💡 思考题 (20%)</span><span id="detailThoughtScore">0/20</span></div>
+            <div class="score-item"><span>📄 实验小结 (10%)</span><span id="detailSummaryScore">0/10</span></div>
+            <div class="score-item"><span>📸 证据图片 (30%)</span><span id="detailEvidenceScore">0/30</span></div>
+            <div class="score-item" style="font-weight:bold; border-top:2px solid #ff9800;"><span>🏆 总分</span><span id="detailTotalScore">0/100</span></div>
+        </div>
+        <div id="commentContent" style="background:#fff8e7; border-radius: 28px; padding: 20px; margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 全局数据
+        // ============================================================
+        let imageList = [];
+        let teacherVerified = false;
+        let evidenceScoreManual = 0;
+
+        function showToast(message, duration = 2200) {
+            document.querySelectorAll('.report-toast').forEach(el => el.remove());
+            let toast = document.createElement('div');
+            toast.className = 'report-toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, duration);
+        }
+
+        // 标准答案映射
+        const answerKey = {
+            "meshFile": ["nmos.str"],
+            "model1": ["Lombardi迁移率", "CVT"],
+            "model2": ["Shockley-Read-Hall复合", "SRH"],
+            "contactGate": ["n+多晶硅", "n.poly"],
+            "qfVal": ["3e10"],
+            "method1": ["Gummel+Newton", "Gummel Newton"],
+            "method2": ["Gummel"],
+            "method3": ["Newton"],
+            "initSol": ["零偏初始解", "热平衡"],
+            "vdVal": ["0.1"],
+            "vgStart": ["0"],
+            "vgEnd": ["3.3"],
+            "vgStep": ["0.1"],
+            "logFile": ["nmos1_0.log"],
+            "vtMethod": ["最大斜率外推", "斜率外推"],
+            "betaDef": ["跨导系数"],
+            "thetaDef": ["迁移率退化系数"],
+            "varSyntax": ["栅极电压", "gate voltage"],
+            "varSyntax2": ["漏极电流", "drain current"],
+            "vg1": ["1.1"],
+            "vg2": ["2.2"],
+            "vg3": ["3.3"],
+            "vdStart": ["0"],
+            "vdEnd": ["3.3"],
+            "vdStep": ["0.3"],
+            "loadDef": ["载入之前保存的解文件", "载入解文件"]
+        };
+
+        // ============================================================
+        // 填空状态更新
+        // ============================================================
+        function updateAnswerStatus(input) {
+            const container = input.parentElement;
+            const statusSpan = container.querySelector('.answer-status');
+            if (!statusSpan) return;
+            const correctList = answerKey[input.id] || [];
+            const user = input.value.trim().toLowerCase();
+            let ok = false;
+            for (let c of correctList) {
+                if (user === c.toLowerCase()) { ok = true; break; }
+            }
+            if (ok) { statusSpan.innerHTML = '✓';
+                statusSpan.className = 'answer-status correct-icon'; } else if (user === '') { statusSpan.innerHTML =
+                    '○';
+                statusSpan.className = 'answer-status empty-icon'; } else { statusSpan.innerHTML = '✗';
+                statusSpan.className = 'answer-status incorrect-icon'; }
+        }
+
+        function bindFillEvents() {
+            document.querySelectorAll('.fill-blank').forEach(inp => {
+                inp.addEventListener('input', () => updateAnswerStatus(inp));
+                updateAnswerStatus(inp);
+            });
+        }
+
+        // ============================================================
+        // 教师验证
+        // ============================================================
+        function verifyTeacher() {
+            const pwd = document.getElementById('teacherPwd').value;
+            if (pwd === "52531314") {
+                teacherVerified = true;
+                document.getElementById('teacherMsg').innerHTML = "✅ 验证成功，可评分及上报";
+                document.getElementById('teacherPanelLocked').style.display = "block";
+                document.getElementById('reportBtnForTeacher').onclick = oneClickDataReport;
+                showToast("🔓 教师权限已解锁");
+            } else {
+                teacherVerified = false;
+                document.getElementById('teacherMsg').innerHTML = "❌ 密码错误，无法评分/上报";
+                document.getElementById('teacherPanelLocked').style.display = "none";
+                showToast("❌ 教师密码错误");
+            }
+        }
+
+        function saveEvidenceScore() {
+            if (!teacherVerified) { showToast("⚠️ 请先验证教师密码"); return; }
+            let sc = parseInt(document.getElementById('evidenceScore').value);
+            if (isNaN(sc)) sc = 0;
+            evidenceScoreManual = Math.min(30, Math.max(0, sc));
+            document.getElementById('currentEvidenceScoreSpan').innerText = evidenceScoreManual;
+            showToast(`📸 证据分数已设置为 ${evidenceScoreManual}/30`);
+            manualSave();
+        }
+
+        // ============================================================
+        // 评分逻辑
+        // ============================================================
+        function gradeBlanks() {
+            const inputs = document.querySelectorAll('.fill-blank');
+            let correct = 0,
+                total = 0;
+            inputs.forEach(inp => {
+                total++;
+                const val = inp.value.trim();
+                if (val === "") return;
+                const ans = answerKey[inp.id] || [];
+                if (ans.length && ans.some(a => val.toLowerCase() === a.toLowerCase())) { correct++; }
+            });
+            if (total === 0) return 0;
+            return Math.round((correct / total) * 40);
+        }
+
+        function gradeThought() {
+            const t1 = document.getElementById('thought1').value.trim();
+            const t2 = document.getElementById('thought2').value.trim();
+            const t3 = document.getElementById('thought3').value.trim();
+            let score = 0;
+            if (t1.length >= 20) {
+                let s = 0;
+                if (/CVT|Lombardi|迁移率|浓度|温度|电场/i.test(t1)) s += 4;
+                if (/反型层|表面散射|库仑散射/i.test(t1)) s += 2;
+                if (t1.length >= 60) s += 1;
+                score += Math.min(7, s);
+            }
+            if (t2.length >= 20) {
+                let s = 0;
+                if (/阈值|Vt|外推|斜率/i.test(t2)) s += 4;
+                if (/强反型|弱反型|串联电阻/i.test(t2)) s += 2;
+                if (t2.length >= 60) s += 1;
+                score += Math.min(7, s);
+            }
+            if (t3.length >= 20) {
+                let s = 0;
+                if (/饱和|夹断|恒流|压控/i.test(t3)) s += 3;
+                if (/沟道长度调制|电流源/i.test(t3)) s += 2;
+                if (t3.length >= 60) s += 1;
+                score += Math.min(6, s);
+            }
+            return Math.min(20, score);
+        }
+
+        function gradeSummary() {
+            const s = document.getElementById('summary').value.trim();
+            if (s.length < 100) return 0;
+            const keywords = ['NMOS', 'ATLAS', '仿真', '模型', 'CVT', 'SRH', '阈值', '跨导', '输出特性', '曲线族', '提取', '参数'];
+            let count = 0;
+            for (let k of keywords) { if (s.includes(k)) count++; }
+            if (s.length >= 200 && count >= 4) return 10;
+            if (s.length >= 150 && count >= 3) return 7;
+            if (s.length >= 100 && count >= 2) return 4;
+            return 2;
+        }
+
+        function getEvidenceScore() {
+            if (!teacherVerified) return 0;
+            return evidenceScoreManual;
+        }
+
+        function runAutoGrade() {
+            const blankScore = gradeBlanks();
+            const thoughtScore = gradeThought();
+            const summaryScore = gradeSummary();
+            const evidenceScore = getEvidenceScore();
+            const total = blankScore + thoughtScore + summaryScore + evidenceScore;
+
+            document.getElementById('detailBlankScore').innerText = `${blankScore}/40`;
+            document.getElementById('detailThoughtScore').innerText = `${thoughtScore}/20`;
+            document.getElementById('detailSummaryScore').innerText = `${summaryScore}/10`;
+            document.getElementById('detailEvidenceScore').innerText = `${evidenceScore}/30`;
+            document.getElementById('detailTotalScore').innerText = `${total}/100`;
+            document.getElementById('scoreDetails').style.display = 'block';
+
+            const teacherName = document.getElementById('instructor').value || "马厂";
+            let comment =
+                `📊 NMOS ATLAS仿真考查得分 ${total}/100。填空/参数${blankScore}/40，思考题${thoughtScore}/20，小结${summaryScore}/10，证据图片${evidenceScore}/30。<br>教师：${teacherName}<br>${total>=85?"优秀！深入掌握NMOS电学特性仿真与参数提取。":total>=70?"良好，加强模型选择与IV特性分析。":"请认真复习ATLAS命令及MOSFET物理。"}`;
+            document.getElementById('commentContent').innerHTML = comment;
+            manualSave();
+            showToast(`📊 评分完成：${total}/100`);
+        }
+
+        // ============================================================
+        // 一键上报
+        // ============================================================
+        async function oneClickDataReport() {
+            if (!teacherVerified) { showToast("⚠️ 请先输入教师密码并验证通过后才能上报数据！"); return; }
+            runAutoGrade();
+            const className = document.getElementById('class').value.trim() || "未填";
+            const stuId = document.getElementById('studentId').value.trim() || "未填";
+            const stuName = document.getElementById('studentName').value.trim() || "未填";
+            const totalScore = document.getElementById('detailTotalScore').innerText;
+            const date = document.getElementById('expDate').value.trim() || new Date().toLocaleDateString('zh-CN');
+            const instructor = document.getElementById('instructor').value.trim() || "马厂";
+            const expName = "NMOS器件ATLAS仿真 (电学特性模拟)";
+            const reportText =
+                `${expName}\n专业班级:${className}\n学号:${stuId}\n姓名:${stuName}\n综合得分:${totalScore}\n实验日期:${date}\n指导教师:${instructor}`;
+            try {
+                await navigator.clipboard.writeText(reportText);
+                showToast("✅ 实验报告数据已复制，可粘贴至表单");
+            } catch (_) {
+                let ta = document.createElement('textarea');
+                ta.value = reportText;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                showToast("✅ 实验报告数据已复制（备用方式）");
+            }
+            window.open("https://qrbgda8w.jsjform.com/f/GXDAiI", '_blank');
+        }
+
+        // ============================================================
+        // 图片上传
+        // ============================================================
+        function uploadEvidenceImages() {
+            const files = document.getElementById('evidenceUpload').files;
+            if (files.length === 0) { showToast("📂 请先选择图片文件"); return; }
+            let loaded = 0;
+            for (let f of files) {
+                if (!f.type.startsWith('image/')) continue;
+                const reader = new FileReader();
+                reader.onload = e => {
+                    imageList.push(e.target.result);
+                    loaded++;
+                    if (loaded === files.length) { displayImages();
+                        manualSave();
+                        showToast(`📸 已上传 ${imageList.length} 张图片证据`); }
+                };
+                reader.readAsDataURL(f);
+            }
+            document.getElementById('evidenceUpload').value = '';
+        }
+
+        function displayImages() {
+            const container = document.getElementById('imagePreviewContainer');
+            container.innerHTML = '';
+            imageList.forEach((src, idx) => {
+                const div = document.createElement('div');
+                div.className = 'img-card';
+                div.innerHTML =
+                    `<img src="${src}" alt="证据"><div class="del-img" onclick="removeImage(${idx})">✕</div>`;
+                container.appendChild(div);
+            });
+            localStorage.setItem('evidenceImages', JSON.stringify(imageList));
+        }
+
+        function removeImage(idx) {
+            imageList.splice(idx, 1);
+            displayImages();
+            manualSave();
+            showToast(`🗑️ 已移除一张图片，剩余 ${imageList.length} 张`);
+        }
+
+        // ============================================================
+        // 保存 / 加载 / 导出 / 重置
+        // ============================================================
+        function manualSave() {
+            const data = {
+                info: {},
+                blanks: {},
+                thoughts: {},
+                summary: document.getElementById('summary').value,
+                imageList: imageList,
+                evidenceScoreManual: evidenceScoreManual,
+                teacherVerified: false
+            };
+            document.querySelectorAll('.info-input').forEach(i => {
+                if (i.id !== 'expName') { data.info[i.id] = i.value; }
+            });
+            document.querySelectorAll('.fill-blank').forEach(i => data.blanks[i.id] = i.value);
+            data.thoughts.thought1 = document.getElementById('thought1').value;
+            data.thoughts.thought2 = document.getElementById('thought2').value;
+            data.thoughts.thought3 = document.getElementById('thought3').value;
+            localStorage.setItem('fullReport', JSON.stringify(data));
+            document.getElementById('lastSaveTime').innerText = `📁 保存于 ${new Date().toLocaleTimeString()}`;
+            showToast("💾 进度已保存（实验名称固定不变）");
+        }
+
+        function manualLoad() {
+            const raw = localStorage.getItem('fullReport');
+            if (!raw) { showToast("📭 无保存记录"); return; }
+            const data = JSON.parse(raw);
+            Object.entries(data.info || {}).forEach(([id, val]) => {
+                const e = document.getElementById(id);
+                if (e && e.id !== 'expName') e.value = val;
+            });
+            Object.entries(data.blanks || {}).forEach(([id, val]) => {
+                const e = document.getElementById(id);
+                if (e) e.value = val;
+            });
+            if (data.summary) document.getElementById('summary').value = data.summary;
+            if (data.thoughts) {
+                document.getElementById('thought1').value = data.thoughts.thought1 || '';
+                document.getElementById('thought2').value = data.thoughts.thought2 || '';
+                document.getElementById('thought3').value = data.thoughts.thought3 || '';
+            }
+            if (data.imageList) { imageList = data.imageList;
+                displayImages(); }
+            if (data.evidenceScoreManual !== undefined && teacherVerified) evidenceScoreManual = data.evidenceScoreManual;
+            document.getElementById('currentEvidenceScoreSpan').innerText = evidenceScoreManual;
+            document.getElementById('expName').value = 'NMOS器件ATLAS仿真 (电学特性模拟)';
+            bindFillEvents();
+            showToast("📂 加载完成（实验名称保持固定，证据分需教师重新认证）");
+        }
+
+        function exportData() {
+            const d = localStorage.getItem('fullReport');
+            if (d) {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([d], { type: 'application/json' }));
+                a.download = 'nmos_atlas_exam_backup.json';
+                a.click();
+                showToast("📎 备份文件已下载");
+            } else { showToast("📭 暂无数据可导出"); }
+        }
+
+        function clearSavedData() {
+            localStorage.clear();
+            showToast("🗑️ 所有数据已清除，页面即将刷新");
+            setTimeout(() => location.reload(), 800);
+        }
+
+        function toggleAnswer(n) {
+            const div = document.getElementById(`answer${n}`);
+            if (div.style.display === 'block') div.style.display = 'none';
+            else div.style.display = 'block';
+        }
+
+        // ============================================================
+        // 绘制IV曲线 (Chart.js)
+        // ============================================================
+        function drawCharts() {
+            // Id-Vgs (Vds=0.1V)
+            const ctx1 = document.getElementById('ivChart1').getContext('2d');
+            const vgs = [];
+            const ids = [];
+            for (let v = 0; v <= 3.3; v += 0.1) {
+                vgs.push(v);
+                // 模拟典型NMOS转移特性: 线性区
+                let id = 0;
+                if (v > 0.6) {
+                    id = 1.2e-4 * (v - 0.6) * (v - 0.6);
+                    // 加入饱和效应
+                    id = id / (1 + id * 50);
+                }
+                ids.push(id);
+            }
+            new Chart(ctx1, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Id-Vgs (Vds=0.1V)',
+                        data: vgs.map((v, i) => ({ x: v, y: ids[i] })),
+                        borderColor: '#0d6efd',
+                        backgroundColor: '#0d6efd',
+                        pointRadius: 0,
+                        borderWidth: 2.5,
+                        showLine: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Vgs (V)' }, min: 0, max: 3.5, grid: { color: '#e0e0e0' } },
+                        y: { title: { display: true, text: 'Id (A/μm)' }, min: 0, max: 0.00015, grid: { color: '#e0e0e0' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Id-Vds 曲线族
+            const ctx2 = document.getElementById('ivChart2').getContext('2d');
+            const vds = [];
+            for (let v = 0; v <= 3.3; v += 0.3) vds.push(v);
+            const colors = ['#d32f2f', '#2e7d32', '#0d6efd'];
+            const labels = ['Vgs=1.1V', 'Vgs=2.2V', 'Vgs=3.3V'];
+            const datasets = [];
+            // 模拟不同Vgs下的输出特性
+            const vgs_vals = [1.1, 2.2, 3.3];
+            vgs_vals.forEach((vg, idx) => {
+                const ids = vds.map(vd => {
+                    if (vd < 0.05) return 0;
+                    let id = 0;
+                    if (vg > 0.6) {
+                        let vov = vg - 0.6;
+                        let lin = 2e-4 * vov * vd;
+                        let sat = 1e-4 * vov * vov;
+                        // 平滑过渡
+                        let vdsat = vov * 0.5;
+                        if (vd < vdsat) id = lin;
+                        else id = sat * (1 + 0.02 * (vd - vdsat));
+                        id = Math.min(id, 2e-4);
+                    }
+                    return id;
+                });
+                datasets.push({
+                    label: labels[idx],
+                    data: vds.map((v, i) => ({ x: v, y: ids[i] })),
+                    borderColor: colors[idx],
+                    backgroundColor: colors[idx],
+                    pointRadius: 0,
+                    borderWidth: 2.5,
+                    showLine: true,
+                    tension: 0.2
+                });
+            });
+            new Chart(ctx2, {
+                type: 'scatter',
+                data: { datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        x: { title: { display: true, text: 'Vds (V)' }, min: 0, max: 3.5, grid: { color: '#e0e0e0' } },
+                        y: { title: { display: true, text: 'Id (A/μm)' }, min: 0, max: 0.0002, grid: { color: '#e0e0e0' } }
+                    },
+                    plugins: { legend: { display: true, position: 'top' } }
+                }
+            });
+        }
+
+        // ============================================================
+        // 初始化
+        // ============================================================
+        window.onload = function() {
+            document.getElementById('expName').value = 'NMOS器件ATLAS仿真 (电学特性模拟)';
+            bindFillEvents();
+            if (localStorage.getItem('fullReport')) manualLoad();
+            teacherVerified = false;
+            document.getElementById('teacherPanelLocked').style.display = "none";
+            document.getElementById('teacherMsg').innerHTML = "";
+            document.getElementById('evidenceScore').value = "0";
+            evidenceScoreManual = 0;
+            document.getElementById('currentEvidenceScoreSpan').innerText = "0";
+            drawCharts();
+        };
+    </script>
+</body>
+</html>
