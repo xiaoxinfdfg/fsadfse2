@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>光敏电阻的特性实验 | 智能实验报告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(2px);
+            padding: 30px 20px;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+        h1 { color: #1e466e; text-align: center; margin-bottom: 20px; font-size: 1.9rem; }
+        h2 { color: #2c5a2e; border-left: 6px solid #4CAF50; padding-left: 15px; margin-top: 30px; font-size: 1.5rem; }
+        h3 { color: #1565C0; margin: 20px 0 10px 0; }
+        .fill-blank {
+            border: none;
+            border-bottom: 2px solid #3498db;
+            background: #f0f8ff;
+            padding: 4px 10px;
+            text-align: center;
+            min-width: 110px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: 0.1s;
+        }
+        .fill-blank:focus { outline: none; background: #e3f2fd; }
+        .fill-blank-container { position: relative; display: inline-block; white-space: nowrap; }
+        .answer-status { margin-left: 6px; font-size: 1.1rem; font-weight: bold; display: inline-block; width: 20px; text-align: left; }
+        .correct-icon { color: #2e7d32; }
+        .incorrect-icon { color: #c62828; }
+        .empty-icon { color: #757575; }
+        .data-input {
+            width: 70px;
+            text-align: center;
+            border: 1px solid #b0bec5;
+            border-radius: 8px;
+            padding: 4px;
+            background: white;
+            font-size: 0.82rem;
+        }
+        .data-input:focus { outline: 2px solid #1e88e5; border-color: transparent; }
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px 0;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            background: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+            font-size: 0.85rem;
+        }
+        th {
+            background: #2c5a2e;
+            color: white;
+            padding: 10px 6px;
+            font-weight: 600;
+            white-space: nowrap;
+            text-align: center;
+        }
+        td {
+            border: 1px solid #cfd8dc;
+            padding: 6px 4px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        th:first-child, td:first-child { background: #e8f5e9; font-weight: 600; }
+        .score-btn, .chart-btn, .auto-grade-btn, .save-btn, .upload-btn {
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 600;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .chart-btn { background: linear-gradient(135deg, #1565C0, #0d47a1); }
+        .auto-grade-btn { background: linear-gradient(135deg, #e65100, #bf360c); }
+        .submit-report-btn {
+            background: linear-gradient(135deg, #0f4c5c, #0b3b48);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            margin: 5px 0 0 0;
+            font-weight: 600;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .submit-report-btn:hover { transform: translateY(-2px); background: linear-gradient(135deg, #1a6f85, #0f4c5c); }
+        .thought-input { width: 100%; min-height: 80px; border: 1px solid #cfd8dc; border-radius: 16px; padding: 10px; margin: 8px 0; font-family: inherit; font-size: 0.9rem; resize: vertical; }
+        .summary-box { width: 100%; min-height: 80px; border: 1px solid #cfd8dc; border-radius: 16px; padding: 10px; margin: 8px 0; font-family: inherit; font-size: 0.9rem; resize: vertical; background: white; }
+        .score-details { background: #f1f8e9; border-radius: 24px; padding: 20px; margin-top: 20px; border: 1px solid #a5d6a7; }
+        .score-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #c8e6c9; padding: 8px; }
+        .operator-panel { background: #e0f2f1; border-radius: 24px; padding: 18px; margin: 20px 0; border: 1px solid #00897b; }
+        .evidence-area { background: #f3e5f5; border-radius: 28px; padding: 20px; margin: 25px 0; border: 1px dashed #ab47bc; }
+        .image-preview { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 15px; }
+        .img-card { position: relative; width: 130px; border-radius: 16px; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 6px; text-align: center; }
+        .img-card img { width: 100%; height: 90px; object-fit: cover; border-radius: 12px; }
+        .del-img { position: absolute; top: -8px; right: -8px; background: #c62828; color: white; border-radius: 30px; width: 26px; height: 26px; cursor: pointer; font-weight: bold; line-height: 24px; text-align: center; font-size: 18px; }
+        .chart-container { margin: 20px 0; background: white; padding: 15px; border-radius: 28px; box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
+        .calculation-result { background: #e8f0fe; padding: 5px 12px; border-radius: 24px; display: inline-block; margin: 6px 0; font-size: 0.85rem; }
+        .thought-answer { display: none; background: #e8f5e9; padding: 12px; border-radius: 16px; margin: 6px 0; font-size: 0.9rem; }
+        .save-toolbar { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .info-input { border: none; border-bottom: 2px solid #90a4ae; background: #fafafa; padding: 6px 12px; min-width: 130px; border-radius: 8px; }
+        .info-input:read-only { background: #e9ecef; cursor: default; color: #2c3e50; }
+        #class { width: 300px; }
+        button:hover { transform: translateY(-2px); filter: brightness(1.02); }
+        .experiment-step { background: rgba(240,248,255,0.7); padding: 8px 12px; border-left: 4px solid #3498db; margin: 10px 0; border-radius: 12px; }
+        .question-item { margin: 12px 0; line-height: 1.8; }
+        .report-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e466e;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            z-index: 2000;
+            font-weight: bold;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+            animation: fadeOut 2.6s ease forwards;
+            font-size: 0.95rem;
+            pointer-events: none;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            75% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(-50%) translateY(20px); visibility: hidden; }
+        }
+        @media (max-width: 700px) {
+            .container { padding: 20px 12px; }
+            th, td { font-size: 0.72rem; padding: 4px 2px; }
+            .fill-blank { min-width: 70px; font-size: 0.75rem; }
+            #class { width: 200px; }
+            .data-input { width: 55px; font-size: 0.72rem; }
+        }
+        .result-display { background: #e3f2fd; padding: 5px 12px; border-radius: 12px; display: inline-block; margin: 4px 0; }
+        .flex-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+        .manual-plot-area { background: #f0f4c3; border-radius: 24px; padding: 20px; margin: 20px 0; border: 2px dashed #f57f17; }
+        .param-input { width: 80px; text-align: center; border: 1px solid #ff9800; border-radius: 8px; padding: 4px; background: #fff8e1; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>💡 光敏电阻的特性实验 · 智能实验报告</h1>
+
+    <div class="save-toolbar">
+        <div class="save-time" id="lastSaveTime">📁 上次保存：未保存</div>
+        <button class="save-btn" onclick="manualSave()">💾 手动保存报告</button>
+        <button class="save-btn" onclick="manualLoad()">📂 加载上次数据</button>
+        <button class="save-btn" onclick="exportData()">📎 导出备份(JSON)</button>
+        <button class="save-btn" onclick="importData()">📤 导入备份</button>
+        <button class="save-btn danger" onclick="clearSavedData()" style="background:#c62828;">🗑️ 重置所有数据</button>
+    </div>
+
+    <div class="basic-info" style="background: #f8f9fa; padding: 15px; border-radius: 24px; margin-bottom: 20px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+            <div>实验名称：<input type="text" class="info-input" id="expName" value="光敏电阻的特性实验" readonly></div>
+            <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-01"></div>
+            <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名"></div>
+            <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号"></div>
+            <div>指导教师：<input type="text" class="info-input" id="instructor" value="马厂"></div>
+            <div>专业班级：<input type="text" class="info-input" id="class" placeholder="专业班级" style="width:400px"></div>
+        </div>
+    </div>
+
+    <!-- 预习填空 -->
+    <h2>一、实验目的</h2>
+    <div class="question-item">1．了解光敏电阻的 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose1" data-answer="工作原理"><span class="answer-status"></span></span> ；</div>
+    <div class="question-item">2．掌握光敏电阻的 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose2" data-answer="光电特性"><span class="answer-status"></span></span> 、光谱响应特性、频率特性等基本特性；</div>
+    <div class="question-item">3．理解光敏电阻的 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose3" data-answer="一般应用"><span class="answer-status"></span></span> 。</div>
+
+    <h2>二、实验仪器</h2>
+    <div class="question-item">YJ-GR-2光敏电阻照度特性实验仪、 <span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument1" data-answer="光电实验装置"><span class="answer-status"></span></span> 。</div>
+
+    <h2>三、实验原理</h2>
+    <div class="question-item">1．光敏电阻是基于 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory1" data-answer="内光电效应"><span class="answer-status"></span></span> 的光电元件。</div>
+    <div class="question-item">2．光敏电阻的伏安特性曲线近似 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory2" data-answer="直线"><span class="answer-status"></span></span> ，没有饱和现象。</div>
+    <div class="question-item">3．光敏电阻的光照特性是 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory3" data-answer="非线性"><span class="answer-status"></span></span> 的，不适宜作线性敏感元件。</div>
+    <div class="question-item">4．光敏电阻对不同波长的入射光有不同的灵敏度，称为 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory4" data-answer="光谱特性"><span class="answer-status"></span></span> 。</div>
+
+    <h2>四、实验内容</h2>
+    <div class="experiment-step">1．在一定照度下，测量光敏电阻的电压与光电流的关系，测绘 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure1" data-answer="伏安特性"><span class="answer-status"></span></span> 曲线。</div>
+    <div class="experiment-step">2．在一定工作电压下，测量光敏电阻的照度与光电流的关系，测绘 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure2" data-answer="光照特性"><span class="answer-status"></span></span> 曲线。</div>
+    <div class="experiment-step">3．取工作电压为10V，使用不同滤光片测量光电流，研究光敏电阻的 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure3" data-answer="光谱响应"><span class="answer-status"></span></span> 特性。</div>
+
+    <!-- 五、原始数据记录 -->
+    <h2>五、原始数据记录</h2>
+    <div class="section-title" style="font-weight: bold; font-size: 1.1rem; margin: 10px 0 5px 0;">表16-2 光敏电阻的电压与光电流的关系及照度与光电流的关系</div>
+    <div class="table-wrapper">
+        <table id="mainTable">
+            <thead>
+                <tr>
+                    <th>光照度<br>(LUX)</th>
+                    <th>2V</th><th>3V</th><th>4V</th><th>5V</th>
+                    <th>6V</th><th>7V</th><th>8V</th><th>9V</th><th>10V</th>
+                </tr>
+            </thead>
+            <tbody id="mainTableBody">
+                <tr><td>50</td><td><input class="data-input" id="ph_1_1" placeholder="μA"></td><td><input class="data-input" id="ph_1_2" placeholder="μA"></td><td><input class="data-input" id="ph_1_3" placeholder="μA"></td><td><input class="data-input" id="ph_1_4" placeholder="μA"></td><td><input class="data-input" id="ph_1_5" placeholder="μA"></td><td><input class="data-input" id="ph_1_6" placeholder="μA"></td><td><input class="data-input" id="ph_1_7" placeholder="μA"></td><td><input class="data-input" id="ph_1_8" placeholder="μA"></td><td><input class="data-input" id="ph_1_9" placeholder="μA"></td></tr>
+                <tr><td>100</td><td><input class="data-input" id="ph_2_1" placeholder="μA"></td><td><input class="data-input" id="ph_2_2" placeholder="μA"></td><td><input class="data-input" id="ph_2_3" placeholder="μA"></td><td><input class="data-input" id="ph_2_4" placeholder="μA"></td><td><input class="data-input" id="ph_2_5" placeholder="μA"></td><td><input class="data-input" id="ph_2_6" placeholder="μA"></td><td><input class="data-input" id="ph_2_7" placeholder="μA"></td><td><input class="data-input" id="ph_2_8" placeholder="μA"></td><td><input class="data-input" id="ph_2_9" placeholder="μA"></td></tr>
+                <tr><td>200</td><td><input class="data-input" id="ph_3_1" placeholder="μA"></td><td><input class="data-input" id="ph_3_2" placeholder="μA"></td><td><input class="data-input" id="ph_3_3" placeholder="μA"></td><td><input class="data-input" id="ph_3_4" placeholder="μA"></td><td><input class="data-input" id="ph_3_5" placeholder="μA"></td><td><input class="data-input" id="ph_3_6" placeholder="μA"></td><td><input class="data-input" id="ph_3_7" placeholder="μA"></td><td><input class="data-input" id="ph_3_8" placeholder="μA"></td><td><input class="data-input" id="ph_3_9" placeholder="μA"></td></tr>
+                <tr><td>300</td><td><input class="data-input" id="ph_4_1" placeholder="μA"></td><td><input class="data-input" id="ph_4_2" placeholder="μA"></td><td><input class="data-input" id="ph_4_3" placeholder="μA"></td><td><input class="data-input" id="ph_4_4" placeholder="μA"></td><td><input class="data-input" id="ph_4_5" placeholder="μA"></td><td><input class="data-input" id="ph_4_6" placeholder="μA"></td><td><input class="data-input" id="ph_4_7" placeholder="μA"></td><td><input class="data-input" id="ph_4_8" placeholder="μA"></td><td><input class="data-input" id="ph_4_9" placeholder="μA"></td></tr>
+                <tr><td>350</td><td><input class="data-input" id="ph_5_1" placeholder="μA"></td><td><input class="data-input" id="ph_5_2" placeholder="μA"></td><td><input class="data-input" id="ph_5_3" placeholder="μA"></td><td><input class="data-input" id="ph_5_4" placeholder="μA"></td><td><input class="data-input" id="ph_5_5" placeholder="μA"></td><td><input class="data-input" id="ph_5_6" placeholder="μA"></td><td><input class="data-input" id="ph_5_7" placeholder="μA"></td><td><input class="data-input" id="ph_5_8" placeholder="μA"></td><td><input class="data-input" id="ph_5_9" placeholder="μA"></td></tr>
+                <tr><td>400</td><td><input class="data-input" id="ph_6_1" placeholder="μA"></td><td><input class="data-input" id="ph_6_2" placeholder="μA"></td><td><input class="data-input" id="ph_6_3" placeholder="μA"></td><td><input class="data-input" id="ph_6_4" placeholder="μA"></td><td><input class="data-input" id="ph_6_5" placeholder="μA"></td><td><input class="data-input" id="ph_6_6" placeholder="μA"></td><td><input class="data-input" id="ph_6_7" placeholder="μA"></td><td><input class="data-input" id="ph_6_8" placeholder="μA"></td><td><input class="data-input" id="ph_6_9" placeholder="μA"></td></tr>
+                <tr><td>450</td><td><input class="data-input" id="ph_7_1" placeholder="μA"></td><td><input class="data-input" id="ph_7_2" placeholder="μA"></td><td><input class="data-input" id="ph_7_3" placeholder="μA"></td><td><input class="data-input" id="ph_7_4" placeholder="μA"></td><td><input class="data-input" id="ph_7_5" placeholder="μA"></td><td><input class="data-input" id="ph_7_6" placeholder="μA"></td><td><input class="data-input" id="ph_7_7" placeholder="μA"></td><td><input class="data-input" id="ph_7_8" placeholder="μA"></td><td><input class="data-input" id="ph_7_9" placeholder="μA"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-title" style="font-weight: bold; font-size: 1.1rem; margin: 10px 0 5px 0;">表16-1 滤光片型号与波长对应关系及光谱响应测量</div>
+    <div class="table-wrapper">
+        <table id="spectrumTable">
+            <thead>
+                <tr><th>滤光片型号</th><th>波长 (nm)</th><th>10 LUX 下 \(I_{ph}\) (μA)</th><th>20 LUX 下 \(I_{ph}\) (μA)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>NG405</td><td>404.7</td><td><input class="data-input" id="spec_1_1" placeholder="μA"></td><td><input class="data-input" id="spec_1_2" placeholder="μA"></td></tr>
+                <tr><td>NG436</td><td>435.8</td><td><input class="data-input" id="spec_2_1" placeholder="μA"></td><td><input class="data-input" id="spec_2_2" placeholder="μA"></td></tr>
+                <tr><td>NG546</td><td>546.0</td><td><input class="data-input" id="spec_3_1" placeholder="μA"></td><td><input class="data-input" id="spec_3_2" placeholder="μA"></td></tr>
+                <tr><td>NG577</td><td>577.0</td><td><input class="data-input" id="spec_4_1" placeholder="μA"></td><td><input class="data-input" id="spec_4_2" placeholder="μA"></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="text-align:center; margin: 10px 0 20px;">
+        <button class="chart-btn" onclick="prepareCharts()">📊 生成图表</button>
+    </div>
+
+    <!-- 六、数据处理与分析 -->
+    <h2>六、数据处理与分析</h2>
+    <div class="calculation-section" style="background:#eef2fc; padding: 20px; border-radius: 24px;">
+
+        <h3>1. 伏安特性曲线 (\(I_{ph}-U\))</h3>
+        <p>在不同光照度下，光电流随电压的变化关系。</p>
+        <div class="chart-container"><canvas id="chartVA" style="width:100%; height:auto; max-width:800px; margin:0 auto; display:block;"></canvas></div>
+        <div class="flex-row" style="margin-top:10px;">
+            <span class="result-display">光照度 50 LUX 斜率: <span id="slope_50">—</span> μA/V</span>
+            <span class="result-display">光照度 100 LUX 斜率: <span id="slope_100">—</span> μA/V</span>
+            <span class="result-display">光照度 200 LUX 斜率: <span id="slope_200">—</span> μA/V</span>
+        </div>
+        <p style="font-size:0.9rem; color:#555;">* 伏安特性曲线近似直线，无饱和现象，斜率随光照度增大而增大。</p>
+
+        <h3>2. 光照特性曲线 (\(I_{ph}-\Phi\))</h3>
+        <p>在不同电压下，光电流随光照度的变化关系。</p>
+        <div class="chart-container"><canvas id="chartPhoto" style="width:100%; height:auto; max-width:800px; margin:0 auto; display:block;"></canvas></div>
+        <p style="font-size:0.9rem; color:#555;">* 光照特性呈非线性，光电流随光照度增大而增大，但增长率逐渐减小。</p>
+
+        <h3>3. 光谱响应特性 (\(I_{ph}-\lambda\))</h3>
+        <p>在10V工作电压下，不同滤光片对应的光电流与波长的关系。</p>
+        <div class="chart-container"><canvas id="chartSpec" style="width:100%; height:auto; max-width:800px; margin:0 auto; display:block;"></canvas></div>
+        <p style="font-size:0.9rem; color:#555;">* 光谱响应反映光敏电阻对不同波长光的灵敏度，峰值波长约在500-600nm附近。</p>
+
+        <div style="margin-top:20px; font-style:italic;">※ 数据处理评分标准（满分20分）：正确绘制伏安特性曲线(6分)、光照特性曲线(6分)、光谱响应曲线(4分)，对曲线规律有正确描述(4分)。</div>
+        <div id="conclusionText" style="margin-top:20px; font-weight:bold;"></div>
+    </div>
+
+    <h2>七、思考题</h2>
+    <div>1．光敏电阻的伏安特性有什么特点？为什么没有饱和现象？<textarea id="thought1" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(1)">显示参考答案</button><div id="answer1" class="thought-answer">答：光敏电阻的伏安特性曲线近似直线，没有饱和现象。这是因为光敏电阻是光电导器件，其电导率随光照强度变化，在一定的光照度下，光电流与外加电压成正比，且载流子浓度不会因电压增大而饱和，所以伏安特性呈线性且无饱和。</div></div>
+    <div>2．光敏电阻的光照特性为什么是非线性的？这对应用有什么影响？<textarea id="thought2" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(2)">显示参考答案</button><div id="answer2" class="thought-answer">答：光敏电阻的光照特性非线性是因为光生载流子的复合率与载流子浓度有关，在低光照度下复合率低，光电流增长较快；高光照度下复合率增大，光电流增长变缓。由于非线性，光敏电阻不适宜作线性敏感元件，但适用于开关量控制等对线性度要求不高的场合。</div></div>
+    <div>3．光敏电阻的光谱响应特性有什么实际意义？<textarea id="thought3" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(3)">显示参考答案</button><div id="answer3" class="thought-answer">答：光敏电阻的光谱响应特性决定了它对不同波长光的灵敏度，实际应用中需要根据光源的波长范围选择合适的光敏电阻材料。例如，硫化镉光敏电阻对可见光敏感，硫化铅光敏电阻对红外光敏感，在光控开关、火焰探测、红外传感等领域有重要应用。</div></div>
+
+    <h2>八、实验小结</h2>
+    <textarea id="summary" class="summary-box" placeholder="总结实验结论、误差来源、改进建议..."></textarea>
+
+    <!-- 手工绘图上传 -->
+    <div class="manual-plot-area">
+        <strong>✏️ 手工图形绘制上传 (权重10%)</strong>
+        <p>请上传您手绘的伏安特性、光照特性或光谱响应曲线图（照片或扫描件）。</p>
+        <input type="file" id="manualPlotUpload" accept="image/*" multiple>
+        <button onclick="uploadManualPlots()" class="upload-btn" style="background:#f57f17;">➕ 上传手绘图形</button>
+        <div id="manualPlotPreview" class="image-preview"></div>
+        <small style="color: #4a148c;">* 上传手绘图形可获得额外分数，至少一张。</small>
+    </div>
+
+    <!-- 实验证据 -->
+    <div class="evidence-area">
+        <strong>📸 实验证据图片上传（权重5%）</strong>
+        <div style="margin: 12px 0;"><input type="file" id="evidenceUpload" accept="image/*" multiple><button class="upload-btn" onclick="uploadEvidenceImages()" style="background:#7b1fa2;">➕ 添加图片</button></div>
+        <div id="imagePreviewContainer" class="image-preview"></div>
+        <small style="color: #4a148c;">* 上传实验现场照片（仪器数据与人同框且与表格数据相同），至少上传一张可获得5%分数。</small>
+    </div>
+
+    <!-- 操作分 -->
+    <div class="operator-panel">
+        <strong>🔐 实验操作分 (权重20%，仅教师可操作) & 一键数据上报</strong><br>
+        <input type="password" id="opPwd" placeholder="教师密码" autocomplete="off">
+        <button onclick="unlockOpScore()" class="chart-btn">验证并解锁</button>
+        <span id="opLockMsg" style="color:#b71c1c;"></span>
+        <div id="opScoreDiv" style="display:none; margin-top: 12px;">
+            <label>操作分数 (0~20): </label>
+            <input type="number" id="operationScore" min="0" max="20" step="1" value="0">
+            <button onclick="saveOpScore()" class="save-btn">💾 保存操作分</button>
+            <button id="oneClickReportBtn" class="submit-report-btn" style="margin-left: 12px;">📤 一键数据上报</button>
+        </div>
+        <div>📋 当前操作分：<span id="currentOpScore">0</span> 分</div>
+        <div style="margin-top: 8px; font-size:0.85rem; color:#00695c;">🔔 教师验证密码后，上方将显示"一键数据上报"按钮，可导出专业班级、学号、姓名、预习得分、操作得分、综合得分及日期（预习和操作已换算为百分制）。</div>
+    </div>
+
+    <h2>九、自动评分 & 实验评语</h2>
+    <div class="score-section" style="text-align:center;">
+        <button class="auto-grade-btn" onclick="autoGrade()">✨ 自动评分并生成评语</button>
+        <div id="scoreDetails" class="score-details" style="display:none;">
+            <div class="score-item"><span>📖 预习填空 (10%)</span><span id="detailPreScore">0/10</span></div>
+            <div class="score-item"><span>📝 数据记录 (10%)</span><span id="detailDataScore">0/10</span></div>
+            <div class="score-item"><span>📐 数据处理 (20%)</span><span id="detailCalcScore">0/20</span></div>
+            <div class="score-item"><span>📊 自动绘图 (5%)</span><span id="detailAutoPlotScore">0/5</span></div>
+            <div class="score-item"><span>✏️ 手工绘图 (10%)</span><span id="detailManualPlotScore">0/10</span></div>
+            <div class="score-item"><span>💡 思考题 (10%)</span><span id="detailThoughtScore">0/10</span></div>
+            <div class="score-item"><span>📄 实验小结 (10%)</span><span id="detailSummaryScore">0/10</span></div>
+            <div class="score-item"><span>📸 实验证据 (5%)</span><span id="detailEvidenceScore">0/5</span></div>
+            <div class="score-item"><span>🔧 实验操作 (20%)</span><span id="detailOpScore">0/20</span></div>
+            <div class="score-item" style="font-weight:bold; border-top:2px solid #4caf50;"><span>🏆 总分</span><span id="detailTotalScore">0/100</span></div>
+        </div>
+        <div id="commentContent" style="background:#fff8e7; border-radius: 28px; padding: 20px; margin-top: 20px; text-align: left;"></div>
+    </div>
+</div>
+
+<script>
+    // ========== Toast ==========
+    function showReportToast(msg) {
+        let toast = document.createElement('div');
+        toast.className = 'report-toast';
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2600);
+    }
+
+    // ========== 答案映射 ==========
+    const answers = {
+        "工作原理": ["工作原理"],
+        "光电特性": ["光电特性"],
+        "一般应用": ["一般应用", "应用"],
+        "光电实验装置": ["光电实验装置"],
+        "内光电效应": ["内光电效应"],
+        "直线": ["直线", "线性"],
+        "非线性": ["非线性"],
+        "光谱特性": ["光谱特性"],
+        "伏安特性": ["伏安特性", "伏安"],
+        "光照特性": ["光照特性"],
+        "光谱响应": ["光谱响应"]
+    };
+
+    // ========== 状态 ==========
+    let chartVAInstance = null, chartPhotoInstance = null, chartSpecInstance = null;
+    let opScoreLocked = false;
+    let imageList = [];
+    let manualPlotImages = [];
+    let hasDrawnVA = false, hasDrawnPhoto = false, hasDrawnSpec = false;
+
+    // ========== 填空状态 ==========
+    function updateAnswerStatusIcon(inputElement) {
+        const container = inputElement.parentElement;
+        const statusSpan = container.querySelector('.answer-status');
+        if (!statusSpan) return;
+        const userAnswer = inputElement.value.trim();
+        const correctAnswers = answers[inputElement.dataset.answer];
+        let status = 'empty';
+        if (userAnswer === '') status = 'empty';
+        else if (correctAnswers && correctAnswers.some(ans => {
+                const user = userAnswer.toLowerCase().replace(/\s+/g, '');
+                const correct = ans.toLowerCase().replace(/\s+/g, '');
+                return user === correct || user.includes(correct) || correct.includes(user);
+            })) status = 'correct';
+        else status = 'incorrect';
+        statusSpan.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
+        if (status === 'correct') { statusSpan.textContent = '✓'; statusSpan.classList.add('correct-icon'); }
+        else if (status === 'incorrect') { statusSpan.textContent = '✗'; statusSpan.classList.add('incorrect-icon'); }
+        else { statusSpan.textContent = '○'; statusSpan.classList.add('empty-icon'); }
+    }
+    function updateAllAnswerStatusIcons() { document.querySelectorAll('.fill-blank').forEach(inp => updateAnswerStatusIcon(inp)); }
+
+    // ========== 获取数据 ==========
+    function getMainData() {
+        const illuminations = [50, 100, 200, 300, 350, 400, 450];
+        const voltages = [2, 3, 4, 5, 6, 7, 8, 9, 10];
+        let data = [];
+        for (let i = 0; i < illuminations.length; i++) {
+            let row = { illum: illuminations[i], currents: [] };
+            for (let j = 0; j < voltages.length; j++) {
+                let val = parseFloat(document.getElementById('ph_' + (i+1) + '_' + (j+1)).value);
+                row.currents.push(isNaN(val) ? null : val);
+            }
+            data.push(row);
+        }
+        return { data, voltages };
+    }
+
+    function getSpecData() {
+        const wavelengths = [404.7, 435.8, 546.0, 577.0];
+        let data10 = [], data20 = [];
+        for (let i = 0; i < 4; i++) {
+            let v10 = parseFloat(document.getElementById('spec_' + (i+1) + '_1').value);
+            let v20 = parseFloat(document.getElementById('spec_' + (i+1) + '_2').value);
+            data10.push(isNaN(v10) ? null : v10);
+            data20.push(isNaN(v20) ? null : v20);
+        }
+        return { wavelengths, data10, data20 };
+    }
+
+    // ========== 图表绘制 ==========
+    function prepareCharts() {
+        drawVAChart();
+        drawPhotoChart();
+        drawSpecChart();
+        manualSave();
+        showReportToast("✅ 图表已生成");
+    }
+
+    function drawVAChart() {
+        let ctx = document.getElementById('chartVA').getContext('2d');
+        let { data, voltages } = getMainData();
+        let hasData = false;
+        let datasets = [];
+        const colors = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#00acc1'];
+        data.forEach((row, idx) => {
+            let valid = row.currents.filter(v => v !== null);
+            if (valid.length >= 2) hasData = true;
+            let points = voltages.map((v, j) => ({ x: v, y: row.currents[j] })).filter(p => p.y !== null);
+            if (points.length >= 2) {
+                datasets.push({
+                    label: row.illum + ' LUX',
+                    data: points,
+                    backgroundColor: colors[idx % colors.length],
+                    borderColor: colors[idx % colors.length],
+                    borderWidth: 2,
+                    pointRadius: 5,
+                    showLine: true,
+                    tension: 0.1
+                });
+            }
+        });
+        if (!hasData) { showReportToast("⚠️ 请先填写表16-2的数据"); return; }
+        if (chartVAInstance) chartVAInstance.destroy();
+        chartVAInstance = new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: { title: { display: true, text: '电压 U (V)' }, beginAtZero: true },
+                    y: { title: { display: true, text: '光电流 I_ph (μA)' }, beginAtZero: true }
+                },
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    title: { display: true, text: '光敏电阻伏安特性曲线' }
+                }
+            }
+        });
+        hasDrawnVA = true;
+        // 计算斜率
+        const illums = [50, 100, 200];
+        illums.forEach((ill, idx) => {
+            let row = data.find(r => r.illum === ill);
+            if (row) {
+                let valid = row.currents.map((v, j) => ({ v: voltages[j], c: v })).filter(p => p.c !== null);
+                if (valid.length >= 2) {
+                    let sumX = valid.reduce((s, p) => s + p.v, 0);
+                    let sumY = valid.reduce((s, p) => s + p.c, 0);
+                    let sumXY = valid.reduce((s, p) => s + p.v * p.c, 0);
+                    let sumX2 = valid.reduce((s, p) => s + p.v * p.v, 0);
+                    let n = valid.length;
+                    let slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+                    document.getElementById('slope_' + ill).innerText = slope.toFixed(2);
+                }
+            }
+        });
+    }
+
+    function drawPhotoChart() {
+        let ctx = document.getElementById('chartPhoto').getContext('2d');
+        let { data, voltages } = getMainData();
+        let hasData = false;
+        let datasets = [];
+        const colors = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#00acc1', '#d81b60', '#6d4c41'];
+        const selectedV = [2, 4, 6, 8, 10];
+        selectedV.forEach((v, idx) => {
+            let vIdx = voltages.indexOf(v);
+            if (vIdx === -1) return;
+            let points = data.map(row => ({ x: row.illum, y: row.currents[vIdx] })).filter(p => p.y !== null);
+            if (points.length >= 2) {
+                hasData = true;
+                datasets.push({
+                    label: v + ' V',
+                    data: points,
+                    backgroundColor: colors[idx % colors.length],
+                    borderColor: colors[idx % colors.length],
+                    borderWidth: 2,
+                    pointRadius: 5,
+                    showLine: true,
+                    tension: 0.3
+                });
+            }
+        });
+        if (!hasData) { showReportToast("⚠️ 请先填写表16-2的数据"); return; }
+        if (chartPhotoInstance) chartPhotoInstance.destroy();
+        chartPhotoInstance = new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: { title: { display: true, text: '光照度 Φ (LUX)' }, beginAtZero: true },
+                    y: { title: { display: true, text: '光电流 I_ph (μA)' }, beginAtZero: true }
+                },
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    title: { display: true, text: '光敏电阻光照特性曲线' }
+                }
+            }
+        });
+        hasDrawnPhoto = true;
+    }
+
+    function drawSpecChart() {
+        let ctx = document.getElementById('chartSpec').getContext('2d');
+        let { wavelengths, data10, data20 } = getSpecData();
+        let hasData = false;
+        let pts10 = wavelengths.map((w, i) => ({ x: w, y: data10[i] })).filter(p => p.y !== null);
+        let pts20 = wavelengths.map((w, i) => ({ x: w, y: data20[i] })).filter(p => p.y !== null);
+        if (pts10.length >= 2) hasData = true;
+        if (pts20.length >= 2) hasData = true;
+        if (!hasData) { showReportToast("⚠️ 请先填写光谱响应数据"); return; }
+        if (chartSpecInstance) chartSpecInstance.destroy();
+        let datasets = [];
+        if (pts10.length >= 2) {
+            datasets.push({
+                label: '10 LUX',
+                data: pts10,
+                backgroundColor: '#e53935',
+                borderColor: '#e53935',
+                borderWidth: 2,
+                pointRadius: 6,
+                showLine: true,
+                tension: 0.2
+            });
+        }
+        if (pts20.length >= 2) {
+            datasets.push({
+                label: '20 LUX',
+                data: pts20,
+                backgroundColor: '#1e88e5',
+                borderColor: '#1e88e5',
+                borderWidth: 2,
+                pointRadius: 6,
+                showLine: true,
+                tension: 0.2
+            });
+        }
+        chartSpecInstance = new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets: datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: { title: { display: true, text: '波长 λ (nm)' }, beginAtZero: false },
+                    y: { title: { display: true, text: '光电流 I_ph (μA)' }, beginAtZero: true }
+                },
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    title: { display: true, text: '光敏电阻光谱响应特性' }
+                }
+            }
+        });
+        hasDrawnSpec = true;
+    }
+
+    // ========== 手工绘图上传 ==========
+    function uploadManualPlots() {
+        let files = document.getElementById('manualPlotUpload').files;
+        if (!files.length) return;
+        for (let file of files) {
+            if (!file.type.startsWith('image/')) continue;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                manualPlotImages.push(e.target.result);
+                displayManualPlots();
+            };
+            reader.readAsDataURL(file);
+        }
+        document.getElementById('manualPlotUpload').value = '';
+    }
+    function displayManualPlots() {
+        let container = document.getElementById('manualPlotPreview');
+        container.innerHTML = '';
+        manualPlotImages.forEach((imgSrc, idx) => {
+            let div = document.createElement('div');
+            div.className = 'img-card';
+            div.innerHTML = `<img src="${imgSrc}" alt="手工绘图"><div class="del-img" onclick="removeManualPlot(${idx})">✕</div>`;
+            container.appendChild(div);
+        });
+        localStorage.setItem('manualPlotImages', JSON.stringify(manualPlotImages));
+    }
+    function removeManualPlot(idx) { manualPlotImages.splice(idx,1); displayManualPlots(); }
+
+    // ========== 实验证据上传 ==========
+    function uploadEvidenceImages() {
+        let files = document.getElementById('evidenceUpload').files;
+        if (!files.length) return;
+        for (let file of files) {
+            if (!file.type.startsWith('image/')) continue;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                imageList.push(e.target.result);
+                displayImages();
+            };
+            reader.readAsDataURL(file);
+        }
+        document.getElementById('evidenceUpload').value = '';
+    }
+    function displayImages() {
+        let container = document.getElementById('imagePreviewContainer');
+        container.innerHTML = '';
+        imageList.forEach((imgSrc, idx) => {
+            let div = document.createElement('div');
+            div.className = 'img-card';
+            div.innerHTML = `<img src="${imgSrc}" alt="实验证据"><div class="del-img" onclick="removeImage(${idx})">✕</div>`;
+            container.appendChild(div);
+        });
+        localStorage.setItem('evidenceImages', JSON.stringify(imageList));
+    }
+    function removeImage(idx) { imageList.splice(idx,1); displayImages(); }
+
+    // ========== 评分 ==========
+    function gradePre() {
+        let inputs = document.querySelectorAll('.fill-blank');
+        let correct = 0;
+        inputs.forEach(inp => {
+            let ans = answers[inp.dataset.answer];
+            let val = inp.value.trim().toLowerCase();
+            if (val && ans && ans.some(a => {
+                    const user = val.replace(/\s+/g,'');
+                    const correct = a.toLowerCase().replace(/\s+/g,'');
+                    return user === correct || user.includes(correct) || correct.includes(user);
+                })) correct++;
+        });
+        return Math.round((correct / inputs.length) * 10);
+    }
+
+    function gradeDataRecord() {
+        let valid = 0, total = 0;
+        for (let i = 1; i <= 7; i++) {
+            for (let j = 1; j <= 9; j++) {
+                total++;
+                let v = parseFloat(document.getElementById('ph_' + i + '_' + j).value);
+                if (!isNaN(v) && v >= 0) valid++;
+            }
+        }
+        for (let i = 1; i <= 4; i++) {
+            for (let j = 1; j <= 2; j++) {
+                total++;
+                let v = parseFloat(document.getElementById('spec_' + i + '_' + j).value);
+                if (!isNaN(v) && v >= 0) valid++;
+            }
+        }
+        let score = total > 0 ? (valid / total) * 10 : 0;
+        return Math.min(10, Math.round(score));
+    }
+
+    function gradeDataProcess() {
+        let score = 0;
+        if (hasDrawnVA) score += 6;
+        if (hasDrawnPhoto) score += 6;
+        if (hasDrawnSpec) score += 4;
+        let summary = document.getElementById('summary').value.trim();
+        if (summary.length > 30 && (summary.includes("伏安") || summary.includes("光照") || summary.includes("光谱") ||
+            summary.includes("线性") || summary.includes("非线性"))) score += 4;
+        return Math.min(20, Math.round(score));
+    }
+
+    function gradeAutoPlot() {
+        let s = 0;
+        if (hasDrawnVA) s += 2;
+        if (hasDrawnPhoto) s += 2;
+        if (hasDrawnSpec) s += 1;
+        return Math.min(5, Math.round(s));
+    }
+
+    function gradeManualPlot() {
+        return manualPlotImages.length > 0 ? 10 : 0;
+    }
+
+    function gradeThought() {
+        let t1 = document.getElementById('thought1').value.trim();
+        let t2 = document.getElementById('thought2').value.trim();
+        let t3 = document.getElementById('thought3').value.trim();
+        let score = 0;
+        if (t1.length > 20) score += 3; else if (t1.length > 8) score += 1;
+        if (t2.length > 20) score += 3; else if (t2.length > 8) score += 1;
+        if (t3.length > 20) score += 4; else if (t3.length > 10) score += 2;
+        return Math.min(10, score);
+    }
+
+    function gradeSummary() {
+        let sum = document.getElementById('summary').value.trim();
+        if (sum.length > 150 && (sum.includes("光敏") || sum.includes("电阻") || sum.includes("特性") || sum.includes("误差"))) return 10;
+        if (sum.length > 90) return 8;
+        if (sum.length > 50) return 6;
+        if (sum.length > 20) return 4;
+        return 0;
+    }
+
+    function gradeEvidence() { return imageList.length > 0 ? 5 : 0; }
+
+    function autoGrade() {
+        let preSc = gradePre();
+        let dataSc = gradeDataRecord();
+        let calcSc = gradeDataProcess();
+        let autoPlotSc = gradeAutoPlot();
+        let manualPlotSc = gradeManualPlot();
+        let thoughtSc = gradeThought();
+        let summarySc = gradeSummary();
+        let evidenceSc = gradeEvidence();
+        let opScore = parseFloat(document.getElementById('operationScore').value);
+        if (isNaN(opScore)) opScore = 0;
+        opScore = Math.min(20, Math.max(0, opScore));
+        let total = preSc + dataSc + calcSc + autoPlotSc + manualPlotSc + thoughtSc + summarySc + evidenceSc + opScore;
+        document.getElementById('detailPreScore').innerText = `${preSc}/10`;
+        document.getElementById('detailDataScore').innerText = `${dataSc}/10`;
+        document.getElementById('detailCalcScore').innerText = `${calcSc}/20`;
+        document.getElementById('detailAutoPlotScore').innerText = `${autoPlotSc}/5`;
+        document.getElementById('detailManualPlotScore').innerText = `${manualPlotSc}/10`;
+        document.getElementById('detailThoughtScore').innerText = `${thoughtSc}/10`;
+        document.getElementById('detailSummaryScore').innerText = `${summarySc}/10`;
+        document.getElementById('detailEvidenceScore').innerText = `${evidenceSc}/5`;
+        document.getElementById('detailOpScore').innerText = `${opScore}/20`;
+        document.getElementById('detailTotalScore').innerText = `${Math.round(total)}/100`;
+        document.getElementById('scoreDetails').style.display = 'block';
+        let teacher = document.getElementById('instructor').value.trim() || "马厂";
+        let now = new Date();
+        let dateTimeStr = `${now.toLocaleDateString('zh-CN')} ${now.toLocaleTimeString('zh-CN', {hour12: false})}`;
+        let comment =
+            `📊 实验报告得分 ${Math.round(total)}/100。预习${preSc}/10，数据记录${dataSc}/10，数据处理${calcSc}/20，自动绘图${autoPlotSc}/5，手工绘图${manualPlotSc}/10，思考题${thoughtSc}/10，小结${summarySc}/10，实验证据${evidenceSc}/5，操作分${opScore}/20。<br><br>教师签名：${teacher}<br>评语日期：${dateTimeStr}`;
+        if (total >= 90) comment += "<br>⭐ 优秀！实验严谨，分析透彻。";
+        else if (total >= 75) comment += "<br>👍 良好，可进一步提升精度。";
+        else if (total >= 60) comment += "<br>⚠️ 合格，注意数据处理与误差分析。";
+        else comment += "<br>❌ 需重做实验或补充数据，认真分析误差。";
+        document.getElementById('commentContent').innerHTML = comment;
+        let conclusion =
+            `实验结论：通过实验研究了光敏电阻的伏安特性、光照特性和光谱响应特性。伏安特性近似线性，无饱和现象；光照特性呈非线性，光电流随光照度增大而增大；光谱响应显示光敏电阻对不同波长光的灵敏度不同。${total>=60?"实验数据合理，验证了理论规律。":"误差较大，建议检查实验操作。"}`;
+        document.getElementById('conclusionText').innerHTML = conclusion;
+        manualSave();
+    }
+
+    // ========== 操作分 ==========
+    function unlockOpScore() {
+        let pwd = document.getElementById('opPwd').value;
+        if (pwd === "52501314") {
+            document.getElementById('opScoreDiv').style.display = 'block';
+            document.getElementById('opLockMsg').innerHTML = "✅ 密码正确，可评分及上报";
+            opScoreLocked = true;
+        } else { document.getElementById('opLockMsg').innerHTML = "❌ 密码错误"; opScoreLocked = false; }
+    }
+    function saveOpScore() {
+        if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁"); return; }
+        let val = parseFloat(document.getElementById('operationScore').value);
+        if (isNaN(val)) val = 0;
+        val = Math.min(20, Math.max(0, val));
+        document.getElementById('operationScore').value = val;
+        localStorage.setItem('operationScore', val);
+        document.getElementById('currentOpScore').innerText = val;
+        showReportToast("✅ 操作分已保存");
+    }
+
+    // ========== 一键上报 ==========
+    async function oneClickDataReport() {
+        if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁后再执行上报"); return; }
+        autoGrade();
+        const className = document.getElementById('class')?.value.trim() || "未填专业班级";
+        const studentId = document.getElementById('studentId')?.value.trim() || "未填学号";
+        const studentName = document.getElementById('studentName')?.value.trim() || "未填姓名";
+        const expDate = document.getElementById('expDate')?.value.trim() || new Date().toLocaleDateString('zh-CN');
+        let preScoreRaw = parseFloat(document.getElementById('detailPreScore')?.innerText?.split('/')[0]) || 0;
+        let opScoreRaw = parseFloat(document.getElementById('currentOpScore')?.innerText) || 0;
+        let totalScoreRaw = parseFloat(document.getElementById('detailTotalScore')?.innerText?.split('/')[0]) || 0;
+        const now = new Date();
+        const fullDateTime = `${expDate} ${now.toLocaleTimeString('zh-CN', {hour12: false})}`;
+        const reportLines = [
+            "光敏电阻的特性实验",
+            `专业班级: ${className}`,
+            `学号: ${studentId}`,
+            `姓名: ${studentName}`,
+            `预习得分: ${preScoreRaw.toFixed(1)} `,
+            `操作得分: ${opScoreRaw.toFixed(1)} `,
+            `综合得分: ${totalScoreRaw.toFixed(1)} `,
+            `实验日期: ${fullDateTime}`,
+            `指导教师: ${document.getElementById('instructor')?.value || "马厂"}`,
+        ];
+        const reportText = reportLines.join("\n");
+        try {
+            await navigator.clipboard.writeText(reportText);
+            showReportToast("✅ 实验数据已复制（预习/操作已换算百分制）！可粘贴至表单");
+        } catch (err) {
+            const textarea = document.createElement('textarea');
+            textarea.value = reportText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showReportToast("✅ 已复制 (传统方式，含百分制换算)");
+        }
+        window.open("https://qrbgda8w.jsjform.com/f/uJfvvZ", '_blank');
+    }
+
+    // ========== 保存/加载 ==========
+    function manualSave() {
+        let data = { info: {}, blanks: {}, main: {}, spec: {}, thoughts: {},
+            summary: document.getElementById('summary').value,
+            opScore: document.getElementById('operationScore').value,
+            images: imageList, manualPlots: manualPlotImages,
+            hasDrawnVA, hasDrawnPhoto, hasDrawnSpec };
+        document.querySelectorAll('.info-input').forEach(i => { if (i.id !== 'expName') data.info[i.id] = i.value; });
+        document.querySelectorAll('.fill-blank').forEach(i => data.blanks[i.id] = i.value);
+        for (let i = 1; i <= 7; i++) {
+            for (let j = 1; j <= 9; j++) {
+                data.main['ph_' + i + '_' + j] = document.getElementById('ph_' + i + '_' + j).value;
+            }
+        }
+        for (let i = 1; i <= 4; i++) {
+            for (let j = 1; j <= 2; j++) {
+                data.spec['spec_' + i + '_' + j] = document.getElementById('spec_' + i + '_' + j).value;
+            }
+        }
+        document.querySelectorAll('.thought-input').forEach(i => data.thoughts[i.id] = i.value);
+        localStorage.setItem('fullReport_photo', JSON.stringify(data));
+        document.getElementById('lastSaveTime').innerText = `📁 上次保存：${new Date().toLocaleTimeString()}`;
+        showReportToast("✅ 报告已手动保存");
+    }
+
+    function manualLoad() {
+        let raw = localStorage.getItem('fullReport_photo');
+        if (!raw) { showReportToast("⚠️ 无保存记录"); return; }
+        let data = JSON.parse(raw);
+        Object.entries(data.info || {}).forEach(([id, val]) => {
+            let e = document.getElementById(id);
+            if (e && id !== 'expName' && id !== 'operationScore') e.value = val;
+        });
+        Object.entries(data.blanks || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+        Object.entries(data.main || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+        Object.entries(data.spec || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+        Object.entries(data.thoughts || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+        if (data.summary) document.getElementById('summary').value = data.summary;
+        if (data.images) { imageList = data.images; displayImages(); }
+        if (data.manualPlots) { manualPlotImages = data.manualPlots; displayManualPlots(); }
+        if (data.hasDrawnVA !== undefined) hasDrawnVA = data.hasDrawnVA;
+        if (data.hasDrawnPhoto !== undefined) hasDrawnPhoto = data.hasDrawnPhoto;
+        if (data.hasDrawnSpec !== undefined) hasDrawnSpec = data.hasDrawnSpec;
+
+        document.getElementById('operationScore').value = '0';
+        document.getElementById('currentOpScore').innerText = '0';
+        document.getElementById('opScoreDiv').style.display = 'none';
+        document.getElementById('opLockMsg').innerHTML = '';
+        opScoreLocked = false;
+        document.getElementById('opPwd').value = '';
+        localStorage.removeItem('operationScore');
+
+        updateAllAnswerStatusIcons();
+        if (hasDrawnVA || hasDrawnPhoto || hasDrawnSpec) {
+            prepareCharts();
+        }
+        showReportToast("✅ 加载完成（操作分已重置，需教师重新验证密码）");
+    }
+
+    function exportData() {
+        let d = localStorage.getItem('fullReport_photo');
+        if (d) { let blob = new Blob([d], {type:'application/json'}); let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'photo_resistor_exp_backup.json'; a.click(); } else showReportToast("⚠️ 无数据");
+    }
+    function importData() {
+        let inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = '.json';
+        inp.onchange = function(e) {
+            let f = e.target.files[0];
+            if (!f) return;
+            let reader = new FileReader();
+            reader.onload = function(ev) {
+                localStorage.setItem('fullReport_photo', ev.target.result);
+                showReportToast("✅ 导入成功，即将刷新页面");
+                setTimeout(() => location.reload(), 1500);
+            };
+            reader.readAsText(f);
+        };
+        inp.click();
+    }
+    function clearSavedData() {
+        localStorage.removeItem('fullReport_photo');
+        localStorage.removeItem('evidenceImages');
+        localStorage.removeItem('manualPlotImages');
+        localStorage.removeItem('operationScore');
+        showReportToast("🗑️ 数据已清除，页面将刷新");
+        setTimeout(() => location.reload(), 1200);
+    }
+
+    function toggleAnswer(n) {
+        let ansDiv = document.getElementById(`answer${n}`);
+        if (ansDiv.style.display === 'block') ansDiv.style.display = 'none';
+        else ansDiv.style.display = 'block';
+    }
+
+    // ========== 初始化 ==========
+    window.onload = function() {
+        let raw = localStorage.getItem('fullReport_photo');
+        if (raw) {
+            try {
+                let data = JSON.parse(raw);
+                Object.entries(data.info || {}).forEach(([id, val]) => {
+                    let e = document.getElementById(id);
+                    if (e && id !== 'expName' && id !== 'operationScore') e.value = val;
+                });
+                Object.entries(data.blanks || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                Object.entries(data.main || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                Object.entries(data.spec || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                Object.entries(data.thoughts || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                if (data.summary) document.getElementById('summary').value = data.summary;
+                if (data.images) { imageList = data.images; displayImages(); }
+                if (data.manualPlots) { manualPlotImages = data.manualPlots; displayManualPlots(); }
+                if (data.hasDrawnVA !== undefined) hasDrawnVA = data.hasDrawnVA;
+                if (data.hasDrawnPhoto !== undefined) hasDrawnPhoto = data.hasDrawnPhoto;
+                if (data.hasDrawnSpec !== undefined) hasDrawnSpec = data.hasDrawnSpec;
+            } catch(e) {}
+        }
+        document.getElementById('operationScore').value = '0';
+        document.getElementById('currentOpScore').innerText = '0';
+        document.getElementById('opScoreDiv').style.display = 'none';
+        document.getElementById('opLockMsg').innerHTML = '';
+        opScoreLocked = false;
+        document.getElementById('opPwd').value = '';
+        localStorage.removeItem('operationScore');
+
+        document.querySelectorAll('.fill-blank').forEach(inp => {
+            inp.addEventListener('input', function(e) { updateAnswerStatusIcon(e.target); });
+        });
+        updateAllAnswerStatusIcons();
+
+        const reportBtn = document.getElementById('oneClickReportBtn');
+        if (reportBtn) reportBtn.addEventListener('click', oneClickDataReport);
+
+        if (raw) showReportToast("📂 已自动加载上次保存的数据");
+        if (hasDrawnVA || hasDrawnPhoto || hasDrawnSpec) {
+            prepareCharts();
+        }
+    };
+</script>
+</body>
+</html>

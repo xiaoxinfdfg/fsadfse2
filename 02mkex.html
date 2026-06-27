@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>迈克尔逊干涉仪的调节与使用 | 智能实验报告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.96);
+            backdrop-filter: blur(2px);
+            padding: 30px 20px;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+        h1 { color: #1e466e; text-align: center; margin-bottom: 20px; font-size: 1.9rem; }
+        h2 { color: #2c5a2e; border-left: 6px solid #4CAF50; padding-left: 15px; margin-top: 30px; font-size: 1.5rem; }
+        h3 { color: #1565C0; margin: 20px 0 10px 0; }
+        .fill-blank {
+            border: none;
+            border-bottom: 2px solid #3498db;
+            background: #f0f8ff;
+            padding: 4px 10px;
+            text-align: center;
+            min-width: 110px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: 0.1s;
+        }
+        .fill-blank:focus { outline: none; background: #e3f2fd; }
+        .fill-blank-container { position: relative; display: inline-block; white-space: nowrap; }
+        .answer-status { margin-left: 6px; font-size: 1.1rem; font-weight: bold; display: inline-block; width: 20px; text-align: left; }
+        .correct-icon { color: #2e7d32; }
+        .incorrect-icon { color: #c62828; }
+        .empty-icon { color: #757575; }
+        .data-input {
+            width: 70px;
+            text-align: center;
+            border: 1px solid #b0bec5;
+            border-radius: 8px;
+            padding: 4px;
+            background: white;
+            font-size: 0.82rem;
+        }
+        .data-input:focus { outline: 2px solid #1e88e5; border-color: transparent; }
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px 0;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            background: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+            font-size: 0.85rem;
+        }
+        th {
+            background: #2c5a2e;
+            color: white;
+            padding: 10px 6px;
+            font-weight: 600;
+            white-space: nowrap;
+            text-align: center;
+        }
+        td {
+            border: 1px solid #cfd8dc;
+            padding: 6px 4px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        th:first-child, td:first-child { background: #e8f5e9; font-weight: 600; }
+        .score-btn, .chart-btn, .auto-grade-btn, .save-btn, .upload-btn {
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 600;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .chart-btn { background: linear-gradient(135deg, #1565C0, #0d47a1); }
+        .auto-grade-btn { background: linear-gradient(135deg, #e65100, #bf360c); }
+        .submit-report-btn {
+            background: linear-gradient(135deg, #0f4c5c, #0b3b48);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            margin: 5px 0 0 0;
+            font-weight: 600;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .submit-report-btn:hover { transform: translateY(-2px); background: linear-gradient(135deg, #1a6f85, #0f4c5c); }
+        .thought-input { width: 100%; min-height: 80px; border: 1px solid #cfd8dc; border-radius: 16px; padding: 10px; margin: 8px 0; font-family: inherit; font-size: 0.9rem; resize: vertical; }
+        .summary-box { width: 100%; min-height: 80px; border: 1px solid #cfd8dc; border-radius: 16px; padding: 10px; margin: 8px 0; font-family: inherit; font-size: 0.9rem; resize: vertical; background: white; }
+        .score-details { background: #f1f8e9; border-radius: 24px; padding: 20px; margin-top: 20px; border: 1px solid #a5d6a7; }
+        .score-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #c8e6c9; padding: 8px; }
+        .operator-panel { background: #e0f2f1; border-radius: 24px; padding: 18px; margin: 20px 0; border: 1px solid #00897b; }
+        .evidence-area { background: #f3e5f5; border-radius: 28px; padding: 20px; margin: 25px 0; border: 1px dashed #ab47bc; }
+        .image-preview { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 15px; }
+        .img-card { position: relative; width: 130px; border-radius: 16px; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); padding: 6px; text-align: center; }
+        .img-card img { width: 100%; height: 90px; object-fit: cover; border-radius: 12px; }
+        .del-img { position: absolute; top: -8px; right: -8px; background: #c62828; color: white; border-radius: 30px; width: 26px; height: 26px; cursor: pointer; font-weight: bold; line-height: 24px; text-align: center; font-size: 18px; }
+        .chart-container { margin: 20px 0; background: white; padding: 15px; border-radius: 28px; box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
+        .calculation-result { background: #e8f0fe; padding: 5px 12px; border-radius: 24px; display: inline-block; margin: 6px 0; font-size: 0.85rem; }
+        .thought-answer { display: none; background: #e8f5e9; padding: 12px; border-radius: 16px; margin: 6px 0; font-size: 0.9rem; }
+        .save-toolbar { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .info-input { border: none; border-bottom: 2px solid #90a4ae; background: #fafafa; padding: 6px 12px; min-width: 130px; border-radius: 8px; }
+        .info-input:read-only { background: #e9ecef; cursor: default; color: #2c3e50; }
+        #class { width: 300px; }
+        button:hover { transform: translateY(-2px); filter: brightness(1.02); }
+        .experiment-step { background: rgba(240,248,255,0.7); padding: 8px 12px; border-left: 4px solid #3498db; margin: 10px 0; border-radius: 12px; }
+        .question-item { margin: 12px 0; line-height: 1.8; }
+        .report-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e466e;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            z-index: 2000;
+            font-weight: bold;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+            animation: fadeOut 2.6s ease forwards;
+            font-size: 0.95rem;
+            pointer-events: none;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            75% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(-50%) translateY(20px); visibility: hidden; }
+        }
+        @media (max-width: 700px) {
+            .container { padding: 20px 12px; }
+            th, td { font-size: 0.72rem; padding: 4px 2px; }
+            .fill-blank { min-width: 70px; font-size: 0.75rem; }
+            #class { width: 200px; }
+            .data-input { width: 55px; font-size: 0.72rem; }
+        }
+        .result-display { background: #e3f2fd; padding: 5px 12px; border-radius: 12px; display: inline-block; margin: 4px 0; }
+        .flex-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+        .manual-plot-area { background: #f0f4c3; border-radius: 24px; padding: 20px; margin: 20px 0; border: 2px dashed #f57f17; }
+        .param-input { width: 80px; text-align: center; border: 1px solid #ff9800; border-radius: 8px; padding: 4px; background: #fff8e1; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔬 迈克尔逊干涉仪的调节与使用 · 智能实验报告</h1>
+
+    <div class="save-toolbar">
+        <div class="save-time" id="lastSaveTime">📁 上次保存：未保存</div>
+        <button class="save-btn" onclick="manualSave()">💾 手动保存报告</button>
+        <button class="save-btn" onclick="manualLoad()">📂 加载上次数据</button>
+        <button class="save-btn" onclick="exportData()">📎 导出备份(JSON)</button>
+        <button class="save-btn" onclick="importData()">📤 导入备份</button>
+        <button class="save-btn danger" onclick="clearSavedData()" style="background:#c62828;">🗑️ 重置所有数据</button>
+    </div>
+
+    <div class="basic-info" style="background: #f8f9fa; padding: 15px; border-radius: 24px; margin-bottom: 20px;">
+        <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+            <div>实验名称：<input type="text" class="info-input" id="expName" value="迈克尔逊干涉仪的调节与使用" readonly></div>
+            <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-01"></div>
+            <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名"></div>
+            <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号"></div>
+            <div>指导教师：<input type="text" class="info-input" id="instructor" value="马厂"></div>
+            <div>专业班级：<input type="text" class="info-input" id="class" placeholder="专业班级" style="width:400px"></div>
+        </div>
+    </div>
+
+    <!-- 预习填空 -->
+    <h2>一、实验目的</h2>
+    <div class="question-item">1．了解迈克尔逊干涉仪的 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose1" data-answer="原理"><span class="answer-status"></span></span> 并掌握调节方法；</div>
+    <div class="question-item">2．观察 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose2" data-answer="等倾干涉"><span class="answer-status"></span></span> 的条纹，并能区别定域干涉和非定域干涉；</div>
+    <div class="question-item">3．测定 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose3" data-answer="He-Ne激光"><span class="answer-status"></span></span> 的波长。</div>
+
+    <h2>二、实验仪器</h2>
+    <div class="question-item">
+        迈克尔逊干涉仪、 <span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument1" data-answer="He-Ne激光器"><span class="answer-status"></span></span> 、小孔光阑、扩束镜、毛玻璃屏。
+    </div>
+
+    <h2>三、实验原理</h2>
+    <div class="question-item">1．迈克尔逊干涉仪中，分光板 \(G_1\) 将入射光分为互相垂直的两束光，分别射向 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory1" data-answer="全反射镜"><span class="answer-status"></span></span> \(M_1\) 和 \(M_2\) 。</div>
+    <div class="question-item">2．补偿板 \(G_2\) 的作用是补偿 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory2" data-answer="色散"><span class="answer-status"></span></span> 。</div>
+    <div class="question-item">3．当 \(M_1\) 和 \(M_2\) 互相垂直时，产生 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory3" data-answer="等倾干涉"><span class="answer-status"></span></span> 条纹；当 \(M_1\) 和 \(M_2\) 有微小夹角时，产生 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory4" data-answer="等厚干涉"><span class="answer-status"></span></span> 条纹。</div>
+    <div class="question-item">4．测量激光波长的公式为 \(\lambda = \frac{2\Delta d}{m}\) ，其中 \(m\) 为“冒出”或“缩进”的条纹数，\(\Delta d\) 为 \(M_1\) 镜移动的距离。请填写公式中的分子：<span class="fill-blank-container"><input type="text" class="fill-blank" id="theory5" data-answer="2\Delta d"><span class="answer-status"></span></span> 。</div>
+
+    <h2>四、实验内容</h2>
+    <div class="experiment-step">1．观察点光源非定域干涉条纹，测定半导体激光波长。</div>
+    <div class="experiment-step">2．（选做）观察扩展光源定域干涉中的等倾条纹。</div>
+
+    <!-- 五、原始数据记录 -->
+    <h2>五、原始数据记录</h2>
+    <div class="section-title" style="font-weight: bold; font-size: 1.1rem; margin: 10px 0 5px 0;">表29-1 半导体激光波长测定</div>
+    <div class="table-wrapper">
+        <table>
+            <thead><tr><th>实验次数</th><th>条纹变化数 \(m\)</th><th>\(M_1\) 移动距离 \(\Delta d\) (mm)</th><th>\(\lambda = 2\Delta d / m\) (nm)</th></tr></thead>
+            <tbody id="table1Body">
+                <tr><td>1</td><td><input class="data-input" id="m1" placeholder="条"></td><td><input class="data-input" id="d1" placeholder="mm"></td><td id="lambda1">—</td></tr>
+                <tr><td>2</td><td><input class="data-input" id="m2" placeholder="条"></td><td><input class="data-input" id="d2" placeholder="mm"></td><td id="lambda2">—</td></tr>
+                <tr><td>3</td><td><input class="data-input" id="m3" placeholder="条"></td><td><input class="data-input" id="d3" placeholder="mm"></td><td id="lambda3">—</td></tr>
+                <tr><td>4</td><td><input class="data-input" id="m4" placeholder="条"></td><td><input class="data-input" id="d4" placeholder="mm"></td><td id="lambda4">—</td></tr>
+                <tr><td>5</td><td><input class="data-input" id="m5" placeholder="条"></td><td><input class="data-input" id="d5" placeholder="mm"></td><td id="lambda5">—</td></tr>
+                <tr><td>6</td><td><input class="data-input" id="m6" placeholder="条"></td><td><input class="data-input" id="d6" placeholder="mm"></td><td id="lambda6">—</td></tr>
+                <tr><td>7</td><td><input class="data-input" id="m7" placeholder="条"></td><td><input class="data-input" id="d7" placeholder="mm"></td><td id="lambda7">—</td></tr>
+                <tr><td>8</td><td><input class="data-input" id="m8" placeholder="条"></td><td><input class="data-input" id="d8" placeholder="mm"></td><td id="lambda8">—</td></tr>
+                <tr><td>9</td><td><input class="data-input" id="m9" placeholder="条"></td><td><input class="data-input" id="d9" placeholder="mm"></td><td id="lambda9">—</td></tr>
+                <tr><td>10</td><td><input class="data-input" id="m10" placeholder="条"></td><td><input class="data-input" id="d10" placeholder="mm"></td><td id="lambda10">—</td></tr>
+            </tbody>
+            <tfoot><tr><td colspan="2" style="text-align:right; font-weight:bold;">平均波长 \(\bar{\lambda}\) (nm)</td><td id="avgLambdaLaser" colspan="2">—</td></tr></tfoot>
+        </table>
+    </div>
+
+    <div style="text-align:center; margin: 10px 0 20px;">
+        <button class="chart-btn" onclick="calculateData()">📐 计算波长并绘图</button>
+    </div>
+
+    <!-- 六、数据处理与分析 -->
+    <h2>六、数据处理与分析</h2>
+    <div class="calculation-section" style="background:#eef2fc; padding: 20px; border-radius: 24px;">
+
+        <h3>1. 激光波长测量结果</h3>
+        <p>实验测得激光波长平均值 \(\bar{\lambda}_{\text{laser}} = \) <span id="resultLaser" class="calculation-result">—</span> nm</p>
+        <p>理论值 \(\lambda_0 = 632.8\) nm，相对误差 = <span id="errLaser">—</span> %</p>
+
+        <h3>2. 推荐绘图：\(m\) 与 \(\Delta d\) 的关系</h3>
+        <p>由 \(\lambda = 2\Delta d / m\) 可得 \(\Delta d = \frac{\lambda}{2} \cdot m\)，即 \(\Delta d\) 与 \(m\) 成正比，斜率即为 \(\lambda/2\)。</p>
+        <p>绘制 \(\Delta d\) 随 \(m\) 的变化曲线，通过线性拟合可得到斜率，从而求得激光波长 \(\lambda = 2 \times \text{斜率}\)。</p>
+        <p>下方已自动生成该散点图及拟合直线，请查看。</p>
+
+        <div style="margin-top:20px; font-style:italic;">※ 数据处理评分标准（满分20分）：正确计算各次波长并求平均（8分），相对误差≤2%得6分，≤5%得4分，≤10%得2分；正确绘制 \(\Delta d-m\) 图并完成线性拟合（6分）。</div>
+
+        <div style="margin-top: 30px; text-align:center;">
+            <button class="chart-btn" onclick="drawChart()">📈 绘制 \(\Delta d - m\) 拟合曲线</button>
+        </div>
+        <div class="chart-container"><canvas id="chartLaser" style="width:100%; height:auto; max-width:800px; margin:0 auto; display:block;"></canvas></div>
+        <div id="conclusionText" style="margin-top:20px; font-weight:bold;"></div>
+    </div>
+
+    <h2>七、思考题</h2>
+    <div>1．当 \(d\) 增加时，非定域干涉同心圆条纹的粗细和间距如何变化？请说明理由。<textarea id="thought1" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(1)">显示参考答案</button><div id="answer1" class="thought-answer">答：当 \(d\) 增加时，非定域干涉同心圆条纹变细变密。因为光程差 \(\delta = 2d\cos\alpha\)，对于同一级次，\(d\) 增大时，\(\alpha\) 必须减小才能保持相同的 \(\delta\)，因此条纹向中心收缩，且相邻条纹间的角间距减小，条纹变密变细。</div></div>
+    <div>2．当 \(d\) 增加时，等倾干涉同心圆条纹是“冒出”还是“缩进”？为什么？<textarea id="thought2" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(2)">显示参考答案</button><div id="answer2" class="thought-answer">答：当 \(d\) 增加时，等倾干涉同心圆条纹从中心“冒出”。因为中心处 \(\alpha=0\)，光程差 \(\delta=2d\)，当 \(d\) 增大时，\(\delta\) 增大，中心干涉级次升高，新的亮环从中心产生并向外扩展，所以看到条纹“冒出”。</div></div>
+    <div>3．试从形成条纹的条件、条纹特点、条纹出现的位置和测量光波波长的公式来比较牛顿环和等倾干涉同心圆条纹的异同。<textarea id="thought3" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(3)">显示参考答案</button><div id="answer3" class="thought-answer">答：相同点：都是同心圆环，条纹间距随半径增大而减小。不同点：牛顿环是等厚干涉，由空气楔上下表面反射光干涉，条纹定位于空气膜表面，公式 \(r_m^2 = mR\lambda\)；等倾干涉是等倾干涉，由平行板两表面反射光干涉，条纹定位于无穷远，公式 \(2d\cos\alpha = m\lambda\)。测量波长时，牛顿环用 \(R = (D_m^2 - D_n^2)/(4(m-n)\lambda)\)，等倾干涉用 \(\lambda = 2\Delta d/m\)。</div></div>
+
+    <h2>八、实验小结</h2>
+    <textarea id="summary" class="summary-box" placeholder="总结实验结论、误差来源、改进建议..."></textarea>
+
+    <!-- 手工绘图上传 -->
+    <div class="manual-plot-area">
+        <strong>✏️ 手工图形绘制上传 (权重10%)</strong>
+        <p>请上传您手绘的 \(\Delta d\) 与 \(m\) 关系曲线图（照片或扫描件）。</p>
+        <input type="file" id="manualPlotUpload" accept="image/*" multiple>
+        <button onclick="uploadManualPlots()" class="upload-btn" style="background:#f57f17;">➕ 上传手绘图形</button>
+        <div id="manualPlotPreview" class="image-preview"></div>
+        <small style="color: #4a148c;">* 上传手绘图形可获得额外分数，至少一张。</small>
+    </div>
+
+    <!-- 实验证据 -->
+    <div class="evidence-area">
+        <strong>📸 实验证据图片上传（权重5%）</strong>
+        <div style="margin: 12px 0;"><input type="file" id="evidenceUpload" accept="image/*" multiple><button class="upload-btn" onclick="uploadEvidenceImages()" style="background:#7b1fa2;">➕ 添加图片</button></div>
+        <div id="imagePreviewContainer" class="image-preview"></div>
+        <small style="color: #4a148c;">* 上传实验现场照片（仪器数据与人同框且与表格数据相同），至少上传一张可获得5%分数。</small>
+    </div>
+
+    <!-- 操作分 -->
+    <div class="operator-panel">
+        <strong>🔐 实验操作分 (权重20%，仅教师可操作) & 一键数据上报</strong><br>
+        <input type="password" id="opPwd" placeholder="教师密码" autocomplete="off">
+        <button onclick="unlockOpScore()" class="chart-btn">验证并解锁</button>
+        <span id="opLockMsg" style="color:#b71c1c;"></span>
+        <div id="opScoreDiv" style="display:none; margin-top: 12px;">
+            <label>操作分数 (0~20): </label>
+            <input type="number" id="operationScore" min="0" max="20" step="1" value="0">
+            <button onclick="saveOpScore()" class="save-btn">💾 保存操作分</button>
+            <button id="oneClickReportBtn" class="submit-report-btn" style="margin-left: 12px;">📤 一键数据上报</button>
+        </div>
+        <div>📋 当前操作分：<span id="currentOpScore">0</span> 分</div>
+        <div style="margin-top: 8px; font-size:0.85rem; color:#00695c;">🔔 教师验证密码后，上方将显示"一键数据上报"按钮，可导出专业班级、学号、姓名、预习得分、操作得分、综合得分及日期（预习和操作已换算为百分制）。</div>
+    </div>
+
+    <h2>九、自动评分 & 实验评语</h2>
+    <div class="score-section" style="text-align:center;">
+        <button class="auto-grade-btn" onclick="autoGrade()">✨ 自动评分并生成评语</button>
+        <div id="scoreDetails" class="score-details" style="display:none;">
+            <div class="score-item"><span>📖 预习填空 (10%)</span><span id="detailPreScore">0/10</span></div>
+            <div class="score-item"><span>📝 数据记录 (10%)</span><span id="detailDataScore">0/10</span></div>
+            <div class="score-item"><span>📐 数据处理 (20%)</span><span id="detailCalcScore">0/20</span></div>
+            <div class="score-item"><span>📊 自动绘图 (5%)</span><span id="detailAutoPlotScore">0/5</span></div>
+            <div class="score-item"><span>✏️ 手工绘图 (10%)</span><span id="detailManualPlotScore">0/10</span></div>
+            <div class="score-item"><span>💡 思考题 (10%)</span><span id="detailThoughtScore">0/10</span></div>
+            <div class="score-item"><span>📄 实验小结 (10%)</span><span id="detailSummaryScore">0/10</span></div>
+            <div class="score-item"><span>📸 实验证据 (5%)</span><span id="detailEvidenceScore">0/5</span></div>
+            <div class="score-item"><span>🔧 实验操作 (20%)</span><span id="detailOpScore">0/20</span></div>
+            <div class="score-item" style="font-weight:bold; border-top:2px solid #4caf50;"><span>🏆 总分</span><span id="detailTotalScore">0/100</span></div>
+        </div>
+        <div id="commentContent" style="background:#fff8e7; border-radius: 28px; padding: 20px; margin-top: 20px; text-align: left;"></div>
+    </div>
+</div>
+
+<script>
+    // ========== Toast ==========
+    function showReportToast(msg) {
+        let toast = document.createElement('div');
+        toast.className = 'report-toast';
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2600);
+    }
+
+    // ========== 答案映射 ==========
+    const answers = {
+        "原理": ["原理"],
+        "等倾干涉": ["等倾干涉", "等倾"],
+        "He-Ne激光": ["He-Ne激光", "氦氖激光", "激光"],
+        "He-Ne激光器": ["He-Ne激光器", "氦氖激光器"],
+        "全反射镜": ["全反射镜", "反射镜"],
+        "色散": ["色散"],
+        "等厚干涉": ["等厚干涉", "等厚"],
+        "2\\Delta d": ["2Δd", "2delta d", "2d"]
+    };
+
+    // ========== 状态 ==========
+    let chartInstance = null;
+    let opScoreLocked = false;
+    let imageList = [];
+    let manualPlotImages = [];
+    let hasDrawnChart = false;
+    let avgLaser = 0;
+
+    // ========== 填空状态 ==========
+    function updateAnswerStatusIcon(inputElement) {
+        const container = inputElement.parentElement;
+        const statusSpan = container.querySelector('.answer-status');
+        if (!statusSpan) return;
+        const userAnswer = inputElement.value.trim();
+        const correctAnswers = answers[inputElement.dataset.answer];
+        let status = 'empty';
+        if (userAnswer === '') status = 'empty';
+        else if (correctAnswers && correctAnswers.some(ans => {
+                const user = userAnswer.toLowerCase().replace(/\s+/g, '');
+                const correct = ans.toLowerCase().replace(/\s+/g, '');
+                return user === correct || user.includes(correct) || correct.includes(user);
+            })) status = 'correct';
+        else status = 'incorrect';
+        statusSpan.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
+        if (status === 'correct') { statusSpan.textContent = '✓'; statusSpan.classList.add('correct-icon'); }
+        else if (status === 'incorrect') { statusSpan.textContent = '✗'; statusSpan.classList.add('incorrect-icon'); }
+        else { statusSpan.textContent = '○'; statusSpan.classList.add('empty-icon'); }
+    }
+    function updateAllAnswerStatusIcons() { document.querySelectorAll('.fill-blank').forEach(inp => updateAnswerStatusIcon(inp)); }
+
+    // ========== 线性拟合 ==========
+    function linearFit(x, y) {
+        let n = x.length;
+        if (n < 2) return { slope: 0, intercept: 0, r2: 0 };
+        let sumX = x.reduce((a,b)=>a+b,0);
+        let sumY = y.reduce((a,b)=>a+b,0);
+        let sumXY = x.reduce((a,b,i)=>a+b*y[i],0);
+        let sumX2 = x.reduce((a,b)=>a+b*b,0);
+        let sumY2 = y.reduce((a,b)=>a+b*b,0);
+        let slope = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
+        let intercept = (sumY - slope*sumX) / n;
+        let r2 = (n*sumXY - sumX*sumY)**2 / ((n*sumX2 - sumX*sumX)*(n*sumY2 - sumY*sumY));
+        return { slope, intercept, r2 };
+    }
+
+    // ========== 计算 ==========
+    function calculateData() {
+        let sumLaser = 0, countLaser = 0;
+        let mArr = [], dArr = [];
+        for (let i = 1; i <= 10; i++) {
+            let m = parseFloat(document.getElementById('m'+i).value);
+            let d = parseFloat(document.getElementById('d'+i).value);
+            let lambda = (m && d) ? (2 * d * 1000 / m) : NaN; // d in mm, lambda in nm
+            document.getElementById('lambda'+i).innerText = isNaN(lambda) ? '—' : lambda.toFixed(1);
+            if (!isNaN(lambda) && lambda > 0) {
+                sumLaser += lambda;
+                countLaser++;
+                mArr.push(m);
+                dArr.push(d);
+            }
+        }
+        avgLaser = countLaser ? sumLaser / countLaser : 0;
+        document.getElementById('avgLambdaLaser').innerText = avgLaser ? avgLaser.toFixed(1) + ' nm' : '—';
+        document.getElementById('resultLaser').innerText = avgLaser ? avgLaser.toFixed(1) : '—';
+        let errLaser = avgLaser ? Math.abs(avgLaser - 632.8) / 632.8 * 100 : 0;
+        document.getElementById('errLaser').innerText = avgLaser ? errLaser.toFixed(2) : '—';
+
+        // 如果数据足够，自动绘制图表
+        if (mArr.length >= 2) {
+            drawChart(mArr, dArr);
+        } else {
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = null;
+            hasDrawnChart = false;
+        }
+        manualSave();
+    }
+
+    // ========== 绘图 ==========
+    function drawChart(mArr, dArr) {
+        if (!mArr || !dArr) {
+            // 从表格重新读取
+            mArr = []; dArr = [];
+            for (let i = 1; i <= 10; i++) {
+                let m = parseFloat(document.getElementById('m'+i).value);
+                let d = parseFloat(document.getElementById('d'+i).value);
+                if (m && d && m > 0 && d > 0) {
+                    mArr.push(m);
+                    dArr.push(d);
+                }
+            }
+        }
+        if (mArr.length < 2) {
+            showReportToast("⚠️ 有效数据不足，请至少输入2组数据");
+            return;
+        }
+
+        let ctx = document.getElementById('chartLaser').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+
+        let fit = linearFit(mArr, dArr);
+        let xMin = Math.min(...mArr), xMax = Math.max(...mArr);
+        let xFit = [xMin, xMax];
+        let yFit = xFit.map(x => fit.slope * x + fit.intercept);
+        let lambda_from_slope = fit.slope * 2 * 1000; // nm
+
+        chartInstance = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: '实验数据',
+                    data: mArr.map((m, idx) => ({ x: m, y: dArr[idx] })),
+                    backgroundColor: '#1e88e5',
+                    pointRadius: 6,
+                }, {
+                    label: '拟合直线 (斜率 = λ/2)',
+                    data: xFit.map((x, i) => ({ x: x, y: yFit[i] })),
+                    type: 'line',
+                    borderColor: '#e91e63',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    x: { title: { display: true, text: '条纹变化数 m' }, beginAtZero: true },
+                    y: { title: { display: true, text: 'Δd (mm)' }, beginAtZero: true }
+                },
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    title: { display: true, text: 'Δd - m 拟合曲线，斜率 = ' + fit.slope.toFixed(5) + ' mm, λ = ' + lambda_from_slope.toFixed(1) + ' nm' }
+                }
+            }
+        });
+        hasDrawnChart = true;
+        manualSave();
+    }
+
+    // ========== 手工绘图上传 ==========
+    function uploadManualPlots() {
+        let files = document.getElementById('manualPlotUpload').files;
+        if (!files.length) return;
+        for (let file of files) {
+            if (!file.type.startsWith('image/')) continue;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                manualPlotImages.push(e.target.result);
+                displayManualPlots();
+            };
+            reader.readAsDataURL(file);
+        }
+        document.getElementById('manualPlotUpload').value = '';
+    }
+    function displayManualPlots() {
+        let container = document.getElementById('manualPlotPreview');
+        container.innerHTML = '';
+        manualPlotImages.forEach((imgSrc, idx) => {
+            let div = document.createElement('div');
+            div.className = 'img-card';
+            div.innerHTML = `<img src="${imgSrc}" alt="手工绘图"><div class="del-img" onclick="removeManualPlot(${idx})">✕</div>`;
+            container.appendChild(div);
+        });
+        localStorage.setItem('manualPlotImages', JSON.stringify(manualPlotImages));
+    }
+    function removeManualPlot(idx) { manualPlotImages.splice(idx,1); displayManualPlots(); }
+
+    // ========== 实验证据上传 ==========
+    function uploadEvidenceImages() {
+        let files = document.getElementById('evidenceUpload').files;
+        if (!files.length) return;
+        for (let file of files) {
+            if (!file.type.startsWith('image/')) continue;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                imageList.push(e.target.result);
+                displayImages();
+            };
+            reader.readAsDataURL(file);
+        }
+        document.getElementById('evidenceUpload').value = '';
+    }
+    function displayImages() {
+        let container = document.getElementById('imagePreviewContainer');
+        container.innerHTML = '';
+        imageList.forEach((imgSrc, idx) => {
+            let div = document.createElement('div');
+            div.className = 'img-card';
+            div.innerHTML = `<img src="${imgSrc}" alt="实验证据"><div class="del-img" onclick="removeImage(${idx})">✕</div>`;
+            container.appendChild(div);
+        });
+        localStorage.setItem('evidenceImages', JSON.stringify(imageList));
+    }
+    function removeImage(idx) { imageList.splice(idx,1); displayImages(); }
+
+    // ========== 评分 ==========
+    function gradePre() {
+        let inputs = document.querySelectorAll('.fill-blank');
+        let correct = 0;
+        inputs.forEach(inp => {
+            let ans = answers[inp.dataset.answer];
+            let val = inp.value.trim().toLowerCase();
+            if (val && ans && ans.some(a => {
+                    const user = val.replace(/\s+/g,'');
+                    const correct = a.toLowerCase().replace(/\s+/g,'');
+                    return user === correct || user.includes(correct) || correct.includes(user);
+                })) correct++;
+        });
+        return Math.round((correct / inputs.length) * 10);
+    }
+
+    function gradeDataRecord() {
+        let valid = 0, total = 0;
+        for (let i=1; i<=10; i++) {
+            let m = document.getElementById('m'+i).value.trim();
+            let d = document.getElementById('d'+i).value.trim();
+            total += 2;
+            if (m && !isNaN(parseFloat(m)) && parseFloat(m) > 0) valid++;
+            if (d && !isNaN(parseFloat(d)) && parseFloat(d) > 0) valid++;
+        }
+        let score = total > 0 ? (valid / total) * 10 : 0;
+        return Math.min(10, Math.round(score));
+    }
+
+    function gradeDataProcess() {
+        let score = 0;
+        // 计算平均波长并求误差 (14分)
+        if (avgLaser > 0) {
+            let err = Math.abs(avgLaser - 632.8) / 632.8 * 100;
+            // 平均波长计算正确 8分
+            score += 8;
+            // 误差分
+            if (err <= 2) score += 6;
+            else if (err <= 5) score += 4;
+            else if (err <= 10) score += 2;
+        }
+        // 绘图拟合 (6分)
+        if (hasDrawnChart) {
+            score += 6;
+        }
+        return Math.min(20, Math.round(score));
+    }
+
+    function gradeAutoPlot() {
+        return hasDrawnChart ? 5 : 0;
+    }
+
+    function gradeManualPlot() {
+        return manualPlotImages.length > 0 ? 10 : 0;
+    }
+
+    function gradeThought() {
+        let t1 = document.getElementById('thought1').value.trim();
+        let t2 = document.getElementById('thought2').value.trim();
+        let t3 = document.getElementById('thought3').value.trim();
+        let score = 0;
+        if (t1.length > 20) score += 3; else if (t1.length > 8) score += 1;
+        if (t2.length > 20) score += 3; else if (t2.length > 8) score += 1;
+        if (t3.length > 30) score += 4; else if (t3.length > 15) score += 2;
+        return Math.min(10, score);
+    }
+
+    function gradeSummary() {
+        let sum = document.getElementById('summary').value.trim();
+        if (sum.length > 150 && (sum.includes("干涉") || sum.includes("波长") || sum.includes("误差"))) return 10;
+        if (sum.length > 90) return 8;
+        if (sum.length > 50) return 6;
+        if (sum.length > 20) return 4;
+        return 0;
+    }
+
+    function gradeEvidence() { return imageList.length > 0 ? 5 : 0; }
+
+    function autoGrade() {
+        calculateData();
+        let preSc = gradePre();
+        let dataSc = gradeDataRecord();
+        let calcSc = gradeDataProcess();
+        let autoPlotSc = gradeAutoPlot();
+        let manualPlotSc = gradeManualPlot();
+        let thoughtSc = gradeThought();
+        let summarySc = gradeSummary();
+        let evidenceSc = gradeEvidence();
+        let opScore = parseFloat(document.getElementById('operationScore').value);
+        if (isNaN(opScore)) opScore = 0;
+        opScore = Math.min(20, Math.max(0, opScore));
+        let total = preSc + dataSc + calcSc + autoPlotSc + manualPlotSc + thoughtSc + summarySc + evidenceSc + opScore;
+        document.getElementById('detailPreScore').innerText = `${preSc}/10`;
+        document.getElementById('detailDataScore').innerText = `${dataSc}/10`;
+        document.getElementById('detailCalcScore').innerText = `${calcSc}/20`;
+        document.getElementById('detailAutoPlotScore').innerText = `${autoPlotSc}/5`;
+        document.getElementById('detailManualPlotScore').innerText = `${manualPlotSc}/10`;
+        document.getElementById('detailThoughtScore').innerText = `${thoughtSc}/10`;
+        document.getElementById('detailSummaryScore').innerText = `${summarySc}/10`;
+        document.getElementById('detailEvidenceScore').innerText = `${evidenceSc}/5`;
+        document.getElementById('detailOpScore').innerText = `${opScore}/20`;
+        document.getElementById('detailTotalScore').innerText = `${Math.round(total)}/100`;
+        document.getElementById('scoreDetails').style.display = 'block';
+        let teacher = document.getElementById('instructor').value.trim() || "马厂";
+        let now = new Date();
+        let dateTimeStr = `${now.toLocaleDateString('zh-CN')} ${now.toLocaleTimeString('zh-CN', {hour12: false})}`;
+        let comment =
+            `📊 实验报告得分 ${Math.round(total)}/100。预习${preSc}/10，数据记录${dataSc}/10，数据处理${calcSc}/20，自动绘图${autoPlotSc}/5，手工绘图${manualPlotSc}/10，思考题${thoughtSc}/10，小结${summarySc}/10，实验证据${evidenceSc}/5，操作分${opScore}/20。<br><br>教师签名：${teacher}<br>评语日期：${dateTimeStr}`;
+        if (total >= 90) comment += "<br>⭐ 优秀！实验严谨，分析透彻。";
+        else if (total >= 75) comment += "<br>👍 良好，可进一步提升精度。";
+        else if (total >= 60) comment += "<br>⚠️ 合格，注意数据处理与误差分析。";
+        else comment += "<br>❌ 需重做实验或补充数据，认真分析误差。";
+        document.getElementById('commentContent').innerHTML = comment;
+        let conclusion =
+            `实验结论：通过迈克尔逊干涉仪测量激光波长，平均值为 ${avgLaser.toFixed(1)} nm，相对误差 ${((Math.abs(avgLaser-632.8)/632.8)*100).toFixed(2)}%。${total>=60?"实验数据合理，验证了干涉原理。":"误差较大，建议检查实验操作。"}`;
+        document.getElementById('conclusionText').innerHTML = conclusion;
+        manualSave();
+    }
+
+    // ========== 操作分 ==========
+    function unlockOpScore() {
+        let pwd = document.getElementById('opPwd').value;
+        if (pwd === "52501314") {
+            document.getElementById('opScoreDiv').style.display = 'block';
+            document.getElementById('opLockMsg').innerHTML = "✅ 密码正确，可评分及上报";
+            opScoreLocked = true;
+        } else { document.getElementById('opLockMsg').innerHTML = "❌ 密码错误"; opScoreLocked = false; }
+    }
+    function saveOpScore() {
+        if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁"); return; }
+        let val = parseFloat(document.getElementById('operationScore').value);
+        if (isNaN(val)) val = 0;
+        val = Math.min(20, Math.max(0, val));
+        document.getElementById('operationScore').value = val;
+        localStorage.setItem('operationScore', val);
+        document.getElementById('currentOpScore').innerText = val;
+        showReportToast("✅ 操作分已保存");
+    }
+
+    // ========== 一键上报 ==========
+    async function oneClickDataReport() {
+        if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁后再执行上报"); return; }
+        autoGrade();
+        const className = document.getElementById('class')?.value.trim() || "未填专业班级";
+        const studentId = document.getElementById('studentId')?.value.trim() || "未填学号";
+        const studentName = document.getElementById('studentName')?.value.trim() || "未填姓名";
+        const expDate = document.getElementById('expDate')?.value.trim() || new Date().toLocaleDateString('zh-CN');
+        let preScoreRaw = parseFloat(document.getElementById('detailPreScore')?.innerText?.split('/')[0]) || 0;
+        let opScoreRaw = parseFloat(document.getElementById('currentOpScore')?.innerText) || 0;
+        let totalScoreRaw = parseFloat(document.getElementById('detailTotalScore')?.innerText?.split('/')[0]) || 0;
+        const now = new Date();
+        const fullDateTime = `${expDate} ${now.toLocaleTimeString('zh-CN', {hour12: false})}`;
+        const reportLines = [
+            "迈克尔逊干涉仪实验",
+            `专业班级: ${className}`,
+            `学号: ${studentId}`,
+            `姓名: ${studentName}`,
+            `预习得分: ${preScoreRaw.toFixed(1)} `,
+            `操作得分: ${opScoreRaw.toFixed(1)} `,
+            `综合得分: ${totalScoreRaw.toFixed(1)} `,
+            `实验日期: ${fullDateTime}`,
+            `指导教师: ${document.getElementById('instructor')?.value || "马厂"}`,
+        ];
+        const reportText = reportLines.join("\n");
+        try {
+            await navigator.clipboard.writeText(reportText);
+            showReportToast("✅ 实验数据已复制（预习/操作已换算百分制）！可粘贴至表单");
+        } catch (err) {
+            const textarea = document.createElement('textarea');
+            textarea.value = reportText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showReportToast("✅ 已复制 (传统方式，含百分制换算)");
+        }
+        window.open("https://qrbgda8w.jsjform.com/f/uJfvvZ", '_blank');
+    }
+
+    // ========== 保存/加载 ==========
+    function manualSave() {
+        let data = { info: {}, blanks: {}, m: {}, d: {}, thoughts: {},
+            summary: document.getElementById('summary').value,
+            opScore: document.getElementById('operationScore').value,
+            images: imageList, manualPlots: manualPlotImages,
+            hasDrawnChart };
+        document.querySelectorAll('.info-input').forEach(i => { if (i.id !== 'expName') data.info[i.id] = i.value; });
+        document.querySelectorAll('.fill-blank').forEach(i => data.blanks[i.id] = i.value);
+        for (let i=1; i<=10; i++) {
+            data.m['m'+i] = document.getElementById('m'+i).value;
+            data.d['d'+i] = document.getElementById('d'+i).value;
+        }
+        document.querySelectorAll('.thought-input').forEach(i => data.thoughts[i.id] = i.value);
+        localStorage.setItem('fullReport_michelson', JSON.stringify(data));
+        document.getElementById('lastSaveTime').innerText = `📁 上次保存：${new Date().toLocaleTimeString()}`;
+        showReportToast("✅ 报告已手动保存");
+    }
+
+    function manualLoad() {
+        let raw = localStorage.getItem('fullReport_michelson');
+        if (!raw) { showReportToast("⚠️ 无保存记录"); return; }
+        let data = JSON.parse(raw);
+        Object.entries(data.info || {}).forEach(([id, val]) => {
+            let e = document.getElementById(id);
+            if (e && id !== 'expName' && id !== 'operationScore') e.value = val;
+        });
+        Object.entries(data.blanks || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+        Object.entries(data.m || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+        Object.entries(data.d || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+        Object.entries(data.thoughts || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+        if (data.summary) document.getElementById('summary').value = data.summary;
+        if (data.images) { imageList = data.images; displayImages(); }
+        if (data.manualPlots) { manualPlotImages = data.manualPlots; displayManualPlots(); }
+        if (data.hasDrawnChart !== undefined) hasDrawnChart = data.hasDrawnChart;
+
+        document.getElementById('operationScore').value = '0';
+        document.getElementById('currentOpScore').innerText = '0';
+        document.getElementById('opScoreDiv').style.display = 'none';
+        document.getElementById('opLockMsg').innerHTML = '';
+        opScoreLocked = false;
+        document.getElementById('opPwd').value = '';
+        localStorage.removeItem('operationScore');
+
+        updateAllAnswerStatusIcons();
+        calculateData();
+        if (hasDrawnChart) {
+            // 重新绘制图表
+            let mArr=[], dArr=[];
+            for (let i=1; i<=10; i++) {
+                let m = parseFloat(document.getElementById('m'+i).value);
+                let d = parseFloat(document.getElementById('d'+i).value);
+                if (m && d && m>0 && d>0) { mArr.push(m); dArr.push(d); }
+            }
+            if (mArr.length>=2) drawChart(mArr, dArr);
+        }
+        showReportToast("✅ 加载完成（操作分已重置，需教师重新验证密码）");
+    }
+
+    function exportData() {
+        let d = localStorage.getItem('fullReport_michelson');
+        if (d) { let blob = new Blob([d], {type:'application/json'}); let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'michelson_exp_backup.json'; a.click(); } else showReportToast("⚠️ 无数据");
+    }
+    function importData() {
+        let inp = document.createElement('input');
+        inp.type = 'file';
+        inp.accept = '.json';
+        inp.onchange = function(e) {
+            let f = e.target.files[0];
+            if (!f) return;
+            let reader = new FileReader();
+            reader.onload = function(ev) {
+                localStorage.setItem('fullReport_michelson', ev.target.result);
+                showReportToast("✅ 导入成功，即将刷新页面");
+                setTimeout(() => location.reload(), 1500);
+            };
+            reader.readAsText(f);
+        };
+        inp.click();
+    }
+    function clearSavedData() {
+        localStorage.removeItem('fullReport_michelson');
+        localStorage.removeItem('evidenceImages');
+        localStorage.removeItem('manualPlotImages');
+        localStorage.removeItem('operationScore');
+        showReportToast("🗑️ 数据已清除，页面将刷新");
+        setTimeout(() => location.reload(), 1200);
+    }
+
+    function toggleAnswer(n) {
+        let ansDiv = document.getElementById(`answer${n}`);
+        if (ansDiv.style.display === 'block') ansDiv.style.display = 'none';
+        else ansDiv.style.display = 'block';
+    }
+
+    // ========== 初始化 ==========
+    window.onload = function() {
+        let raw = localStorage.getItem('fullReport_michelson');
+        if (raw) {
+            try {
+                let data = JSON.parse(raw);
+                Object.entries(data.info || {}).forEach(([id, val]) => {
+                    let e = document.getElementById(id);
+                    if (e && id !== 'expName' && id !== 'operationScore') e.value = val;
+                });
+                Object.entries(data.blanks || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                Object.entries(data.m || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                Object.entries(data.d || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                Object.entries(data.thoughts || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                if (data.summary) document.getElementById('summary').value = data.summary;
+                if (data.images) { imageList = data.images; displayImages(); }
+                if (data.manualPlots) { manualPlotImages = data.manualPlots; displayManualPlots(); }
+                if (data.hasDrawnChart !== undefined) hasDrawnChart = data.hasDrawnChart;
+            } catch(e) {}
+        }
+        document.getElementById('operationScore').value = '0';
+        document.getElementById('currentOpScore').innerText = '0';
+        document.getElementById('opScoreDiv').style.display = 'none';
+        document.getElementById('opLockMsg').innerHTML = '';
+        opScoreLocked = false;
+        document.getElementById('opPwd').value = '';
+        localStorage.removeItem('operationScore');
+
+        document.querySelectorAll('.fill-blank').forEach(inp => {
+            inp.addEventListener('input', function(e) { updateAnswerStatusIcon(e.target); });
+        });
+        updateAllAnswerStatusIcons();
+
+        const reportBtn = document.getElementById('oneClickReportBtn');
+        if (reportBtn) reportBtn.addEventListener('click', oneClickDataReport);
+
+        if (raw) showReportToast("📂 已自动加载上次保存的数据");
+        calculateData();
+        if (hasDrawnChart) {
+            let mArr=[], dArr=[];
+            for (let i=1; i<=10; i++) {
+                let m = parseFloat(document.getElementById('m'+i).value);
+                let d = parseFloat(document.getElementById('d'+i).value);
+                if (m && d && m>0 && d>0) { mArr.push(m); dArr.push(d); }
+            }
+            if (mArr.length>=2) drawChart(mArr, dArr);
+        }
+    };
+</script>
+</body>
+</html>
