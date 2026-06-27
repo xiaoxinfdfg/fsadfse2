@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>齐纳二极管工艺与器件仿真 | ATHENA+ATLAS</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
     <style>
         * {
             box-sizing: border-box;
@@ -126,6 +128,9 @@
         .btn-info {
             background: linear-gradient(135deg, #17a2b8, #138496);
         }
+        .btn-danger {
+            background: linear-gradient(135deg, #c62828, #b71c1c);
+        }
         .process-panel {
             background: #eef2fa;
             border-radius: 28px;
@@ -204,6 +209,14 @@
             min-width: 130px;
             border-radius: 10px;
         }
+        .info-input[readonly] {
+            background: #e8edf2;
+            color: #1e466e;
+            font-weight: 600;
+            border-bottom-color: #0d6efd;
+            cursor: default;
+        }
+        /* Toast 轻提示样式 */
         .report-toast {
             position: fixed;
             bottom: 24px;
@@ -215,17 +228,25 @@
             border-radius: 60px;
             z-index: 2000;
             font-weight: bold;
-            animation: fadeOut 2.2s ease forwards;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            animation: toastFade 2.2s ease forwards;
+            white-space: nowrap;
+            max-width: 90vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        @keyframes fadeOut {
+        @keyframes toastFade {
             0% {
                 opacity: 1;
+                transform: translateX(-50%) translateY(0);
             }
             70% {
                 opacity: 1;
+                transform: translateX(-50%) translateY(0);
             }
             100% {
                 opacity: 0;
+                transform: translateX(-50%) translateY(20px);
                 visibility: hidden;
             }
         }
@@ -292,6 +313,25 @@
             gap: 10px;
             align-items: center;
         }
+        .exp-name-fixed {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e3f2fd;
+            padding: 4px 16px 4px 12px;
+            border-radius: 30px;
+            border: 1px solid #90caf9;
+        }
+        .exp-name-fixed .label {
+            color: #0d47a1;
+            font-weight: 500;
+        }
+        .exp-name-fixed .value {
+            color: #1e466e;
+            font-weight: 700;
+            font-size: 1.05rem;
+            letter-spacing: 0.3px;
+        }
         @media (max-width: 600px) {
             .container {
                 padding: 16px 12px;
@@ -311,6 +351,11 @@
             h2 {
                 font-size: 1.15rem;
             }
+            .report-toast {
+                font-size: 0.85rem;
+                padding: 10px 18px;
+                white-space: normal;
+            }
         }
     </style>
 </head>
@@ -323,12 +368,16 @@
             <button class="btn" onclick="manualSave()">💾 保存进度</button>
             <button class="btn" onclick="manualLoad()">📂 加载记录</button>
             <button class="btn" onclick="exportData()">📎 导出备份</button>
-            <button class="btn" onclick="clearSavedData()" style="background:#c62828;">🗑️ 重置所有</button>
+            <button class="btn btn-danger" onclick="clearSavedData()">🗑️ 重置所有</button>
         </div>
 
-        <!-- 基本信息 -->
+        <!-- 基本信息：实验名称固定不可变 -->
         <div style="background: #f8f9fa; padding: 18px; border-radius: 32px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
-            <div>实验名称：<input type="text" class="info-input" id="expName" value="齐纳二极管工艺与器件仿真" readonly></div>
+            <div class="exp-name-fixed">
+                <span class="label">🧪 实验名称</span>
+                <span class="value">齐纳二极管工艺与器件仿真</span>
+            </div>
+            <input type="hidden" id="expName" value="齐纳二极管工艺与器件仿真">
             <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-25"></div>
             <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名"></div>
             <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号"></div>
@@ -429,12 +478,12 @@
                 extract init infile="diodeex05.log"
                 extract name="bv" min(v."anode")
                 extract name="leakage" x.val from curve(v."anode",abs(i."anode")) where y.val=1e-10</div>
-            <div class="question-item">🔸 击穿电压 bv = <span class="fill-blank-container"><input type="text" class="fill-blank" id="param1" data-answer="-10"><span class="answer-status"></span></span> V。</div>
-            <div class="question-item">🔸 漏电流 leakage = <span class="fill-blank-container"><input type="text" class="fill-blank" id="param2" data-answer="-5.68681"><span class="answer-status"></span></span> A（在 \(1\times10^{-10}\) A 处提取）。</div>
-        <img src="https://xiaoxinfdfg.github.io/fsadfse2/2jgfx.png" 
-             alt="图7.1 齐纳二极管反向IV特性曲线（仿真）" 
-             class="apparatus-img"
-             style="max-width: 80%; margin: 20px auto; display: block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <div class="question-item">🔸 反向最大扫描电压 bv = <span class="fill-blank-container"><input type="text" class="fill-blank" id="param1" data-answer="-10"><span class="answer-status"></span></span> V。</div>
+            <div class="question-item">🔸 击穿的起始电压leakage = <span class="fill-blank-container"><input type="text" class="fill-blank" id="param2" data-answer="-5.68681"><span class="answer-status"></span></span> V（在 \(1\times10^{-10}\) A 处提取）。</div>
+            <img src="https://xiaoxinfdfg.github.io/fsadfse2/2jgfx.png"
+            alt="图7.1 齐纳二极管反向IV特性曲线（仿真）"
+            class="apparatus-img"
+            style="max-width: 80%; margin: 20px auto; display: block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <div class="question-item">📌 从IV曲线可见，在击穿电压之前反向电流很小（漏电流），击穿后电流 <span class="fill-blank-container"><input type="text" class="fill-blank" id="iv1" data-answer="急剧增大"><span class="answer-status"></span></span>，表现出 <span class="fill-blank-container"><input type="text" class="fill-blank" id="iv2" data-answer="稳压"><span class="answer-status"></span></span> 特性。</div>
         </div>
 
@@ -507,7 +556,20 @@
         let teacherVerified = false;
         let evidenceScoreManual = 0;
 
-        // 标准答案映射（填空）
+        // ---------- Toast 轻提示（无阻塞，自动消失） ----------
+        function showToast(message, duration = 2200) {
+            // 移除已有 toast，避免堆积
+            document.querySelectorAll('.report-toast').forEach(el => el.remove());
+            let toast = document.createElement('div');
+            toast.className = 'report-toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, duration);
+        }
+
+        // 标准答案映射（填空）- 严格匹配用
         const answerKey = {
             "grid1": ["0.02"],
             "grid1p": ["关键区域加密", "加密", "提高精度"],
@@ -555,13 +617,14 @@
             const user = input.value.trim().toLowerCase();
             let ok = false;
             for (let c of correctList) {
-                if (user === c.toLowerCase() || (user.length > 0 && c.toLowerCase().includes(user))) {
+                if (user === c.toLowerCase()) {
                     ok = true;
                     break;
                 }
             }
             if (ok) { statusSpan.innerHTML = '✓';
-                statusSpan.className = 'answer-status correct-icon'; } else if (user === '') { statusSpan.innerHTML = '○';
+                statusSpan.className = 'answer-status correct-icon'; } else if (user === '') { statusSpan.innerHTML =
+                    '○';
                 statusSpan.className = 'answer-status empty-icon'; } else { statusSpan.innerHTML = '✗';
                 statusSpan.className = 'answer-status incorrect-icon'; }
         }
@@ -583,25 +646,30 @@
                 document.getElementById('teacherMsg').innerHTML = "✅ 验证成功，可评分及上报";
                 document.getElementById('teacherPanelLocked').style.display = "block";
                 document.getElementById('reportBtnForTeacher').onclick = oneClickDataReport;
+                showToast("🔓 教师权限已解锁");
             } else {
                 teacherVerified = false;
                 document.getElementById('teacherMsg').innerHTML = "❌ 密码错误，无法评分/上报";
                 document.getElementById('teacherPanelLocked').style.display = "none";
+                showToast("❌ 教师密码错误");
             }
         }
 
         function saveEvidenceScore() {
-            if (!teacherVerified) { alert("请先验证教师密码"); return; }
+            if (!teacherVerified) {
+                showToast("⚠️ 请先验证教师密码");
+                return;
+            }
             let sc = parseInt(document.getElementById('evidenceScore').value);
             if (isNaN(sc)) sc = 0;
             evidenceScoreManual = Math.min(30, Math.max(0, sc));
             document.getElementById('currentEvidenceScoreSpan').innerText = evidenceScoreManual;
-            alert(`证据分数已设置为 ${evidenceScoreManual}/30`);
+            showToast(`📸 证据分数已设置为 ${evidenceScoreManual}/30`);
             manualSave();
         }
 
         // ============================================================
-        // 评分逻辑
+        // 评分逻辑 - 严格版本
         // ============================================================
         function gradeBlanks() {
             const inputs = document.querySelectorAll('.fill-blank');
@@ -612,8 +680,9 @@
                 const val = inp.value.trim();
                 if (val === "") return;
                 const ans = answerKey[inp.id] || [];
-                if (ans.length && ans.some(a => val.toLowerCase() === a.toLowerCase() || (val.length > 1 && a
-                    .toLowerCase().includes(val.toLowerCase())))) correct++;
+                if (ans.length && ans.some(a => val.toLowerCase() === a.toLowerCase())) {
+                    correct++;
+                }
             });
             if (total === 0) return 0;
             return Math.round((correct / total) * 40);
@@ -624,22 +693,46 @@
             const t2 = document.getElementById('thought2').value.trim();
             const t3 = document.getElementById('thought3').value.trim();
             let score = 0;
-            if (t1.length >= 15) score += 7;
-            else if (t1.length > 0) score += 3;
-            if (t2.length >= 15) score += 7;
-            else if (t2.length > 0) score += 3;
-            if (t3.length >= 15) score += 6;
-            else if (t3.length > 0) score += 2;
+
+            if (t1.length >= 20) {
+                let s = 0;
+                if (/齐纳|zener/i.test(t1) && /隧道|隧穿|场致|tunnel|field/i.test(t1)) s += 4;
+                if (/稳压|击穿|breakdown/i.test(t1)) s += 2;
+                if (t1.length >= 60) s += 1;
+                score += Math.min(7, s);
+            }
+
+            if (t2.length >= 20) {
+                let s = 0;
+                if (/硼|boron/i.test(t2) && /掺杂|浓度|doping/i.test(t2)) s += 4;
+                if (/击穿电压|breakdown|反比|降低|decrease/i.test(t2)) s += 2;
+                if (t2.length >= 60) s += 1;
+                score += Math.min(7, s);
+            }
+
+            if (t3.length >= 20) {
+                let s = 0;
+                if (/碰撞电离|impact|电离|ionization/i.test(t3) && /模型|model/i.test(t3)) s += 3;
+                if (/击穿|breakdown|电流|current/i.test(t3)) s += 2;
+                if (t3.length >= 60) s += 1;
+                score += Math.min(6, s);
+            }
+
             return Math.min(20, score);
         }
 
         function gradeSummary() {
             const s = document.getElementById('summary').value.trim();
-            if (s.length >= 80 && (s.includes("工艺") || s.includes("器件") || s.includes("仿真") || s.includes("齐纳") || s
-                    .includes("击穿"))) return 10;
-            else if (s.length >= 40) return 6;
-            else if (s.length > 0) return 3;
-            else return 0;
+            if (s.length < 100) return 0;
+            const keywords = ['工艺', '器件', '仿真', '齐纳', '击穿', '掺杂', '离子注入', '退火', 'IV', 'ATLAS', 'ATHENA'];
+            let count = 0;
+            for (let k of keywords) {
+                if (s.includes(k)) count++;
+            }
+            if (s.length >= 200 && count >= 4) return 10;
+            if (s.length >= 150 && count >= 3) return 7;
+            if (s.length >= 100 && count >= 2) return 4;
+            return 2;
         }
 
         function getEvidenceScore() {
@@ -666,6 +759,7 @@
                 `📊 齐纳二极管仿真考查得分 ${total}/100。填空/参数${blankScore}/40，思考题${thoughtScore}/20，小结${summaryScore}/10，证据图片${evidenceScore}/30。<br>教师：${teacherName}<br>${total>=85?"优秀！深入掌握齐纳二极管工艺与器件仿真。":total>=70?"良好，加强击穿机理与参数提取理解。":"请认真复习ATHENA+ATLAS命令及齐纳二极管原理。"}`;
             document.getElementById('commentContent').innerHTML = comment;
             manualSave();
+            showToast(`📊 评分完成：${total}/100`);
         }
 
         // ============================================================
@@ -673,7 +767,7 @@
         // ============================================================
         async function oneClickDataReport() {
             if (!teacherVerified) {
-                alert("请先输入教师密码并验证通过后才能上报数据！");
+                showToast("⚠️ 请先输入教师密码并验证通过后才能上报数据！");
                 return;
             }
             runAutoGrade();
@@ -683,15 +777,24 @@
             const totalScore = document.getElementById('detailTotalScore').innerText;
             const date = document.getElementById('expDate').value.trim() || new Date().toLocaleDateString('zh-CN');
             const instructor = document.getElementById('instructor').value.trim() || "马厂";
+            const expName = "齐纳二极管工艺与器件仿真";
             const reportText =
-                `齐纳二极管工艺与器件仿真(ATHENA+ATLAS)\n专业班级:${className}\n学号:${stuId}\n姓名:${stuName}\n综合得分:${totalScore}\n实验日期:${date}\n指导教师:${instructor}`;
-            await navigator.clipboard.writeText(reportText);
-            const toast = document.createElement('div');
-            toast.className = 'report-toast';
-            toast.innerText = "✅ 实验报告数据已复制，可粘贴至表单";
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2000);
-            if (confirm("是否打开统计平台提交页面？")) window.open("https://qrbgda8w.jsjform.com/f/GXDAiI", '_blank');
+                `${expName}\n专业班级:${className}\n学号:${stuId}\n姓名:${stuName}\n综合得分:${totalScore}\n实验日期:${date}\n指导教师:${instructor}`;
+            try {
+                await navigator.clipboard.writeText(reportText);
+                showToast("✅ 实验报告数据已复制，可粘贴至表单");
+            } catch (_) {
+                // 降级方案
+                let ta = document.createElement('textarea');
+                ta.value = reportText;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                showToast("✅ 实验报告数据已复制（备用方式）");
+            }
+            // 直接打开链接，不再询问
+            window.open("https://qrbgda8w.jsjform.com/f/GXDAiI", '_blank');
         }
 
         // ============================================================
@@ -699,12 +802,23 @@
         // ============================================================
         function uploadEvidenceImages() {
             const files = document.getElementById('evidenceUpload').files;
+            if (files.length === 0) {
+                showToast("📂 请先选择图片文件");
+                return;
+            }
+            let loaded = 0;
             for (let f of files) {
                 if (!f.type.startsWith('image/')) continue;
                 const reader = new FileReader();
-                reader.onload = e => { imageList.push(e.target.result);
-                    displayImages();
-                    manualSave(); };
+                reader.onload = e => {
+                    imageList.push(e.target.result);
+                    loaded++;
+                    if (loaded === files.length) {
+                        displayImages();
+                        manualSave();
+                        showToast(`📸 已上传 ${imageList.length} 张图片证据`);
+                    }
+                };
                 reader.readAsDataURL(f);
             }
             document.getElementById('evidenceUpload').value = '';
@@ -723,9 +837,12 @@
             localStorage.setItem('evidenceImages', JSON.stringify(imageList));
         }
 
-        function removeImage(idx) { imageList.splice(idx, 1);
+        function removeImage(idx) {
+            imageList.splice(idx, 1);
             displayImages();
-            manualSave(); }
+            manualSave();
+            showToast(`🗑️ 已移除一张图片，剩余 ${imageList.length} 张`);
+        }
 
         // ============================================================
         // 保存 / 加载 / 导出 / 重置
@@ -740,24 +857,35 @@
                 evidenceScoreManual: evidenceScoreManual,
                 teacherVerified: false
             };
-            document.querySelectorAll('.info-input').forEach(i => data.info[i.id] = i.value);
+            document.querySelectorAll('.info-input').forEach(i => {
+                if (i.id !== 'expName') {
+                    data.info[i.id] = i.value;
+                }
+            });
             document.querySelectorAll('.fill-blank').forEach(i => data.blanks[i.id] = i.value);
             data.thoughts.thought1 = document.getElementById('thought1').value;
             data.thoughts.thought2 = document.getElementById('thought2').value;
             data.thoughts.thought3 = document.getElementById('thought3').value;
             localStorage.setItem('fullReport', JSON.stringify(data));
             document.getElementById('lastSaveTime').innerText = `📁 保存于 ${new Date().toLocaleTimeString()}`;
-            alert("进度已保存");
+            showToast("💾 进度已保存（实验名称固定不变）");
         }
 
         function manualLoad() {
             const raw = localStorage.getItem('fullReport');
-            if (!raw) return alert("无保存记录");
+            if (!raw) {
+                showToast("📭 无保存记录");
+                return;
+            }
             const data = JSON.parse(raw);
-            Object.entries(data.info || {}).forEach(([id, val]) => { const e = document.getElementById(id); if (e) e
-                    .value = val; });
-            Object.entries(data.blanks || {}).forEach(([id, val]) => { const e = document.getElementById(id); if (e) e
-                    .value = val; });
+            Object.entries(data.info || {}).forEach(([id, val]) => {
+                const e = document.getElementById(id);
+                if (e && e.id !== 'expName') e.value = val;
+            });
+            Object.entries(data.blanks || {}).forEach(([id, val]) => {
+                const e = document.getElementById(id);
+                if (e) e.value = val;
+            });
             if (data.summary) document.getElementById('summary').value = data.summary;
             if (data.thoughts) {
                 document.getElementById('thought1').value = data.thoughts.thought1 || '';
@@ -769,8 +897,9 @@
             if (data.evidenceScoreManual !== undefined && teacherVerified) evidenceScoreManual = data
             .evidenceScoreManual;
             document.getElementById('currentEvidenceScoreSpan').innerText = evidenceScoreManual;
+            document.getElementById('expName').value = '齐纳二极管工艺与器件仿真';
             bindFillEvents();
-            alert("加载完成（证据分需教师重新认证）");
+            showToast("📂 加载完成（实验名称保持固定，证据分需教师重新认证）");
         }
 
         function exportData() {
@@ -780,11 +909,18 @@
                 a.href = URL.createObjectURL(new Blob([d], { type: 'application/json' }));
                 a.download = 'zener_diode_exam_backup.json';
                 a.click();
+                showToast("📎 备份文件已下载");
+            } else {
+                showToast("📭 暂无数据可导出");
             }
         }
 
-        function clearSavedData() { if (confirm("清除所有数据?")) { localStorage.clear();
-                location.reload(); } }
+        function clearSavedData() {
+            // 直接清除，不再弹窗确认
+            localStorage.clear();
+            showToast("🗑️ 所有数据已清除，页面即将刷新");
+            setTimeout(() => location.reload(), 800);
+        }
 
         function toggleAnswer(n) {
             const div = document.getElementById(`answer${n}`);
@@ -797,29 +933,23 @@
         // ============================================================
         function drawIVChart() {
             const ctx = document.getElementById('ivChart').getContext('2d');
-            // 生成模拟数据：齐纳二极管反向击穿特性
             const voltage = [];
             const current = [];
-            // 从 0 到 -12 V，步长 0.1
             for (let v = 0; v >= -12; v -= 0.1) {
                 voltage.push(v);
-                // 在 -10V 附近击穿
                 let i;
                 if (v > -9.5) {
                     i = 1e-12 * Math.pow(10, (v + 9.5) * 0.3);
                 } else if (v > -10.5) {
-                    // 击穿区域
                     const delta = -(v + 10);
                     i = 1e-9 * Math.pow(10, delta * 2.5);
                 } else {
                     i = 1e-3 * Math.pow(10, -(v + 10.5) * 0.5);
                 }
-                // 限制范围
                 i = Math.min(i, 1e-2);
                 i = Math.max(i, 1e-14);
                 current.push(i);
             }
-            // 反转数据使电压从负到正显示（传统IV图：负电压在左）
             voltage.reverse();
             current.reverse();
 
@@ -875,16 +1005,15 @@
         // 初始化
         // ============================================================
         window.onload = function() {
+            document.getElementById('expName').value = '齐纳二极管工艺与器件仿真';
             bindFillEvents();
             if (localStorage.getItem('fullReport')) manualLoad();
-            // 重置教师状态
             teacherVerified = false;
             document.getElementById('teacherPanelLocked').style.display = "none";
             document.getElementById('teacherMsg').innerHTML = "";
             document.getElementById('evidenceScore').value = "0";
             evidenceScoreManual = 0;
             document.getElementById('currentEvidenceScoreSpan').innerText = "0";
-            // 绘制IV曲线
             drawIVChart();
         };
     </script>
