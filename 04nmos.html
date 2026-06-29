@@ -150,21 +150,47 @@
             flex-wrap: wrap;
             gap: 16px;
             margin-top: 15px;
+            min-height: 80px;
+            border: 1px dashed #ccc;
+            border-radius: 16px;
+            padding: 12px;
+            background: #fafafa;
+            align-items: flex-start;
+        }
+        .image-preview .empty-hint {
+            color: #999;
+            font-size: 0.9rem;
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
         }
         .img-card {
             position: relative;
-            width: 130px;
-            border-radius: 20px;
+            width: 140px;
+            border-radius: 16px;
             background: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
             padding: 6px;
             text-align: center;
+            border: 1px solid #e0e0e0;
         }
         .img-card img {
             width: 100%;
-            height: 90px;
+            height: 100px;
             object-fit: cover;
-            border-radius: 14px;
+            border-radius: 12px;
+            display: block;
+            background: #eee;
+        }
+        .img-card .img-name {
+            font-size: 0.7rem;
+            color: #555;
+            margin-top: 4px;
+            word-break: break-all;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .del-img {
             position: absolute;
@@ -172,13 +198,19 @@
             right: -8px;
             background: #c62828;
             color: white;
-            border-radius: 30px;
+            border-radius: 50%;
             width: 26px;
             height: 26px;
             cursor: pointer;
             font-weight: bold;
             text-align: center;
             line-height: 24px;
+            font-size: 16px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .del-img:hover {
+            transform: scale(1.15);
         }
         .score-details {
             background: #fef9e6;
@@ -351,6 +383,19 @@
             max-width: 100%;
             height: auto;
         }
+        .upload-hint {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 8px;
+        }
+        .image-count-badge {
+            background: #0d6efd;
+            color: white;
+            border-radius: 30px;
+            padding: 2px 12px;
+            font-size: 0.8rem;
+            margin-left: 8px;
+        }
         @media (max-width: 600px) {
             .container {
                 padding: 16px 12px;
@@ -374,6 +419,12 @@
                 font-size: 0.85rem;
                 padding: 10px 18px;
                 white-space: normal;
+            }
+            .img-card {
+                width: 110px;
+            }
+            .img-card img {
+                height: 80px;
             }
         }
     </style>
@@ -575,12 +626,19 @@
         <h2>📝 十、实验小结</h2>
         <textarea id="summary" rows="3" style="width:100%; border-radius:20px; padding:12px; border:1px solid #ccc;" placeholder="总结NMOS ATHENA工艺仿真流程、关键工艺步骤对器件参数的影响、参数提取方法等..."></textarea>
 
-        <!-- ========== 证据图片上传 ========== -->
+        <!-- ========== 证据图片上传（修复版） ========== -->
         <div class="evidence-area">
             <strong>📸 实验证据图片上传（权重30%：仿真结构截图/掺杂分布/参数提取结果等）</strong>
-            <div><input type="file" id="evidenceUpload" accept="image/*" multiple><button class="btn btn-success" onclick="uploadEvidenceImages()">➕ 上传图片证据</button></div>
-            <div id="imagePreviewContainer" class="image-preview"></div>
-            <div style="margin-top: 12px; font-size:0.85rem;">⭐ 至少上传一张有效照片证明你来了且真实做了实验（你与代码的合照）。</div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:10px 0;">
+                <input type="file" id="evidenceUpload" accept="image/*" multiple style="flex:1; min-width:200px;">
+                <button class="btn btn-success" onclick="uploadEvidenceImages()">➕ 上传图片</button>
+                <button class="btn btn-warning" onclick="clearAllImages()">🗑️ 清空所有</button>
+                <span id="imageCount" style="font-size:0.85rem; color:#555;">已上传 0 张</span>
+            </div>
+            <div id="imagePreviewContainer" class="image-preview">
+                <div class="empty-hint">📷 暂无图片，请上传仿真截图或实验证据</div>
+            </div>
+            <div class="upload-hint">⭐ 支持多选上传，至少上传一张有效照片证明你来了且真实做了实验（你与代码的合照）。</div>
         </div>
 
         <!-- ========== 教师评分面板 ========== -->
@@ -631,7 +689,7 @@
             setTimeout(() => { if (toast.parentNode) toast.remove(); }, duration);
         }
 
-        // 标准答案映射
+        // 标准答案映射（保持不变）
         const answerKey = {
             "grid1": ["0.01"],
             "grid1p": ["关键区域加密", "加密", "提高精度"],
@@ -855,45 +913,154 @@
         }
 
         // ============================================================
-        // 图片上传
+        // 图片上传（修复版）
         // ============================================================
         function uploadEvidenceImages() {
-            const files = document.getElementById('evidenceUpload').files;
-            if (files.length === 0) { showToast("📂 请先选择图片文件"); return; }
-            let loaded = 0;
-            for (let f of files) {
-                if (!f.type.startsWith('image/')) continue;
-                const reader = new FileReader();
-                reader.onload = e => {
-                    imageList.push(e.target.result);
-                    loaded++;
-                    if (loaded === files.length) { displayImages();
-                        manualSave();
-                        showToast(`📸 已上传 ${imageList.length} 张图片证据`); }
-                };
-                reader.readAsDataURL(f);
+            const fileInput = document.getElementById('evidenceUpload');
+            const files = fileInput.files;
+            if (!files || files.length === 0) {
+                showToast("📂 请先选择图片文件");
+                return;
             }
-            document.getElementById('evidenceUpload').value = '';
+
+            const validFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+            if (validFiles.length === 0) {
+                showToast("📂 未选择有效的图片文件");
+                return;
+            }
+
+            let loaded = 0;
+            const total = validFiles.length;
+
+            validFiles.forEach((file) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    compressImage(e.target.result, 500, 0.7, function(compressedDataUrl) {
+                        imageList.push(compressedDataUrl);
+                        loaded++;
+                        if (loaded === total) {
+                            displayImages();
+                            manualSave();
+                            showToast(`📸 已上传 ${imageList.length} 张图片证据`);
+                        }
+                    });
+                };
+                reader.onerror = function() {
+                    loaded++;
+                    if (loaded === total) {
+                        displayImages();
+                        manualSave();
+                        showToast(`📸 已上传 ${imageList.length} 张图片证据（部分读取失败）`);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+
+            fileInput.value = '';
+        }
+
+        function compressImage(dataUrl, maxDim, quality, callback) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                let w = img.width,
+                    h = img.height;
+                if (w > maxDim || h > maxDim) {
+                    const ratio = Math.min(maxDim / w, maxDim / h);
+                    w = Math.round(w * ratio);
+                    h = Math.round(h * ratio);
+                }
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                callback(canvas.toDataURL('image/jpeg', quality));
+            };
+            img.onerror = function() {
+                callback(dataUrl);
+            };
+            img.src = dataUrl;
         }
 
         function displayImages() {
             const container = document.getElementById('imagePreviewContainer');
+            const countSpan = document.getElementById('imageCount');
+            countSpan.textContent = `已上传 ${imageList.length} 张`;
+
+            if (imageList.length === 0) {
+                container.innerHTML = `<div class="empty-hint">📷 暂无图片，请上传仿真截图或实验证据</div>`;
+                try { localStorage.removeItem('evidenceImages'); } catch (e) {}
+                return;
+            }
+
             container.innerHTML = '';
             imageList.forEach((src, idx) => {
                 const div = document.createElement('div');
                 div.className = 'img-card';
-                div.innerHTML =
-                    `<img src="${src}" alt="证据"><div class="del-img" onclick="removeImage(${idx})">✕</div>`;
+                const name = `图片_${idx + 1}`;
+                div.innerHTML = `
+                    <img src="${src}" alt="证据图片 ${idx+1}" loading="lazy" 
+                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%22100%22%3E%3Crect fill=%22%23eee%22 width=%22140%22 height=%22100%22/%3E%3Ctext x=%2270%22 y=%2250%22 text-anchor=%22middle%22 fill=%22%23999%22 font-size=%2214%22%3E加载失败%3C/text%3E%3C/svg%3E'">
+                    <div class="img-name">${name}</div>
+                    <div class="del-img" onclick="removeImage(${idx})" title="删除此图片">✕</div>
+                `;
                 container.appendChild(div);
             });
-            localStorage.setItem('evidenceImages', JSON.stringify(imageList));
+
+            try {
+                localStorage.setItem('evidenceImages', JSON.stringify(imageList));
+            } catch (e) {
+                if (e.name === 'QuotaExceededError') {
+                    showToast("⚠️ 存储空间不足，请删除部分图片后重试");
+                } else {
+                    console.warn('图片存储失败:', e);
+                }
+            }
         }
 
         function removeImage(idx) {
-            imageList.splice(idx, 1);
-            displayImages();
-            manualSave();
-            showToast(`🗑️ 已移除一张图片，剩余 ${imageList.length} 张`);
+            if (idx >= 0 && idx < imageList.length) {
+                imageList.splice(idx, 1);
+                displayImages();
+                manualSave();
+                showToast(`🗑️ 已移除一张图片，剩余 ${imageList.length} 张`);
+            }
+        }
+
+        function clearAllImages() {
+            if (imageList.length === 0) {
+                showToast("📭 暂无图片可清空");
+                return;
+            }
+            if (confirm(`确定要清空全部 ${imageList.length} 张图片吗？`)) {
+                imageList = [];
+                displayImages();
+                manualSave();
+                showToast("🗑️ 已清空所有图片");
+            }
+        }
+
+        function loadImagesFromStorage() {
+            try {
+                const stored = localStorage.getItem('evidenceImages');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        const valid = parsed.filter(item => typeof item === 'string' && item.startsWith('data:image'));
+                        if (valid.length > 0) {
+                            imageList = valid;
+                            displayImages();
+                            return true;
+                        } else {
+                            localStorage.removeItem('evidenceImages');
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('图片恢复失败:', e);
+                localStorage.removeItem('evidenceImages');
+            }
+            return false;
         }
 
         // ============================================================
@@ -916,53 +1083,78 @@
             data.thoughts.thought1 = document.getElementById('thought1').value;
             data.thoughts.thought2 = document.getElementById('thought2').value;
             data.thoughts.thought3 = document.getElementById('thought3').value;
-            localStorage.setItem('fullReport', JSON.stringify(data));
-            document.getElementById('lastSaveTime').innerText = `📁 保存于 ${new Date().toLocaleTimeString()}`;
-            showToast("💾 进度已保存（实验名称固定不变）");
+            try {
+                localStorage.setItem('fullReport', JSON.stringify(data));
+                document.getElementById('lastSaveTime').innerText = `📁 保存于 ${new Date().toLocaleTimeString()}`;
+                showToast("💾 进度已保存");
+            } catch (e) {
+                if (e.name === 'QuotaExceededError') {
+                    showToast("⚠️ 存储空间不足，请删除部分图片后重试保存");
+                } else {
+                    showToast("⚠️ 保存失败，请重试");
+                }
+            }
         }
 
         function manualLoad() {
             const raw = localStorage.getItem('fullReport');
             if (!raw) { showToast("📭 无保存记录"); return; }
-            const data = JSON.parse(raw);
-            Object.entries(data.info || {}).forEach(([id, val]) => {
-                const e = document.getElementById(id);
-                if (e && e.id !== 'expName') e.value = val;
-            });
-            Object.entries(data.blanks || {}).forEach(([id, val]) => {
-                const e = document.getElementById(id);
-                if (e) e.value = val;
-            });
-            if (data.summary) document.getElementById('summary').value = data.summary;
-            if (data.thoughts) {
-                document.getElementById('thought1').value = data.thoughts.thought1 || '';
-                document.getElementById('thought2').value = data.thoughts.thought2 || '';
-                document.getElementById('thought3').value = data.thoughts.thought3 || '';
+            try {
+                const data = JSON.parse(raw);
+                Object.entries(data.info || {}).forEach(([id, val]) => {
+                    const e = document.getElementById(id);
+                    if (e && e.id !== 'expName') e.value = val;
+                });
+                Object.entries(data.blanks || {}).forEach(([id, val]) => {
+                    const e = document.getElementById(id);
+                    if (e) e.value = val;
+                });
+                if (data.summary) document.getElementById('summary').value = data.summary;
+                if (data.thoughts) {
+                    document.getElementById('thought1').value = data.thoughts.thought1 || '';
+                    document.getElementById('thought2').value = data.thoughts.thought2 || '';
+                    document.getElementById('thought3').value = data.thoughts.thought3 || '';
+                }
+                // 恢复图片：优先使用 fullReport 中的 imageList，否则尝试从独立的 evidenceImages 恢复
+                if (data.imageList && Array.isArray(data.imageList) && data.imageList.length > 0) {
+                    imageList = data.imageList;
+                    displayImages();
+                } else {
+                    loadImagesFromStorage();
+                }
+                if (data.evidenceScoreManual !== undefined && teacherVerified) {
+                    evidenceScoreManual = data.evidenceScoreManual;
+                    document.getElementById('currentEvidenceScoreSpan').innerText = evidenceScoreManual;
+                }
+                document.getElementById('expName').value = 'NMOS器件工艺仿真 (ATHENA)';
+                bindFillEvents();
+                showToast("📂 加载完成");
+            } catch (e) {
+                showToast("⚠️ 数据加载失败，可能已损坏");
             }
-            if (data.imageList) { imageList = data.imageList;
-                displayImages(); }
-            if (data.evidenceScoreManual !== undefined && teacherVerified) evidenceScoreManual = data.evidenceScoreManual;
-            document.getElementById('currentEvidenceScoreSpan').innerText = evidenceScoreManual;
-            document.getElementById('expName').value = 'NMOS器件工艺仿真 (ATHENA)';
-            bindFillEvents();
-            showToast("📂 加载完成（实验名称保持固定，证据分需教师重新认证）");
         }
 
         function exportData() {
             const d = localStorage.getItem('fullReport');
             if (d) {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(new Blob([d], { type: 'application/json' }));
-                a.download = 'nmos_athena_exam_backup.json';
-                a.click();
-                showToast("📎 备份文件已下载");
+                try {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(new Blob([d], { type: 'application/json' }));
+                    a.download = 'nmos_athena_exam_backup.json';
+                    a.click();
+                    showToast("📎 备份文件已下载");
+                } catch (e) {
+                    showToast("⚠️ 导出失败");
+                }
             } else { showToast("📭 暂无数据可导出"); }
         }
 
         function clearSavedData() {
-            localStorage.clear();
-            showToast("🗑️ 所有数据已清除，页面即将刷新");
-            setTimeout(() => location.reload(), 800);
+            if (confirm("确定要清除所有本地保存的数据吗？此操作不可恢复！")) {
+                localStorage.clear();
+                showToast("🗑️ 所有数据已清除，页面即将刷新");
+                setTimeout(() => location.reload(), 800);
+            }
         }
 
         function toggleAnswer(n) {
@@ -977,7 +1169,41 @@
         window.onload = function() {
             document.getElementById('expName').value = 'NMOS器件工艺仿真 (ATHENA)';
             bindFillEvents();
-            if (localStorage.getItem('fullReport')) manualLoad();
+
+            // 先尝试从 fullReport 恢复，但图片数据可能单独存储
+            loadImagesFromStorage();
+
+            const raw = localStorage.getItem('fullReport');
+            if (raw) {
+                try {
+                    const data = JSON.parse(raw);
+                    Object.entries(data.info || {}).forEach(([id, val]) => {
+                        const e = document.getElementById(id);
+                        if (e && e.id !== 'expName') e.value = val;
+                    });
+                    Object.entries(data.blanks || {}).forEach(([id, val]) => {
+                        const e = document.getElementById(id);
+                        if (e) e.value = val;
+                    });
+                    if (data.summary) document.getElementById('summary').value = data.summary;
+                    if (data.thoughts) {
+                        document.getElementById('thought1').value = data.thoughts.thought1 || '';
+                        document.getElementById('thought2').value = data.thoughts.thought2 || '';
+                        document.getElementById('thought3').value = data.thoughts.thought3 || '';
+                    }
+                    // 如果 fullReport 中有图片列表且当前没有图片，则使用它
+                    if (data.imageList && Array.isArray(data.imageList) && data.imageList.length > 0 && imageList.length === 0) {
+                        imageList = data.imageList;
+                        displayImages();
+                    }
+                    if (data.evidenceScoreManual !== undefined && teacherVerified) {
+                        evidenceScoreManual = data.evidenceScoreManual;
+                        document.getElementById('currentEvidenceScoreSpan').innerText = evidenceScoreManual;
+                    }
+                    bindFillEvents();
+                } catch (e) {}
+            }
+
             teacherVerified = false;
             document.getElementById('teacherPanelLocked').style.display = "none";
             document.getElementById('teacherMsg').innerHTML = "";
