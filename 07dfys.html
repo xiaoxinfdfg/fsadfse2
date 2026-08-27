@@ -803,6 +803,7 @@
         localStorage.setItem('operationScore', val);
         document.getElementById('currentOpScore').innerText = val;
         showReportToast("✅ 操作分已保存");
+        autoGrade();
     }
 
     // ========== 一键上报 ==========
