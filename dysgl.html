@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>湖北理工学院 · 应用物理学2班大一上课程攻略</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        /* ========== 基础重置 & 变量 ========== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #0f2b4a;
+            --navy-light: #1a3f64;
+            --gold: #c9a84c;
+            --gold-light: #e8d5a3;
+            --gold-pale: #f8f0e0;
+            --cream: #fcf9f5;
+            --gray: #f0ede8;
+            --gray-dark: #6b6a6a;
+            --text: #1e1e2a;
+            --text-light: #4a4a5a;
+            --shadow: 0 8px 32px rgba(15, 43, 74, 0.10);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.25s ease;
+            --font-sans: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--cream);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 0 20px 60px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* ========== 排版 ========== */
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        h2 {
+            font-size: 1.7rem;
+            margin: 0 0 0.5rem 0;
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2 .badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: var(--gold);
+            color: #fff;
+            padding: 2px 14px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        h3 {
+            font-size: 1.2rem;
+            margin: 1.5rem 0 0.6rem 0;
+            color: var(--navy-light);
+        }
+        h4 {
+            font-size: 1rem;
+            margin: 1rem 0 0.3rem 0;
+            color: var(--navy);
+        }
+
+        p {
+            margin-bottom: 0.8rem;
+            color: var(--text-light);
+        }
+
+        a {
+            color: var(--navy);
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: border-color var(--transition);
+        }
+        a:hover {
+            border-bottom-color: var(--gold);
+        }
+
+        ul,
+        ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        li {
+            margin-bottom: 0.35rem;
+            color: var(--text-light);
+        }
+        li strong {
+            color: var(--text);
+        }
+
+        hr {
+            border: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold-light), transparent);
+            margin: 2rem 0;
+        }
+
+        /* ========== 头部 Hero ========== */
+        .hero {
+            background: linear-gradient(145deg, var(--navy) 0%, #0b1f33 100%);
+            padding: 48px 40px 40px;
+            border-radius: var(--radius);
+            margin: 20px 0 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(201, 168, 76, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .hero-top {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-title-group h1 {
+            font-size: 2.2rem;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+        .hero-title-group .sub {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+        .hero-title-group .sub span {
+            color: var(--gold-light);
+            font-weight: 500;
+        }
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px 40px;
+            margin-top: 18px;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-meta-item {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hero-meta-item .label {
+            opacity: 0.6;
+            font-weight: 400;
+        }
+        .hero-meta-item .value {
+            font-weight: 500;
+            color: #fff;
+        }
+        .hero-meta-item .value.gold {
+            color: var(--gold-light);
+        }
+
+        .hero-tag {
+            background: rgba(201, 168, 76, 0.15);
+            border: 1px solid rgba(201, 168, 76, 0.25);
+            padding: 6px 18px;
+            border-radius: 40px;
+            color: var(--gold-light);
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        /* ========== 快速导航 ========== */
+        .quick-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            background: #fff;
+            padding: 16px 24px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            border: 1px solid rgba(15, 43, 74, 0.04);
+        }
+        .quick-nav a {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--navy-light);
+            border-bottom: 2px solid transparent;
+            padding-bottom: 2px;
+            transition: all var(--transition);
+        }
+        .quick-nav a:hover {
+            border-bottom-color: var(--gold);
+            color: var(--navy);
+        }
+
+        /* ========== 卡片通用 ========== */
+        .card {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 30px 32px;
+            box-shadow: var(--shadow);
+            margin-bottom: 32px;
+            border: 1px solid rgba(15, 43, 74, 0.04);
+            transition: box-shadow var(--transition);
+        }
+        .card:hover {
+            box-shadow: 0 12px 40px rgba(15, 43, 74, 0.08);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .card-header .icon {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+        .card-header h2 {
+            margin: 0;
+            flex: 1;
+        }
+
+        /* ========== 特殊卡片 ========== */
+        .card-gold {
+            border-left: 5px solid var(--gold);
+        }
+        .card-navy {
+            border-left: 5px solid var(--navy);
+        }
+        .card-warning {
+            border-left: 5px solid #d97747;
+            background: #fefaf7;
+        }
+
+        /* ========== 课程分类展示 ========== */
+        .course-section {
+            margin-bottom: 28px;
+        }
+        .course-section:last-child {
+            margin-bottom: 0;
+        }
+        .course-section .section-label {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--navy);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid var(--gold-pale);
+            padding-bottom: 8px;
+        }
+        .course-section .section-label .tag {
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--gold);
+            color: #fff;
+            padding: 1px 14px;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+        }
+        .course-section .section-label .tag.blue {
+            background: var(--navy-light);
+        }
+        .course-section .section-label .tag.green {
+            background: #2b7a62;
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+        }
+        .course-item {
+            background: var(--gray);
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            border-bottom: 4px solid var(--gold);
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+        .course-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+        }
+        .course-item .name {
+            font-weight: 600;
+            color: var(--navy);
+            font-size: 0.95rem;
+        }
+        .course-item .meta {
+            font-size: 0.75rem;
+            color: var(--gray-dark);
+            margin-top: 2px;
+        }
+        .course-item .tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 600;
+            background: var(--gold);
+            color: #fff;
+            padding: 1px 12px;
+            border-radius: 30px;
+            margin-top: 4px;
+        }
+        .course-item .tag.high {
+            background: #d97747;
+        }
+        .course-item .tag.blue {
+            background: var(--navy-light);
+        }
+        .course-item .tag.green {
+            background: #2b7a62;
+        }
+
+        /* ========== 月度时间线 ========== */
+        .month-block {
+            border-left: 4px solid var(--gold);
+            padding-left: 24px;
+            margin-bottom: 28px;
+            position: relative;
+        }
+        .month-block::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 6px;
+            width: 16px;
+            height: 16px;
+            background: var(--gold);
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 2px var(--gold);
+        }
+        .month-block .month-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.4rem;
+        }
+        .month-block .month-title small {
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: var(--gray-dark);
+            margin-left: 8px;
+        }
+        .month-block ul {
+            list-style: none;
+            padding: 0;
+        }
+        .month-block ul li {
+            padding: 4px 0 4px 28px;
+            position: relative;
+            color: var(--text-light);
+        }
+        .month-block ul li::before {
+            content: '▹';
+            position: absolute;
+            left: 4px;
+            color: var(--gold);
+            font-weight: 700;
+        }
+        .month-block ul li strong {
+            color: var(--text);
+        }
+
+        /* ========== 避坑清单 ========== */
+        .pit-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px 24px;
+        }
+        .pit-list li {
+            padding: 10px 16px 10px 44px;
+            position: relative;
+            background: var(--cream);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(15, 43, 74, 0.04);
+            color: var(--text-light);
+            margin: 0;
+            transition: background var(--transition);
+        }
+        .pit-list li:hover {
+            background: var(--gold-pale);
+        }
+        .pit-list li::before {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+        .pit-list li.do::before {
+            content: '✅';
+        }
+        .pit-list li.dont::before {
+            content: '❌';
+        }
+        .pit-list li strong {
+            color: var(--text);
+        }
+
+        @media (max-width: 700px) {
+            .pit-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ========== 两条路线 ========== */
+        .route-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 8px;
+        }
+        .route-card {
+            padding: 24px 26px;
+            border-radius: var(--radius-sm);
+            background: var(--cream);
+            border-top: 5px solid var(--navy);
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+        .route-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 28px rgba(15, 43, 74, 0.06);
+        }
+        .route-card.gold-route {
+            border-top-color: var(--gold);
+        }
+        .route-card h3 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .route-card h3 .emoji {
+            font-size: 1.4rem;
+        }
+        .route-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .route-card ul li {
+            padding: 4px 0 4px 28px;
+            position: relative;
+            color: var(--text-light);
+            margin: 0;
+        }
+        .route-card ul li::before {
+            content: '◆';
+            position: absolute;
+            left: 2px;
+            color: var(--gold);
+            font-size: 0.7rem;
+            top: 8px;
+        }
+
+        @media (max-width: 700px) {
+            .route-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ========== 联系卡片 ========== */
+        .contact-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px 30px;
+            margin: 12px 0 0;
+        }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--cream);
+            padding: 8px 18px 8px 14px;
+            border-radius: 40px;
+            border: 1px solid rgba(15, 43, 74, 0.06);
+            font-size: 0.9rem;
+        }
+        .contact-item .role {
+            font-weight: 500;
+            color: var(--navy);
+        }
+        .contact-item .detail {
+            color: var(--text-light);
+        }
+        .contact-item .detail a {
+            color: var(--navy);
+            border-bottom: 1px dashed rgba(15, 43, 74, 0.2);
+        }
+        .contact-item .detail a:hover {
+            border-bottom-color: var(--gold);
+        }
+
+        /* ========== 脚注 ========== */
+        .footer-note {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--gray-dark);
+            padding: 30px 0 10px;
+            border-top: 1px solid rgba(15, 43, 74, 0.06);
+            margin-top: 20px;
+        }
+        .footer-note span {
+            color: var(--gold);
+        }
+
+        /* ========== 响应式 ========== */
+        @media (max-width: 768px) {
+            body {
+                padding: 0 12px 40px;
+            }
+            .hero {
+                padding: 30px 20px 28px;
+            }
+            .hero-title-group h1 {
+                font-size: 1.6rem;
+            }
+            .hero-meta {
+                gap: 12px 20px;
+            }
+            .card {
+                padding: 22px 18px;
+            }
+            .course-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .quick-nav {
+                padding: 12px 16px;
+                gap: 6px 12px;
+            }
+            .quick-nav a {
+                font-size: 0.75rem;
+            }
+            .month-block {
+                padding-left: 18px;
+            }
+            .contact-grid {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .contact-item {
+                border-radius: var(--radius-sm);
+                padding: 10px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-title-group h1 {
+                font-size: 1.4rem;
+            }
+            .hero-meta-item {
+                font-size: 0.8rem;
+            }
+            h2 {
+                font-size: 1.3rem;
+            }
+            .card-header .icon {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* ========== 打印优化 ========== */
+        @media print {
+            body {
+                background: #fff;
+                padding: 0.5in;
+            }
+            .hero {
+                background: var(--navy) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                break-inside: avoid;
+            }
+            .quick-nav {
+                display: none;
+            }
+            .course-item {
+                background: #f5f5f5 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .month-block::before {
+                background: var(--gold) !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ========== HERO ========== -->
+        <header class="hero">
+            <div class="hero-top">
+                <div class="hero-title-group">
+                    <h1>湖北理工学院 · 应用物理学 2 班</h1>
+                    <div class="sub">2026 级 · 大一上（9 – 1 月）<span>课程攻略</span></div>
+                    <div style="margin-top: 12px;">
+                        <span class="hero-tag">📘 班主任：马厂</span>
+                        <span class="hero-tag" style="margin-left:8px;">🎯 微电子 / 光电方向</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <span class="label">📅 时间</span>
+                    <span class="value">2026.09 – 2027.01</span>
+                </div>
+                <div class="hero-meta-item">
+                    <span class="label">👨‍🏫 班主任</span>
+                    <span class="value gold">马厂</span>
+                </div>
+                <div class="hero-meta-item">
+                    <span class="label">🎓 专业</span>
+                    <span class="value">应用物理学（理学）</span>
+                </div>
+                <div class="hero-meta-item">
+                    <span class="label">🎯 核心目标</span>
+                    <span class="value gold">稳住高加权 · 零挂科</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ========== 快速导航 ========== -->
+        <nav class="quick-nav">
+            <a href="#sec-courses">📚 课程总览</a>
+            <a href="#sec-sep">9月</a>
+            <a href="#sec-oct">10月</a>
+            <a href="#sec-nov">11月</a>
+            <a href="#sec-dec">12月</a>
+            <a href="#sec-jan">1月</a>
+            <a href="#sec-pit">⚠️ 避坑清单</a>
+            <a href="#sec-routes">🧭 两条路线</a>
+            <a href="#sec-contact">📞 联系方式</a>
+        </nav>
+
+        <!-- ========== 1. 课程总览 ========== -->
+        <section id="sec-courses" class="card card-gold">
+            <div class="card-header">
+                <span class="icon">📚</span>
+                <h2>大一上课程总览 <span class="badge">2026 级</span></h2>
+            </div>
+            <p style="margin-bottom:1.2rem;color:var(--text-light);">高学分课程决定加权绩点，<strong>高等数学AⅠ</strong> 与 <strong>线性代数</strong> 是重中之重，务必投入最大精力。</p>
+
+            <!-- 通识教育必修 -->
+            <div class="course-section">
+                <div class="section-label">
+                    <span>📖 通识教育必修</span>
+                    <span class="tag">6 门</span>
+                </div>
+                <div class="course-grid">
+                    <div class="course-item"><div class="name">思想道德与法治</div><div class="meta">出勤 + 作业</div><span class="tag">通识</span></div>
+                    <div class="course-item"><div class="name">体育 Ⅰ</div><div class="meta">体质测试 · 平时分</div><span class="tag">通识</span></div>
+                    <div class="course-item"><div class="name">大学英语 A Ⅰ</div><div class="meta">四级基础</div><span class="tag blue">持续积累</span></div>
+                    <div class="course-item"><div class="name">计算机应用基础及人工智能</div><div class="meta">上机实践</div><span class="tag">通识</span></div>
+                    <div class="course-item"><div class="name">阅读鉴赏与写作沟通</div><div class="meta">人文素养</div><span class="tag">通识</span></div>
+                    <div class="course-item"><div class="name">军事理论</div><div class="meta">线上学习</div><span class="tag">通识</span></div>
+                </div>
+            </div>
+
+            <!-- 学科基础 -->
+            <div class="course-section">
+                <div class="section-label">
+                    <span>🔬 学科基础</span>
+                    <span class="tag blue">3 门 · 核心</span>
+                </div>
+                <div class="course-grid">
+                    <div class="course-item"><div class="name">高等数学 A Ⅰ</div><div class="meta">学分最高 · 重中之重</div><span class="tag high">核心</span></div>
+                    <div class="course-item"><div class="name">线性代数</div><div class="meta">后续课程基础</div><span class="tag high">核心</span></div>
+                    <div class="course-item"><div class="name">物理学导论</div><div class="meta">专业入门</div><span class="tag blue">专业基础</span></div>
+                </div>
+            </div>
+
+            <!-- 实践教育平台 -->
+            <div class="course-section">
+                <div class="section-label">
+                    <span>🧪 实践教育平台</span>
+                    <span class="tag green">2 项</span>
+                </div>
+                <div class="course-grid">
+                    <div class="course-item"><div class="name">军事训练</div><div class="meta">必修学分 · 9月</div><span class="tag green">实践</span></div>
+                    <div class="course-item"><div class="name">数学软件与实验数据处理培训</div><div class="meta">实验技能</div><span class="tag green">实践</span></div>
+                </div>
+            </div>
+
+            <div style="margin-top:16px;font-size:0.9rem;background:var(--gold-pale);padding:12px 18px;border-radius:var(--radius-sm);border-left:4px solid var(--gold);">
+                💡 <strong>策略：</strong>高数、线代投入最多精力；英语持续积累为大一下四级做准备；通识课保证出勤，实践课认真参与。
+            </div>
+        </section>
+
+        <!-- ========== 2. 逐月计划 ========== -->
+        <section class="card card-navy">
+            <div class="card-header">
+                <span class="icon">🗓️</span>
+                <h2>逐月执行计划 <span style="font-size:0.9rem;font-weight:400;color:var(--gray-dark);">9 – 1 月</span></h2>
+            </div>
+
+            <!-- 9月 -->
+            <div class="month-block" id="sec-sep">
+                <div class="month-title">9 月 <small>报到 · 军训 · 入学教育</small></div>
+                <ul>
+                    <li><strong>军事训练</strong>（必修学分）：身体不适及时报告，鞋垫、防晒、大容量水杯必备；碎片时间背英语单词</li>
+                    <li>完成报到、党团关系转入、医保办理、困难补助申报</li>
+                    <li>通读《应用物理学专业人才培养方案》，了解毕业学分、学位课要求</li>
+                    <li>保存班级群、数理学院通知群、教务系统入口；完成新生体检、学籍注册、学生证办理</li>
+                    <li>与班主任、直系学长学姐建立联系，了解考研、课题组情况</li>
+                    <li>宿舍约定作息、卫生轮值，禁用大功率违规电器；社团最多选 1‑2 个，优先科创类</li>
+                </ul>
+            </div>
+
+            <!-- 10月 -->
+            <div class="month-block" id="sec-oct">
+                <div class="month-title">10 月 <small>正式开课 · 进入节奏</small></div>
+                <ul>
+                    <li><strong>高等数学 AⅠ、线性代数</strong> 第一优先级：课前预习，课后刷题，不懂及时找老师/班主任答疑</li>
+                    <li><strong>大学英语 AⅠ</strong> 持续积累词汇，为大一四级打基础</li>
+                    <li><strong>计算机应用基础及人工智能</strong> 重视上机实践，跟上进度</li>
+                    <li>熟悉教务系统：查课表、查成绩、看平时分；看懂本校绩点、综测规则</li>
+                    <li>了解助学金、奖学金申请条件；了解大创项目、学科竞赛（大英赛、数学竞赛）</li>
+                    <li><strong>数学软件与实验数据处理培训</strong> 认真参与，掌握基础工具</li>
+                </ul>
+            </div>
+
+            <!-- 11月 -->
+            <div class="month-block" id="sec-nov">
+                <div class="month-title">11 月 <small>期中阶段 · 巩固深化</small></div>
+                <ul>
+                    <li>部分课程期中考试，<strong>高数、线代</strong> 重点复习，期中成绩影响期末总评</li>
+                    <li><strong>物理学导论</strong> 及时梳理概念，建立学科框架</li>
+                    <li>评估社团：占用大量学习时间、得不到锻炼的社团直接退出</li>
+                    <li>继续英语积累（词汇 + 听力），不要等到大一下才突击四级</li>
+                    <li>有进课题组意向，找马厂班主任咨询本院课题组、半导体/光电方向导师情况</li>
+                    <li><strong>阅读鉴赏与写作沟通</strong> 按时完成作业，提升人文素养</li>
+                </ul>
+            </div>
+
+            <!-- 12月 -->
+            <div class="month-block" id="sec-dec">
+                <div class="month-title">12 月 <small>期末复习启动</small></div>
+                <ul>
+                    <li>全力准备期末，<strong>高数 AⅠ、线性代数</strong> 难度高，务必系统复习，不要靠考前突击</li>
+                    <li><strong>思想道德与法治、军事理论</strong> 保证出勤，完成线上/线下作业</li>
+                    <li><strong>体育 Ⅰ</strong> 关注体测项目，提前练习</li>
+                    <li>本校 12 月无四级考试权限（若政策有变可报名）；准备次年 6 月四级</li>
+                    <li><strong>杜绝作业抄袭、实验报告抄袭</strong>，学术不端直接记处分</li>
+                </ul>
+            </div>
+
+            <!-- 1月 -->
+            <div class="month-block" id="sec-jan">
+                <div class="month-title">1 月 <small>期末考试 + 寒假规划</small></div>
+                <ul>
+                    <li>期末考试，目标：<strong>零挂科，拉高加权绩点</strong>，学位课争取高分</li>
+                    <li>考完复盘本学期成绩，明确薄弱科目</li>
+                    <li style="margin-top:6px;font-weight:500;color:var(--navy);">寒假分两条路线：</li>
+                    <li style="padding-left:44px;position:relative;">
+                        <span style="position:absolute;left:6px;color:var(--gold);">🎓</span>
+                        <strong>保研/考研路线：</strong>刷四级真题；复习高数上册，预习高数下册、普通物理；了解大创、竞赛；联系导师争取线上协助
+                    </li>
+                    <li style="padding-left:44px;position:relative;">
+                        <span style="position:absolute;left:6px;color:var(--navy);">💼</span>
+                        <strong>就业路线：</strong>备考四级；强化计算机应用基础，自学 Python/Excel；了解集成电路/光电企业岗位
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- ========== 3. 避坑清单 ========== -->
+        <section id="sec-pit" class="card card-warning">
+            <div class="card-header">
+                <span class="icon">⚠️</span>
+                <h2>本班级专属避坑清单</h2>
+            </div>
+            <ul class="pit-list">
+                <li class="dont"><strong>不要听信 “大一随便玩”</strong> — 高数、线代是专业分水岭，直接决定后续学习压力</li>
+                <li class="dont"><strong>不要花钱报高价考研、四六级培训班</strong> — 校内资源免费，学院内部有通知</li>
+                <li class="dont"><strong>不要出借银行卡、参与刷单兼职</strong> — 远离校园贷，保护个人信息</li>
+                <li class="dont"><strong>不要把大量时间耗在学生会行政打杂</strong> — 本专业绩点权重远大于学生工作</li>
+                <li class="do"><strong>遇到学业困惑、心理压力</strong> — 优先找班主任、辅导员、学校心理咨询中心，不要硬扛</li>
+                <li class="do"><strong>所有政策以教务处、学院官方通知为准</strong> — 不要只信网上经验帖</li>
+            </ul>
+        </section>
+
+        <!-- ========== 4. 两条路线 ========== -->
+        <section id="sec-routes" class="card">
+            <div class="card-header">
+                <span class="icon">🧭</span>
+                <h2>两条路线 · 大一上核心目标</h2>
+            </div>
+            <div class="route-grid">
+                <!-- 深造 -->
+                <div class="route-card gold-route">
+                    <h3><span class="emoji">🎓</span> 深造（考研）方向</h3>
+                    <ul>
+                        <li><strong>高数 AⅠ、线性代数</strong> 等学位课尽量高分，稳住专业排名；零挂科，无处分</li>
+                        <li>持续英语积累，为大一下四级冲高分做准备</li>
+                        <li>接触学院课题组，认识导师，了解大创项目</li>
+                        <li>吃透培养方案，了解考研方向：集成电路、微电子、光学工程、物理本专业等</li>
+                        <li>重视 <strong>物理学导论</strong>，建立扎实的专业认知</li>
+                    </ul>
+                </div>
+                <!-- 就业 -->
+                <div class="route-card">
+                    <h3><span class="emoji">💼</span> 本科就业方向</h3>
+                    <ul>
+                        <li>课程全部及格以上，学位课程尽量 70+，<strong>杜绝挂科</strong></li>
+                        <li><strong>计算机应用基础及人工智能</strong> 学好，为硬件、测试岗位打基础</li>
+                        <li>持续英语学习，保证大一下四级顺利通过</li>
+                        <li>了解集成电路、光电行业岗位，寒假补充实操技能（Excel、Python 等）</li>
+                        <li>重视 <strong>数学软件与实验数据处理培训</strong>，提升实操能力</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 5. 重要联系方式 ========== -->
+        <section id="sec-contact" class="card">
+            <div class="card-header">
+                <span class="icon">📞</span>
+                <h2>重要联系方式 &amp; 渠道</h2>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <span class="role">👨‍🏫 班主任</span>
+                    <span class="detail"><strong>马厂</strong> 13545559582 · QQ:157120733</span>
+                </div>
+                <div class="contact-item">
+                    <span class="role">👩‍🏫 辅导员</span>
+                    <span class="detail"><strong>袁爽</strong> QQ:13736745</span>
+                </div>
+                <div class="contact-item">
+                    <span class="role">📋 书记</span>
+                    <span class="detail"><strong>廖艳华</strong> QQ:39982491</span>
+                </div>
+                <div class="contact-item" style="background:var(--gold-pale);border-color:var(--gold-light);">
+                    <span class="role">📢 官方渠道</span>
+                    <span class="detail">班级群 · 人工智能学院通知群 · 教务系统</span>
+                </div>
+            </div>
+            <p style="margin-top:18px;font-size:0.9rem;color:var(--gray-dark);">
+                💡 所有评奖、助学金、转专业通知全部来自官方群，<strong>不要相信私域推销</strong>。
+            </p>
+        </section>
+
+        <!-- ========== 脚注 ========== -->
+        <div class="footer-note">
+            <span>✦</span> 湖北理工学院 · 应用物理学 2026 级 2 班 · 班主任马厂 <span>✦</span><br />
+            稳住高加权 · 零挂科 · 适应数理重课 · 做好四级长期备考
+        </div>
+
+    </div>
+
+</body>
+</html>
