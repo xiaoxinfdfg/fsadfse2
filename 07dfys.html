@@ -86,7 +86,7 @@
             text-align: center;
             vertical-align: middle;
         }
-        td:first-child { background: #e8f5e9; font-weight: 600; }
+        td:first-child { font-weight: 600; }
         .score-btn, .chart-btn, .auto-grade-btn, .save-btn, .upload-btn {
             background: linear-gradient(135deg, #2e7d32, #1b5e20);
             color: white;
@@ -166,6 +166,10 @@
         .flex-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
         .manual-plot-area { background: #f0f4c3; border-radius: 24px; padding: 20px; margin: 20px 0; border: 2px dashed #f57f17; }
         .param-input { width: 80px; text-align: center; border: 1px solid #ff9800; border-radius: 8px; padding: 4px; background: #fff8e1; font-size: 0.85rem; }
+        .student-input { width: 100px; text-align: center; border: 2px solid #f57c00; border-radius: 8px; padding: 5px; background: #fff3e0; font-size: 0.88rem; font-weight: 600; color: #bf360c; }
+        .student-input:focus { outline: 2px solid #ff9800; border-color: transparent; }
+        .student-calc-box { background: #fff3e0; border: 2px dashed #f57c00; border-radius: 20px; padding: 16px 18px; margin: 16px 0; }
+        .student-calc-box p { margin: 8px 0; line-height: 1.9; }
     </style>
 </head>
 <body>
@@ -184,7 +188,7 @@
     <div class="basic-info" style="background: #f8f9fa; padding: 15px; border-radius: 24px; margin-bottom: 20px;">
         <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
             <div>实验名称：<input type="text" class="info-input" id="expName" value="单缝和单丝衍射实验" readonly></div>
-            <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-01"></div>
+            <div>日期：<input type="text" class="info-input" id="expDate" value="2026-09-04" placeholder="2026-06-01"></div>
             <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名"></div>
             <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号"></div>
             <div>指导教师：<input type="text" class="info-input" id="instructor" value="马厂"></div>
@@ -235,39 +239,39 @@
                     <td rowspan="3">1</td>
                     <td><input class="data-input data-input-sm" id="s1_L1" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s1_R1" placeholder="mm"></td>
-                    <td id="s1_x1">—</td>
-                    <td id="s1_xbar1" rowspan="3">—</td>
+                    <td><input class="data-input data-input-sm" id="s1_x1" placeholder="mm"></td>
+                    <td rowspan="3"><input class="data-input data-input-sm" id="s1_xbar1" placeholder="mm"></td>
                     <td rowspan="3"><input class="data-input data-input-sm" id="s1_Z1" placeholder="mm"></td>
-                    <td id="s1_a1" rowspan="3">—</td>
+                    <td rowspan="3"><input class="data-input data-input-sm" id="s1_a1" placeholder="mm"></td>
                 </tr>
                 <tr>
                     <td><input class="data-input data-input-sm" id="s1_L2" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s1_R2" placeholder="mm"></td>
-                    <td id="s1_x2">—</td>
+                    <td><input class="data-input data-input-sm" id="s1_x2" placeholder="mm"></td>
                 </tr>
                 <tr>
                     <td><input class="data-input data-input-sm" id="s1_L3" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s1_R3" placeholder="mm"></td>
-                    <td id="s1_x3">—</td>
+                    <td><input class="data-input data-input-sm" id="s1_x3" placeholder="mm"></td>
                 </tr>
                 <tr>
                     <td rowspan="3">2</td>
                     <td><input class="data-input data-input-sm" id="s1_L4" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s1_R4" placeholder="mm"></td>
-                    <td id="s1_x4">—</td>
-                    <td id="s1_xbar2" rowspan="3">—</td>
+                    <td><input class="data-input data-input-sm" id="s1_x4" placeholder="mm"></td>
+                    <td rowspan="3"><input class="data-input data-input-sm" id="s1_xbar2" placeholder="mm"></td>
                     <td rowspan="3"><input class="data-input data-input-sm" id="s1_Z2" placeholder="mm"></td>
-                    <td id="s1_a2" rowspan="3">—</td>
+                    <td rowspan="3"><input class="data-input data-input-sm" id="s1_a2" placeholder="mm"></td>
                 </tr>
                 <tr>
                     <td><input class="data-input data-input-sm" id="s1_L5" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s1_R5" placeholder="mm"></td>
-                    <td id="s1_x5">—</td>
+                    <td><input class="data-input data-input-sm" id="s1_x5" placeholder="mm"></td>
                 </tr>
                 <tr>
                     <td><input class="data-input data-input-sm" id="s1_L6" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s1_R6" placeholder="mm"></td>
-                    <td id="s1_x6">—</td>
+                    <td><input class="data-input data-input-sm" id="s1_x6" placeholder="mm"></td>
                 </tr>
             </tbody>
         </table>
@@ -292,46 +296,46 @@
                     <td rowspan="3">1</td>
                     <td><input class="data-input data-input-sm" id="s2_L1" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s2_R1" placeholder="mm"></td>
-                    <td id="s2_x1">—</td>
-                    <td id="s2_xbar1" rowspan="3">—</td>
+                    <td><input class="data-input data-input-sm" id="s2_x1" placeholder="mm"></td>
+                    <td rowspan="3"><input class="data-input data-input-sm" id="s2_xbar1" placeholder="mm"></td>
                     <td rowspan="3"><input class="data-input data-input-sm" id="s2_Z1" placeholder="mm"></td>
-                    <td id="s2_d1" rowspan="3">—</td>
+                    <td rowspan="3"><input class="data-input data-input-sm" id="s2_d1" placeholder="mm"></td>
                 </tr>
                 <tr>
                     <td><input class="data-input data-input-sm" id="s2_L2" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s2_R2" placeholder="mm"></td>
-                    <td id="s2_x2">—</td>
+                    <td><input class="data-input data-input-sm" id="s2_x2" placeholder="mm"></td>
                 </tr>
                 <tr>
                     <td><input class="data-input data-input-sm" id="s2_L3" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s2_R3" placeholder="mm"></td>
-                    <td id="s2_x3">—</td>
+                    <td><input class="data-input data-input-sm" id="s2_x3" placeholder="mm"></td>
                 </tr>
                 <tr>
                     <td rowspan="3">2</td>
                     <td><input class="data-input data-input-sm" id="s2_L4" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s2_R4" placeholder="mm"></td>
-                    <td id="s2_x4">—</td>
-                    <td id="s2_xbar2" rowspan="3">—</td>
+                    <td><input class="data-input data-input-sm" id="s2_x4" placeholder="mm"></td>
+                    <td rowspan="3"><input class="data-input data-input-sm" id="s2_xbar2" placeholder="mm"></td>
                     <td rowspan="3"><input class="data-input data-input-sm" id="s2_Z2" placeholder="mm"></td>
-                    <td id="s2_d2" rowspan="3">—</td>
+                    <td rowspan="3"><input class="data-input data-input-sm" id="s2_d2" placeholder="mm"></td>
                 </tr>
                 <tr>
                     <td><input class="data-input data-input-sm" id="s2_L5" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s2_R5" placeholder="mm"></td>
-                    <td id="s2_x5">—</td>
+                    <td><input class="data-input data-input-sm" id="s2_x5" placeholder="mm"></td>
                 </tr>
                 <tr>
                     <td><input class="data-input data-input-sm" id="s2_L6" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s2_R6" placeholder="mm"></td>
-                    <td id="s2_x6">—</td>
+                    <td><input class="data-input data-input-sm" id="s2_x6" placeholder="mm"></td>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <div style="text-align:center; margin: 10px 0 20px;">
-        <button class="chart-btn" onclick="calculateWidth()">📐 计算缝宽/丝宽</button>
+        <p style="text-align:center; color:#bf360c; font-weight:bold;">✏️ 请学生自行计算各次 \(x=\frac{|x_{-k}|+|x_k|}{2}\)、平均 \(\bar{x}\) 及 \(a/d = \frac{k\lambda Z}{\bar{x}}\) 并填入表1、表2（系统不再显示计算结果）。</p>
     </div>
 
     <h2>六、数据处理与分析</h2>
@@ -339,18 +343,19 @@
         <h3>1. 单缝缝宽计算</h3>
         <p>对每级 \(k\)，取左右暗纹位置平均 \(x=(|x_{-k}|+|x_k|)/2\)，再对3次测量取平均得 \(\bar{x}\)；由暗条纹条件 \(a = \frac{k \lambda Z}{\bar{x}}\)（\(\theta\) 很小时，\(\sin\theta \approx \tan\theta = \bar{x}/Z\)）计算缝宽。</p>
         <div class="flex-row">
-            <span class="result-display">测量缝宽平均值：<span id="avg_a">—</span> mm</span>
-            <span class="result-display">读数显微镜测量值：<span id="micro_a">—</span> mm</span>
+            <span>✏️ 测量缝宽平均值：<input type="number" id="s_avg_a" class="student-input" step="0.0001" placeholder="mm"> mm</span>
+            <span>✏️ 读数显微镜测量值：<input type="number" id="s_micro_a" class="student-input" step="0.001" placeholder="mm"> mm</span>
         </div>
 
         <h3 style="margin-top:20px;">2. 单丝宽度计算</h3>
         <p>同理，\(d = \frac{k \lambda Z}{\bar{x}}\)。</p>
         <div class="flex-row">
-            <span class="result-display">测量丝宽平均值：<span id="avg_d">—</span> mm</span>
-            <span class="result-display">读数显微镜测量值：<span id="micro_d">—</span> mm</span>
+            <span>✏️ 测量丝宽平均值：<input type="number" id="s_avg_d" class="student-input" step="0.0001" placeholder="mm"> mm</span>
+            <span>✏️ 读数显微镜测量值：<input type="number" id="s_micro_d" class="student-input" step="0.001" placeholder="mm"> mm</span>
         </div>
 
         <div id="conclusionText" style="margin-top:20px; font-weight:bold;"></div>
+        <div style="margin-top:10px; font-style:italic;">※ 数据处理评分标准（满分25分）：各次 \(x\) 计算(5分)，缝宽/丝宽 \(a,d\) 计算(8分)，平均缝宽(6分)，平均丝宽(6分)。评分严格：误差≤1%满分，≤2%得85%，≤5%得65%，≤10%得40%，≤20%得15%，>20%得0分。</div>
     </div>
 
     <h2>七、思考题</h2>
@@ -461,6 +466,7 @@
     let imageList = [];
     let manualPlotImages = [];
     let cachedAvgA = 0, cachedAvgD = 0;
+    let cachedX = {}, cachedXbar = {}, cachedVal = {}; // 后台真实值（评分用，不显示）
 
     // ========== 计算缝宽/丝宽 ==========
     function calculateWidth() {
@@ -476,31 +482,31 @@
                     let R = parseFloat(document.getElementById(prefix + '_R' + idx).value);
                     if (!isNaN(L) && !isNaN(R) && L >= 0 && R >= 0) {
                         let x = (L + R) / 2;
-                        document.getElementById(prefix + '_x' + idx).innerText = x.toFixed(4);
+                        cachedX[prefix + '_x' + idx] = x; // 后台记录真实值用于评分，不显示
                         xs.push(x);
                     } else {
-                        document.getElementById(prefix + '_x' + idx).innerText = '—';
+                        cachedX[prefix + '_x' + idx] = 0;
                     }
                 }
                 let Z = parseFloat(document.getElementById(prefix + '_Z' + k).value);
                 let xbar = xs.length > 0 ? xs.reduce((a, b) => a + b, 0) / xs.length : NaN;
                 if (!isNaN(xbar) && Z > 0) {
-                    document.getElementById(prefix + '_xbar' + k).innerText = xbar.toFixed(4);
+                    cachedXbar[prefix + '_xbar' + k] = xbar; // 后台记录真实值用于评分，不显示
                     let val = (k * lambda * Z) / xbar;
-                    document.getElementById(prefix + '_' + outSuffix + k).innerText = val.toFixed(4);
+                    cachedVal[prefix + '_' + outSuffix + k] = val; // 后台记录真实值用于评分，不显示
                     sumVal += val;
                     countK++;
                 } else {
-                    document.getElementById(prefix + '_xbar' + k).innerText = '—';
-                    document.getElementById(prefix + '_' + outSuffix + k).innerText = '—';
+                    cachedXbar[prefix + '_xbar' + k] = 0;
+                    cachedVal[prefix + '_' + outSuffix + k] = 0;
                 }
             }
             return countK > 0 ? sumVal / countK : 0;
         }
         cachedAvgA = processTable('s1', 'a');
-        document.getElementById('avg_a').innerText = cachedAvgA > 0 ? cachedAvgA.toFixed(4) : '—';
+        // avg_a 结果仅后台记录，不显示给学生
         cachedAvgD = processTable('s2', 'd');
-        document.getElementById('avg_d').innerText = cachedAvgD > 0 ? cachedAvgD.toFixed(4) : '—';
+        // avg_d 结果仅后台记录，不显示给学生
         manualSave();
     }
 
@@ -597,11 +603,43 @@
         let score = total > 0 ? (valid / total) * 10 : 0;
         return Math.min(10, Math.round(score));
     }
+    // 严格评分：相对误差越小得分越高
+    function errFrac(relErr) {
+        if (relErr <= 0.01) return 1;
+        if (relErr <= 0.02) return 0.85;
+        if (relErr <= 0.05) return 0.65;
+        if (relErr <= 0.10) return 0.40;
+        if (relErr <= 0.20) return 0.15;
+        return 0;
+    }
+    function groupErrScore(inputs, trues, maxPts) {
+        let s = 0, cnt = 0;
+        for (let i = 0; i < inputs.length; i++) {
+            let u = parseFloat(inputs[i]);
+            if (isNaN(u) || !(trues[i] > 0)) continue;
+            s += errFrac(Math.abs(u - trues[i]) / trues[i]);
+            cnt++;
+        }
+        return cnt ? (s / cnt) * maxPts : 0;
+    }
     function gradeCalc() {
         let score = 0;
-        if (cachedAvgA > 0) score += 12.5;
-        if (cachedAvgD > 0) score += 12.5;
-        return Math.min(25, score);
+        calculateWidth(); // 更新真实值缓存（内部计算，不显示）
+        // x 计算 (5分)
+        let xIds = [], xTrues = [];
+        ['s1','s2'].forEach(p => { for (let i=1; i<=6; i++) { xIds.push(p+'_x'+i); xTrues.push(cachedX[p+'_x'+i]); } });
+        score += groupErrScore(xIds.map(id => document.getElementById(id).value), xTrues, 5);
+        // a/d 缝宽丝宽计算 (8分)
+        let adIds = [], adTrues = [];
+        ['s1_a1','s1_a2','s2_d1','s2_d2'].forEach(id => { adIds.push(id); adTrues.push(cachedVal[id]); });
+        score += groupErrScore(adIds.map(id => document.getElementById(id).value), adTrues, 8);
+        // 平均缝宽 (6分)
+        let avgAUser = parseFloat(document.getElementById('s_avg_a').value);
+        if (!isNaN(avgAUser) && cachedAvgA > 0) score += errFrac(Math.abs(avgAUser - cachedAvgA) / cachedAvgA) * 6;
+        // 平均丝宽 (6分)
+        let avgDUser = parseFloat(document.getElementById('s_avg_d').value);
+        if (!isNaN(avgDUser) && cachedAvgD > 0) score += errFrac(Math.abs(avgDUser - cachedAvgD) / cachedAvgD) * 6;
+        return Math.min(25, Math.round(score));
     }
     function gradeManualPlot() {
         return manualPlotImages.length > 0 ? 10 : 0;
@@ -738,11 +776,21 @@
             data.s1['s1_R'+i] = document.getElementById('s1_R'+i).value;
             data.s2['s2_L'+i] = document.getElementById('s2_L'+i).value;
             data.s2['s2_R'+i] = document.getElementById('s2_R'+i).value;
+            data.s1['s1_x'+i] = document.getElementById('s1_x'+i).value;
+            data.s2['s2_x'+i] = document.getElementById('s2_x'+i).value;
         }
         for (let k=1; k<=2; k++) {
             data.s1['s1_Z'+k] = document.getElementById('s1_Z'+k).value;
             data.s2['s2_Z'+k] = document.getElementById('s2_Z'+k).value;
+            data.s1['s1_xbar'+k] = document.getElementById('s1_xbar'+k).value;
+            data.s2['s2_xbar'+k] = document.getElementById('s2_xbar'+k).value;
+            data.s1['s1_a'+k] = document.getElementById('s1_a'+k).value;
+            data.s2['s2_d'+k] = document.getElementById('s2_d'+k).value;
         }
+        data.s_avg_a = document.getElementById('s_avg_a').value;
+        data.s_micro_a = document.getElementById('s_micro_a').value;
+        data.s_avg_d = document.getElementById('s_avg_d').value;
+        data.s_micro_d = document.getElementById('s_micro_d').value;
         document.querySelectorAll('.thought-input').forEach(i => data.thoughts[i.id] = i.value);
         localStorage.setItem('fullReport_diffraction', JSON.stringify(data));
         document.getElementById('lastSaveTime').innerText = `📁 上次保存：${new Date().toLocaleTimeString()}`;
@@ -762,6 +810,10 @@
         Object.entries(data.s2 || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
         Object.entries(data.thoughts || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
         if (data.summary) document.getElementById('summary').value = data.summary;
+        if (data.s_avg_a) document.getElementById('s_avg_a').value = data.s_avg_a;
+        if (data.s_micro_a) document.getElementById('s_micro_a').value = data.s_micro_a;
+        if (data.s_avg_d) document.getElementById('s_avg_d').value = data.s_avg_d;
+        if (data.s_micro_d) document.getElementById('s_micro_d').value = data.s_micro_d;
         if (data.images) { imageList = data.images; displayImages(); }
         if (data.manualPlots) { manualPlotImages = data.manualPlots; displayManualPlots(); }
 
@@ -834,10 +886,17 @@
                 Object.entries(data.s2 || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
                 Object.entries(data.thoughts || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
                 if (data.summary) document.getElementById('summary').value = data.summary;
+                if (data.s_avg_a) document.getElementById('s_avg_a').value = data.s_avg_a;
+                if (data.s_micro_a) document.getElementById('s_micro_a').value = data.s_micro_a;
+                if (data.s_avg_d) document.getElementById('s_avg_d').value = data.s_avg_d;
+                if (data.s_micro_d) document.getElementById('s_micro_d').value = data.s_micro_d;
                 if (data.images) { imageList = data.images; displayImages(); }
                 if (data.manualPlots) { manualPlotImages = data.manualPlots; displayManualPlots(); }
             } catch(e) {}
         }
+        // 自动设置日期为当天
+        const _today = new Date();
+        document.getElementById('expDate').value = _today.getFullYear() + '-' + String(_today.getMonth() + 1).padStart(2, '0') + '-' + String(_today.getDate()).padStart(2, '0');
         document.getElementById('operationScore').value = '0';
         document.getElementById('currentOpScore').innerText = '0';
         document.getElementById('opScoreDiv').style.display = 'none';
