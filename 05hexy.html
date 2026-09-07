@@ -752,6 +752,8 @@
                 }
             }
             if (is_arr.length < 2) { showReportToast("⚠️ 表22-1有效数据不足，请检查"); return; }
+            // 用当前绘图数据重新计算拟合，避免使用未更新/过期的全局 fit1（否则直线为水平线）
+            fit1 = linearFit(is_arr, vh_arr);
             let ctx = document.getElementById('chart1').getContext('2d');
             if (chart1Instance) chart1Instance.destroy();
             let xMin = Math.min(...is_arr), xMax = Math.max(...is_arr);
@@ -802,6 +804,8 @@
                 }
             }
             if (im_arr.length < 2) { showReportToast("⚠️ 表22-2有效数据不足，请检查"); return; }
+            // 用当前绘图数据重新计算拟合，避免使用未更新/过期的全局 fit2（否则直线为水平线）
+            fit2 = linearFit(im_arr, vhm_arr);
             let ctx = document.getElementById('chart2').getContext('2d');
             if (chart2Instance) chart2Instance.destroy();
             let xMin = Math.min(...im_arr), xMax = Math.max(...im_arr);
