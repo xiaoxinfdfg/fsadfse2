@@ -519,7 +519,7 @@
                 <span>✏️ 截距 \(b_1 = \) <input type="number" id="s_intercept1" class="student-input" step="0.01" placeholder="mV"> (mV)</span>
             </div>
             <div class="flex-row">
-                <span>✏️ 霍尔灵敏度 \(K_H = \) <input type="number" id="s_kh" class="student-input" step="0.0001" placeholder="V/(A·T)"> V/(A·T) (即 mV/(mA·mT))</span>
+                <span>✏️ 霍尔灵敏度 \(K_H = \) <input type="number" id="s_kh" class="student-input" step="0.0001" placeholder="V/(A·T)"> V/(A·T)（即 mV/(mA·T)，注意 B 需由 mT 换算为 T）</span>
             </div>
 
             <h3>2. \(I_M-V_H\) 线性拟合（固定 \(I_S\)）</h3>
@@ -717,7 +717,7 @@
                 // 拟合结果仅后台记录用于评分，不显示给学生
                 let b_val = parseFloat(document.getElementById('b_value').value);
                 if (!isNaN(b_val) && b_val > 0) {
-                    let kh = fit1.slope / b_val;
+                    let kh = fit1.slope * 1000 / b_val; // mV/(mA·mT) → V/(A·T)
                     cachedKH = kh; // 后台记录真实值用于评分，不显示
                 } else {
                     cachedKH = 0;
@@ -1095,7 +1095,7 @@
             else comment += "<br>❌ 需重做实验或补充数据，认真分析误差。";
             document.getElementById('commentContent').innerHTML = comment;
             let b_show = parseFloat(document.getElementById('b_value').value) || 0;
-            let kh_show = (fit1.slope !== 0 && b_show > 0) ? (fit1.slope / b_show).toFixed(4) : '—';
+            let kh_show = (fit1.slope !== 0 && b_show > 0) ? (fit1.slope * 1000 / b_show).toFixed(4) : '—';
             let conclusion = `实验结论：通过实验验证了霍尔电压与工作电流和励磁电流的线性关系。拟合斜率分别为 k1 = ${fit1.slope.toFixed(4)} mV/mA，k2 = ${fit2.slope.toFixed(4)} mV/mA，相关系数 R² 分别为 ${fit1.r2.toFixed(4)} 和 ${fit2.r2.toFixed(4)}，线性良好。霍尔灵敏度 K_H = ${kh_show} V/(A·T)。${total>=60?"实验数据合理，验证了霍尔效应规律。":"误差较大，建议检查实验操作。"}`;
             document.getElementById('conclusionText').innerHTML = conclusion;
             manualSave();
