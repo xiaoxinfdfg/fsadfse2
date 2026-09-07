@@ -236,25 +236,6 @@
             </thead>
             <tbody>
                 <tr>
-                    <td rowspan="3">1</td>
-                    <td><input class="data-input data-input-sm" id="s1_L1" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s1_R1" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s1_x1" placeholder="mm"></td>
-                    <td rowspan="3"><input class="data-input data-input-sm" id="s1_xbar1" placeholder="mm"></td>
-                    <td rowspan="3"><input class="data-input data-input-sm" id="s1_Z1" placeholder="mm"></td>
-                    <td rowspan="3"><input class="data-input data-input-sm" id="s1_a1" placeholder="mm"></td>
-                </tr>
-                <tr>
-                    <td><input class="data-input data-input-sm" id="s1_L2" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s1_R2" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s1_x2" placeholder="mm"></td>
-                </tr>
-                <tr>
-                    <td><input class="data-input data-input-sm" id="s1_L3" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s1_R3" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s1_x3" placeholder="mm"></td>
-                </tr>
-                <tr>
                     <td rowspan="3">2</td>
                     <td><input class="data-input data-input-sm" id="s1_L4" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s1_R4" placeholder="mm"></td>
@@ -293,25 +274,6 @@
             </thead>
             <tbody>
                 <tr>
-                    <td rowspan="3">1</td>
-                    <td><input class="data-input data-input-sm" id="s2_L1" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s2_R1" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s2_x1" placeholder="mm"></td>
-                    <td rowspan="3"><input class="data-input data-input-sm" id="s2_xbar1" placeholder="mm"></td>
-                    <td rowspan="3"><input class="data-input data-input-sm" id="s2_Z1" placeholder="mm"></td>
-                    <td rowspan="3"><input class="data-input data-input-sm" id="s2_d1" placeholder="mm"></td>
-                </tr>
-                <tr>
-                    <td><input class="data-input data-input-sm" id="s2_L2" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s2_R2" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s2_x2" placeholder="mm"></td>
-                </tr>
-                <tr>
-                    <td><input class="data-input data-input-sm" id="s2_L3" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s2_R3" placeholder="mm"></td>
-                    <td><input class="data-input data-input-sm" id="s2_x3" placeholder="mm"></td>
-                </tr>
-                <tr>
                     <td rowspan="3">2</td>
                     <td><input class="data-input data-input-sm" id="s2_L4" placeholder="mm"></td>
                     <td><input class="data-input data-input-sm" id="s2_R4" placeholder="mm"></td>
@@ -341,7 +303,7 @@
     <h2>六、数据处理与分析</h2>
     <div class="calculation-section" style="background:#eef2fc; padding: 20px; border-radius: 24px;">
         <h3>1. 单缝缝宽计算</h3>
-        <p>对每级 \(k\)，取左右暗纹位置平均 \(x=(|x_{-k}|+|x_k|)/2\)，再对3次测量取平均得 \(\bar{x}\)；由暗条纹条件 \(a = \frac{k \lambda Z}{\bar{x}}\)（\(\theta\) 很小时，\(\sin\theta \approx \tan\theta = \bar{x}/Z\)）计算缝宽。</p>
+        <p>对第2级（\(k=2\)）暗纹，取左右暗纹位置平均 \(x=(|x_{-k}|+|x_k|)/2\)，再对3次测量取平均得 \(\bar{x}\)；由暗条纹条件 \(a = \frac{k \lambda Z}{\bar{x}}\)（\(\theta\) 很小时，\(\sin\theta \approx \tan\theta = \bar{x}/Z\)）计算缝宽。</p>
         <div class="flex-row">
             <span>✏️ 测量缝宽平均值：<input type="number" id="s_avg_a" class="student-input" step="0.0001" placeholder="mm"> mm</span>
             <span>✏️ 读数显微镜测量值：<input type="number" id="s_micro_a" class="student-input" step="0.001" placeholder="mm"> mm</span>
@@ -471,10 +433,10 @@
     // ========== 计算缝宽/丝宽 ==========
     function calculateWidth() {
         const lambda = 632.8e-6; // mm
-        // 表1/表2结构：k=1,2 各3次测量，|x-k|与|xk|取平均得x，再对3次取平均得x̄，最后 a/d = k·λ·Z/x̄
+        // 表1/表2结构：仅 k=2 的3次测量，|x-k|与|xk|取平均得x，再对3次取平均得x̄，最后 a/d = k·λ·Z/x̄
         function processTable(prefix, outSuffix) {
             let sumVal = 0, countK = 0;
-            for (let k = 1; k <= 2; k++) {
+            for (let k = 2; k <= 2; k++) {
                 let xs = [];
                 for (let m = 1; m <= 3; m++) {
                     let idx = 3 * (k - 1) + m;
@@ -614,9 +576,9 @@
 
     function gradeDataRecord() {
         let valid = 0, total = 0;
-        // 表1/表2：每表 k=1,2 各3次测量，每次含 |x-k|、|xk| 两个数据，每个k一个Z
+        // 表1/表2：每表 k=2 的3次测量，每次含 |x-k|、|xk| 两个数据，共一个Z
         for (let prefix of ['s1', 's2']) {
-            for (let k = 1; k <= 2; k++) {
+            for (let k = 2; k <= 2; k++) {
                 for (let m = 1; m <= 3; m++) {
                     let idx = 3 * (k - 1) + m;
                     total += 2;
@@ -657,11 +619,11 @@
         calculateWidth(); // 更新真实值缓存（内部计算，不显示）
         // x 计算 (5分)
         let xIds = [], xTrues = [];
-        ['s1','s2'].forEach(p => { for (let i=1; i<=6; i++) { xIds.push(p+'_x'+i); xTrues.push(cachedX[p+'_x'+i]); } });
+        ['s1','s2'].forEach(p => { for (let i=4; i<=6; i++) { xIds.push(p+'_x'+i); xTrues.push(cachedX[p+'_x'+i]); } });
         score += groupErrScore(xIds.map(id => document.getElementById(id).value), xTrues, 5);
         // a/d 缝宽丝宽计算 (8分)
         let adIds = [], adTrues = [];
-        ['s1_a1','s1_a2','s2_d1','s2_d2'].forEach(id => { adIds.push(id); adTrues.push(cachedVal[id]); });
+        ['s1_a2','s2_d2'].forEach(id => { adIds.push(id); adTrues.push(cachedVal[id]); });
         score += groupErrScore(adIds.map(id => document.getElementById(id).value), adTrues, 8);
         // 平均缝宽 (6分)
         let avgAUser = parseFloat(document.getElementById('s_avg_a').value);
@@ -884,7 +846,7 @@
             images: imageList, manualPlots: manualPlotImages };
         document.querySelectorAll('.info-input').forEach(i => { if (i.id !== 'expName') data.info[i.id] = i.value; });
         document.querySelectorAll('.fill-blank').forEach(i => data.blanks[i.id] = i.value);
-        for (let i=1; i<=6; i++) {
+        for (let i=4; i<=6; i++) {
             data.s1['s1_L'+i] = document.getElementById('s1_L'+i).value;
             data.s1['s1_R'+i] = document.getElementById('s1_R'+i).value;
             data.s2['s2_L'+i] = document.getElementById('s2_L'+i).value;
@@ -892,7 +854,7 @@
             data.s1['s1_x'+i] = document.getElementById('s1_x'+i).value;
             data.s2['s2_x'+i] = document.getElementById('s2_x'+i).value;
         }
-        for (let k=1; k<=2; k++) {
+        for (let k=2; k<=2; k++) {
             data.s1['s1_Z'+k] = document.getElementById('s1_Z'+k).value;
             data.s2['s2_Z'+k] = document.getElementById('s2_Z'+k).value;
             data.s1['s1_xbar'+k] = document.getElementById('s1_xbar'+k).value;
