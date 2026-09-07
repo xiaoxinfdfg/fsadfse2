@@ -406,8 +406,8 @@
 
         <h2>四、实验内容</h2>
         <div class="experiment-step">1．在同一温度下，测量正向电压 \(V_F\) 与正向电流 \(I_F\) 的关系，记录于表23-1。</div>
-        <div class="experiment-step">2．在恒定正向电流下，改变温度（加热），记录 \(V_F\) 与温度 \(T\) 的关系，记录于表23-2。</div>
-        <div class="experiment-step">3．对表23-1数据进行指数拟合，求出玻尔兹曼常数 \(k\) 和反向饱和电流 \(I_S\)；对表23-2数据进行线性拟合，求出灵敏度 \(S\) 和禁带宽度 \(E_{g(0)}\)。</div>
+        <div class="experiment-step">2．<span style="background:#fff3cd; color:#8a6d3b; border:1px solid #f0e0a8; border-radius:20px; padding:1px 10px; font-size:0.85rem;">选做</span> 在恒定正向电流下，改变温度（加热），记录 \(V_F\) 与温度 \(T\) 的关系，记录于表23-2（不计入评分）。</div>
+        <div class="experiment-step">3．对表23-1数据进行指数拟合，求出玻尔兹曼常数 \(k\) 和反向饱和电流 \(I_S\)；对表23-2数据（<span style="background:#fff3cd; color:#8a6d3b; border:1px solid #f0e0a8; border-radius:20px; padding:1px 10px; font-size:0.85rem;">选做</span>）进行线性拟合，求出灵敏度 \(S\) 和禁带宽度 \(E_{g(0)}\)。</div>
 
         <!-- 五、原始数据记录 -->
         <h2>五、原始数据记录</h2>
@@ -442,7 +442,7 @@
             </table>
         </div>
 
-        <div class="section-title" style="font-weight: bold; font-size: 1.1rem; margin: 10px 0 5px 0;">表23-2 恒定正向电流下正向电压与温度的关系（\(I_F =\) <input type="text" id="if_const" class="param-input" placeholder="μA" style="width:60px;"> μA）</div>
+        <div class="section-title" style="font-weight: bold; font-size: 1.1rem; margin: 10px 0 5px 0;">表23-2 恒定正向电流下正向电压与温度的关系（\(I_F =\) <input type="text" id="if_const" class="param-input" placeholder="μA" style="width:60px;"> μA）<span style="background:#fff3cd; color:#8a6d3b; border:1px solid #f0e0a8; border-radius:20px; padding:2px 12px; font-size:0.8rem; font-weight:600; margin-left:8px;">选做 · 不计入评分</span></div>
         <div class="table-wrapper">
             <table id="table2">
                 <thead>
@@ -491,7 +491,8 @@
             </div>
             <p>理论值 \(k_0 = 1.381\times10^{-23}\) J/K，✏️ 相对误差 = <input type="number" id="s_errk" class="student-input" step="0.01" placeholder="%"> %</p>
 
-            <h3>2. \(V_F-T\) 线性拟合（求灵敏度 \(S\) 和禁带宽度 \(E_{g(0)}\)）</h3>
+            <h3>2. \(V_F-T\) 线性拟合（求灵敏度 \(S\) 和禁带宽度 \(E_{g(0)}\)）<span style="background:#fff3cd; color:#8a6d3b; border:1px solid #f0e0a8; border-radius:20px; padding:1px 12px; font-size:0.75rem; font-weight:600; margin-left:8px;">选做 · 不计入评分</span></h3>
+            <p style="color:#8a6d3b; font-size:0.85rem;">※ 以下内容对应表23-2，为选做部分，填写与否均不影响评分。</p>
             <p>对表23-2数据，以温度 \(T\) (K) 为横坐标，\(V_F\) 为纵坐标，进行线性拟合：\(V_F = V_{g(0)} + S \cdot T\)。</p>
             <div class="flex-row">
                 <span>✏️ 灵敏度 \(S = \) <input type="number" id="s_sens" class="student-input" step="0.0001" placeholder="V/K"> V/K</span>
@@ -500,11 +501,11 @@
             </div>
             <p>理论值 \(E_{g(0)} = 1.21\) eV，✏️ 相对误差 = <input type="number" id="s_erregg" class="student-input" step="0.01" placeholder="%"> %</p>
 
-            <div style="margin-top:20px; font-style:italic;">※ 数据处理评分标准（满分20分）：指数拟合斜率(5分)，玻尔兹曼常数k(6分，理论值1.381e-23)，VF-T灵敏度S(4分)，禁带宽度Eg0(5分，理论值1.21eV)。评分严格：误差≤1%满分，≤2%得85%，≤5%得65%，≤10%得40%，≤20%得15%，>20%得0分。</div>
+            <div style="margin-top:20px; font-style:italic;">※ 数据处理评分标准（满分20分，必做部分）：指数拟合斜率(10分)，玻尔兹曼常数k(10分，理论值1.381e-23)。表23-2相关项（VF-T灵敏度S、禁带宽度Eg0）为选做，不计入评分。评分严格：误差≤1%满分，≤2%得85%，≤5%得65%，≤10%得40%，≤20%得15%，>20%得0分。</div>
 
             <div style="margin-top: 30px; text-align:center;">
                 <button class="chart-btn" onclick="drawIV()">📈 绘制 \(\ln I_F - V_F\) 拟合曲线</button>
-                <button class="chart-btn" onclick="drawVFvsT()">📈 绘制 \(V_F - T\) 拟合曲线</button>
+                <button class="chart-btn" onclick="drawVFvsT()">📈 绘制 \(V_F - T\) 拟合曲线（选做）</button>
             </div>
             <div class="chart-container"><canvas id="chartIV" style="width:100%; height:auto; max-width:800px; margin:0 auto; display:block;"></canvas></div>
             <div class="chart-container"><canvas id="chartVFvsT" style="width:100%; height:auto; max-width:800px; margin:0 auto; display:block;"></canvas></div>
@@ -554,6 +555,7 @@
         </div>
 
         <h2>九、自动评分 & 实验评语</h2>
+        <div style="font-size:0.85rem; color:#8a6d3b; margin-bottom:10px;">※ 表23-2相关内容（数据记录、VF-T拟合处理、VF-T绘图）为选做部分，不计入评分，不影响总分100分制。</div>
         <div class="score-section" style="text-align:center;">
             <button class="auto-grade-btn" onclick="autoGrade()">✨ 自动评分并生成评语</button>
             <div id="scoreDetails" class="score-details" style="display:none;">
@@ -688,18 +690,24 @@
             // 结果仅后台记录用于评分，不显示给学生
 
             let vt = getVTData();
-            if (vt.t.length < 2) { showReportToast("⚠️ 表23-2有效数据不足，请至少输入2组数据"); return; }
-            let fit2 = linearFit(vt.t, vt.vf);
-            let S = fit2.slope;
-            let Vg0 = fit2.intercept;
-            let Eg0 = q * Vg0 / 1.602e-19;
-            calcResults.s = S;
-            calcResults.vg0 = Vg0;
-            calcResults.eg0 = Eg0;
+            if (vt.t.length >= 2) {
+                let fit2 = linearFit(vt.t, vt.vf);
+                let S = fit2.slope;
+                let Vg0 = fit2.intercept;
+                let Eg0 = q * Vg0 / 1.602e-19;
+                calcResults.s = S;
+                calcResults.vg0 = Vg0;
+                calcResults.eg0 = Eg0;
+            } else {
+                // 表23-2为选做部分：未填写时不计算，不影响评分
+                calcResults.s = 0;
+                calcResults.vg0 = 0;
+                calcResults.eg0 = 0;
+            }
             // 结果仅后台记录用于评分，不显示给学生
 
             drawIV();
-            drawVFvsT();
+            if (vt.t.length >= 2) drawVFvsT();
             manualSave();
             showReportToast("✅ 计算完成，图表已更新");
         }
@@ -905,13 +913,7 @@
                 if (v && !isNaN(parseFloat(v)) && parseFloat(v)>0) valid++;
                 if (i_ && !isNaN(parseFloat(i_)) && parseFloat(i_)>0) valid++;
             }
-            for (let i=1; i<=20; i++) {
-                let t = document.getElementById('t'+i).value.trim();
-                let v = document.getElementById('vf_t'+i).value.trim();
-                total += 2;
-                if (t && !isNaN(parseFloat(t)) && parseFloat(t)>0) valid++;
-                if (v && !isNaN(parseFloat(v)) && parseFloat(v)>0) valid++;
-            }
+            // 表23-2为选做部分，不计入数据记录评分
             let score = total > 0 ? (valid / total) * 10 : 0;
             return Math.min(10, Math.round(score));
         }
@@ -928,25 +930,20 @@
         function gradeDataProcess() {
             let score = 0;
             calculateAll(); // 更新真实值缓存（内部计算，不显示）
-            // 指数拟合斜率 B (5分)
+            // 指数拟合斜率 B (10分)
             let sB = parseFloat(document.getElementById('s_slopeB').value);
-            if (!isNaN(sB) && calcResults.slope !== 0) score += errFrac(Math.abs(sB - calcResults.slope) / Math.abs(calcResults.slope)) * 5;
-            // 玻尔兹曼常数 k (6分，理论值1.381e-23)
+            if (!isNaN(sB) && calcResults.slope !== 0) score += errFrac(Math.abs(sB - calcResults.slope) / Math.abs(calcResults.slope)) * 10;
+            // 玻尔兹曼常数 k (10分，理论值1.381e-23)
             let sK = parseFloat(document.getElementById('s_k').value);
-            if (!isNaN(sK) && sK > 0) score += errFrac(Math.abs(sK - 1.381e-23) / 1.381e-23) * 6;
-            // VF-T 灵敏度 S (4分)
-            let sS = parseFloat(document.getElementById('s_sens').value);
-            if (!isNaN(sS) && calcResults.s !== 0) score += errFrac(Math.abs(sS - calcResults.s) / Math.abs(calcResults.s)) * 4;
-            // 禁带宽度 Eg0 (5分，理论值1.21eV)
-            let sEg = parseFloat(document.getElementById('s_eg0').value);
-            if (!isNaN(sEg) && sEg > 0) score += errFrac(Math.abs(sEg - 1.21) / 1.21) * 5;
+            if (!isNaN(sK) && sK > 0) score += errFrac(Math.abs(sK - 1.381e-23) / 1.381e-23) * 10;
+            // 表23-2相关项（VF-T灵敏度S、禁带宽度Eg0）为选做，不计入评分
             return Math.min(20, Math.round(score));
         }
 
         function gradeAutoPlot() {
             let s = 0;
-            if (hasDrawnIV) s += 2.5;
-            if (hasDrawnVF) s += 2.5;
+            if (hasDrawnIV) s += 5;
+            // VF-T 图为选做内容，不计入评分
             return Math.min(5, s);
         }
 
@@ -1011,8 +1008,14 @@
             else comment += "<br>❌ 需重做实验或补充数据，认真分析误差。";
             document.getElementById('commentContent').innerHTML = comment;
             let err_k_val = Math.abs(calcResults.k - 1.381e-23) / 1.381e-23 * 100;
-            let err_eg_val = Math.abs(calcResults.eg0 - 1.21) / 1.21 * 100;
-            let conclusion = `实验结论：通过指数拟合得到玻尔兹曼常数 k = ${calcResults.k.toExponential(4)} J/K，相对误差 ${err_k_val.toFixed(2)}%；线性拟合得到灵敏度 S = ${calcResults.s.toFixed(5)} V/K，禁带宽度 E_g(0) = ${calcResults.eg0.toFixed(4)} eV，相对误差 ${err_eg_val.toFixed(2)}%。${total>=60?"实验数据合理，验证了PN结正向特性规律。":"误差较大，建议检查实验操作。"}`;
+            let conclusion;
+            if (calcResults.eg0 > 0) {
+                let err_eg_val = Math.abs(calcResults.eg0 - 1.21) / 1.21 * 100;
+                conclusion = `实验结论：通过指数拟合得到玻尔兹曼常数 k = ${calcResults.k.toExponential(4)} J/K，相对误差 ${err_k_val.toFixed(2)}%；线性拟合得到灵敏度 S = ${calcResults.s.toFixed(5)} V/K，禁带宽度 E_g(0) = ${calcResults.eg0.toFixed(4)} eV，相对误差 ${err_eg_val.toFixed(2)}%。`;
+            } else {
+                conclusion = `实验结论：通过指数拟合得到玻尔兹曼常数 k = ${calcResults.k.toExponential(4)} J/K，相对误差 ${err_k_val.toFixed(2)}%。（表23-2为选做部分，未填写，未计算VF-T拟合结果）`;
+            }
+            conclusion += (total>=60?"实验数据合理，验证了PN结正向特性规律。":"误差较大，建议检查实验操作。");
             document.getElementById('conclusionText').innerHTML = conclusion;
             manualSave();
         }
