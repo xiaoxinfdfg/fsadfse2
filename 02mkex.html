@@ -406,7 +406,7 @@
         for (let i = 1; i <= 10; i++) {
             let m = parseFloat(document.getElementById('m'+i).value);
             let d = parseFloat(document.getElementById('d'+i).value);
-            let lambda = (m && d) ? (2 * d * 1000 / m) : NaN; // d in mm, lambda in nm
+            let lambda = (m && d) ? (2 * d * 1000000 / m) : NaN; // d in mm, lambda in nm
             cachedLambda[i] = isNaN(lambda) ? 0 : lambda; // 后台记录真实值用于评分，不显示
             if (!isNaN(lambda) && lambda > 0) {
                 sumLaser += lambda;
@@ -455,7 +455,7 @@
         let xMin = Math.min(...mArr), xMax = Math.max(...mArr);
         let xFit = [xMin, xMax];
         let yFit = xFit.map(x => fit.slope * x + fit.intercept);
-        let lambda_from_slope = fit.slope * 2 * 1000; // nm
+        let lambda_from_slope = fit.slope * 2 * 1000000; // nm
 
         chartInstance = new Chart(ctx, {
             type: 'scatter',
