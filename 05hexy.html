@@ -1131,7 +1131,7 @@
             const studentName = document.getElementById('studentName')?.value.trim() || "未填姓名";
             const expDate = document.getElementById('expDate')?.value.trim() || new Date().toLocaleDateString('zh-CN');
             let preScoreRaw = parseFloat(document.getElementById('detailPreScore')?.innerText?.split('/')[0]) || 0;
-            let opScoreRaw = parseFloat(document.getElementById('currentOpScore')?.innerText) || 0;
+            let opScoreRaw = parseFloat(document.getElementById('operationScore')?.value) || 0;
             let totalScoreRaw = parseFloat(document.getElementById('detailTotalScore')?.innerText?.split('/')[0]) || 0;
             const now = new Date();
             const fullDateTime = `${expDate} ${now.toLocaleTimeString('zh-CN', {hour12: false})}`;
@@ -1148,11 +1148,32 @@
                 `ϞҨӃҖӜ™`,
             ];
             const reportText = reportLines.join("\n");
-            // ① 先同步打开上报表单（避免移动端弹窗拦截导致"没反应"）
+            // ⑤ 持久化并展示上报数据（返回本页时可再次复制，双保险）
+            const expKey1 = (document.title || "报告").split("|")[0].trim();
+            try { localStorage.setItem("lastReportText", JSON.stringify({ k: expKey1, t: reportText })); } catch (e) {}
+            showReportDataBar(reportText);
+            // ① 先同步复制到剪贴板（textarea+execCommand，页面聚焦时即成功，不依赖异步权限）
+            let copied = copyReportTextSync(reportText);
+            // ② 立即打开上报表单（同步调用，用户激活最充分，QQ浏览器拦截概率最低）
             openReportForm();
-            // ② 复制数据到剪贴板（多级降级，兼容手机浏览器）
-            let copied = await copyReportText(reportText);
+            // ③ 同步复制失败时，用 Clipboard API 兜底
+            if (!copied) {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(reportText);
+                        copied = true;
+                    }
+                } catch (e) { copied = false; }
+            }
             if (copied) {
+                // ④ 终极兜底：新页未打开时（本页仍在前台），800ms 后同页跳转，保证必达统计平台
+                setTimeout(function () {
+                    try {
+                        if (!(document.hidden || document.visibilityState === 'hidden')) {
+                            window.location.href = "https://qrbgda8w.jsjform.com/f/uJfvvZ";
+                        }
+                    } catch (e) { /* 忽略 */ }
+                }, 800);
                 showReportToast("✅ 数据已复制！请在上报页面粘贴提交");
             } else {
                 showReportContentModal(reportText);
@@ -1178,13 +1199,7 @@
         }
 
         // 复制数据：Clipboard API 优先，失败回退传统方式，返回是否成功
-        async function copyReportText(text) {
-            try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(text);
-                    return true;
-                }
-            } catch (e) { /* 继续回退 */ }
+        function copyReportTextSync(text) {
             try {
                 const textarea = document.createElement('textarea');
                 textarea.value = text;
@@ -1198,8 +1213,80 @@
                 textarea.setSelectionRange(0, textarea.value.length);
                 const ok = document.execCommand('copy');
                 document.body.removeChild(textarea);
-                return ok;
+                return !!ok;
             } catch (e) { return false; }
+        }
+
+        // 上报数据常驻条（双保险）：返回本页时可直接复制，再进统计平台粘贴
+        function showReportDataBar(text) {
+            let bar = document.getElementById('reportDataBar');
+            if (!bar) {
+                bar = document.createElement('div');
+                bar.id = 'reportDataBar';
+                bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#fff;border-top:2px solid #1976d2;box-shadow:0 -4px 12px rgba(0,0,0,0.15);padding:10px 14px 12px;font-family:inherit;';
+                let title = document.createElement('div');
+                title.style.cssText = 'font-size:13px;font-weight:700;color:#1976d2;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;';
+                title.innerHTML = '📋 上报数据（返回本页时可直接复制）';
+                let closeBtn = document.createElement('span');
+                closeBtn.textContent = '✕';
+                closeBtn.style.cssText = 'cursor:pointer;font-size:14px;color:#999;padding:2px 8px;';
+                closeBtn.onclick = function () {
+                    bar.remove();
+                    try { document.body.style.paddingBottom = ""; } catch (e) {}
+                    try { localStorage.removeItem("lastReportText"); } catch (e) {}
+                };
+                title.appendChild(closeBtn);
+                let ta = document.createElement('textarea');
+                ta.id = 'reportDataBarText';
+                ta.readOnly = true;
+                ta.value = text;
+                ta.style.cssText = 'width:100%;height:110px;box-sizing:border-box;font-size:12px;border:1px solid #ccc;border-radius:8px;padding:8px;background:#fafafa;color:#222;white-space:pre;resize:none;';
+                let btn = document.createElement('button');
+                btn.textContent = '📋 复制上报数据';
+                btn.style.cssText = 'width:100%;margin-top:8px;padding:10px;border:none;border-radius:8px;background:#1976d2;color:#fff;font-size:14px;font-weight:600;';
+                btn.onclick = async function () {
+                    ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+                    let ok = false;
+                    try { ok = copyReportTextSync(text); } catch (e) { ok = false; }
+                    if (!ok) {
+                        try {
+                            if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); ok = true; }
+                        } catch (e) { ok = false; }
+                    }
+                    showReportToast(ok ? "✅ 已复制！请到统计平台粘贴" : "⚠️ 自动复制失败，请长按文字手动复制");
+                };
+                let openBtn = document.createElement('button');
+                openBtn.textContent = '🚀 再次进入统计平台';
+                openBtn.style.cssText = 'width:100%;margin-top:6px;padding:10px;border:none;border-radius:8px;background:#2e7d32;color:#fff;font-size:14px;font-weight:600;';
+                openBtn.onclick = function () {
+                    let op = false;
+                    try { op = !!window.open('https://qrbgda8w.jsjform.com/f/uJfvvZ', '_blank'); } catch (e) { op = false; }
+                    if (!op) {
+                        try {
+                            const a = document.createElement('a');
+                            a.href = 'https://qrbgda8w.jsjform.com/f/uJfvvZ';
+                            a.target = '_blank';
+                            a.rel = 'noopener';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                        } catch (e) {}
+                    }
+                    setTimeout(function () {
+                        try {
+                            if (!(document.hidden || document.visibilityState === 'hidden')) {
+                                window.location.href = 'https://qrbgda8w.jsjform.com/f/uJfvvZ';
+                            }
+                        } catch (e) {}
+                    }, 800);
+                };
+                bar.appendChild(title); bar.appendChild(ta); bar.appendChild(btn); bar.appendChild(openBtn);
+                document.body.appendChild(bar);
+                try { document.body.style.paddingBottom = '200px'; } catch (e) {}
+            } else {
+                let ta2 = document.getElementById('reportDataBarText');
+                if (ta2) ta2.value = text;
+            }
         }
 
         // 兜底弹窗：剪贴板不可用时展示报告内容，支持长按复制
@@ -1404,6 +1491,15 @@
 
             const reportBtn = document.getElementById('oneClickReportBtn');
             if (reportBtn) reportBtn.addEventListener('click', oneClickDataReport);
+            // 双保险：恢复上次上报数据条（返回本页时可再次复制）
+            try {
+                const lastRaw = localStorage.getItem('lastReportText');
+                if (lastRaw) {
+                    const obj = JSON.parse(lastRaw);
+                    const expKey2 = (document.title || "报告").split("|")[0].trim();
+                    if (obj && obj.t && obj.k === expKey2) showReportDataBar(obj.t);
+                }
+            } catch (e) {}
 
             if (raw) showReportToast("📂 已自动加载上次保存的数据");
             if (hasDrawn1 || hasDrawn2) {
