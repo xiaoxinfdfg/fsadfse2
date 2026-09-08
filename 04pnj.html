@@ -1069,7 +1069,7 @@
             const reportText = reportLines.join("\n");
             // ⑤ 持久化并展示上报数据（返回本页时可再次复制，双保险）
             const expKey1 = (document.title || "报告").split("|")[0].trim();
-            try { localStorage.setItem("lastReportText", JSON.stringify({ k: expKey1, t: reportText })); } catch (e) {}
+            try { localStorage.setItem("lastReportText", JSON.stringify({ k: expKey1, t: reportText, ts: Date.now() })); } catch (e) {}
             showReportDataBar(reportText);
             // ① 先同步复制到剪贴板（textarea+execCommand，页面聚焦时即成功，不依赖异步权限）
             let copied = copyReportTextSync(reportText);
@@ -1145,7 +1145,7 @@
                 bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#fff;border-top:2px solid #1976d2;box-shadow:0 -4px 12px rgba(0,0,0,0.15);padding:10px 14px 12px;font-family:inherit;';
                 let title = document.createElement('div');
                 title.style.cssText = 'font-size:13px;font-weight:700;color:#1976d2;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;';
-                title.innerHTML = '📋 上报数据（返回本页时可直接复制）';
+                title.innerHTML = '📋 上报数据（返回本页可复制，用后失效）';
                 let closeBtn = document.createElement('span');
                 closeBtn.textContent = '✕';
                 closeBtn.style.cssText = 'cursor:pointer;font-size:14px;color:#999;padding:2px 8px;';
@@ -1178,6 +1178,10 @@
                 openBtn.textContent = '🚀 再次进入统计平台';
                 openBtn.style.cssText = 'width:100%;margin-top:6px;padding:10px;border:none;border-radius:8px;background:#2e7d32;color:#fff;font-size:14px;font-weight:600;';
                 openBtn.onclick = function () {
+                    // 一次性使用：点“再次进入统计平台”即消耗常驻条，防止反复进平台刷分
+                    try { bar.remove(); } catch (e) {}
+                    try { document.body.style.paddingBottom = ""; } catch (e) {}
+                    try { localStorage.removeItem("lastReportText"); } catch (e) {}
                     let op = false;
                     try { op = !!window.open('https://qrbgda8w.jsjform.com/f/uJfvvZ', '_blank'); } catch (e) { op = false; }
                     if (!op) {
@@ -1409,7 +1413,8 @@
                 if (lastRaw) {
                     const obj = JSON.parse(lastRaw);
                     const expKey2 = (document.title || "报告").split("|")[0].trim();
-                    if (obj && obj.t && obj.k === expKey2) showReportDataBar(obj.t);
+                    if (obj && obj.t && obj.k === expKey2 && obj.ts && (Date.now() - obj.ts) <= 30 * 60 * 1000) showReportDataBar(obj.t);
+                    else if (obj && obj.k === expKey2) { try { localStorage.removeItem("lastReportText"); } catch (e) {} }
                 }
             } catch (e) {}
 
