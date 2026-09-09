@@ -548,6 +548,8 @@
                 <label>操作分数 (0~20): </label>
                 <input type="number" id="operationScore" min="0" max="20" step="1" value="0">
                 <button onclick="saveOpScore()" class="save-btn">💾 保存操作分</button>
+                <button id="forceFailBtn" onclick="toggleForceFail()" class="save-btn" style="background:#c62828; margin-left: 8px;">⚠️ 强制 0/0/59（未做实验）</button>
+                <span id="forceFailMsg" style="display:block; margin-top:6px; font-size:0.85rem; color:#c62828;"></span>
                 <button id="oneClickReportBtn" class="submit-report-btn" style="margin-left: 12px;">📤 一键数据上报</button>
             </div>
             <div>📋 当前操作分：<span id="currentOpScore">0</span> 分</div>
@@ -599,6 +601,7 @@
         let chartIVInstance = null,
             chartVFInstance = null;
         let opScoreLocked = false;
+        let forcedFail = false; // 强制0/0/59（未做实验）锁定标记
         let imageList = [];
         let manualPlotImages = [];
         let hasDrawnIV = false,
@@ -986,6 +989,8 @@
             if (isNaN(opScore)) opScore = 0;
             opScore = Math.min(20, Math.max(0, opScore));
             let total = preSc + dataSc + calcSc + autoPlotSc + manualPlotSc + thoughtSc + summarySc + evidenceSc + opScore;
+            // 强制0/0/59（未做实验）：预习、操作、总分锁定为 0/0/59
+            if (forcedFail) { preSc = 0; opScore = 0; total = 59; }
             document.getElementById('detailPreScore').innerText = `${preSc}/10`;
             document.getElementById('detailDataScore').innerText = `${dataSc}/10`;
             document.getElementById('detailCalcScore').innerText = `${calcSc}/20`;
@@ -1041,6 +1046,36 @@
             autoGrade();
         }
 
+        // ========== 强制0/0/59（未做实验） ==========
+        function toggleForceFail() {
+            if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁"); return; }
+            if (forcedFail) {
+                forcedFail = false;
+                try { localStorage.removeItem('forcedFail'); } catch (e) {}
+                const ffBtn0 = document.getElementById('forceFailBtn');
+                if (ffBtn0) ffBtn0.textContent = '⚠️ 强制 0/0/59（未做实验）';
+                const ffMsg0 = document.getElementById('forceFailMsg');
+                if (ffMsg0) ffMsg0.innerHTML = '已解除强制，恢复自动评分';
+                autoGrade();
+                showReportToast("✅ 已解除强制，恢复自动评分");
+            return;
+            }
+            forcedFail = true;
+            const expKeyF = (document.title || "报告").split("|");
+            const expKeyF0 = expKeyF[0].trim();
+            try { localStorage.setItem('forcedFail', JSON.stringify({ k: expKeyF0, v: 1 })); } catch (e) {}
+            const opInputF = document.getElementById('operationScore');
+            if (opInputF) opInputF.value = '0';
+            const curOpF = document.getElementById('currentOpScore');
+            if (curOpF) curOpF.innerText = '0';
+            const ffBtn = document.getElementById('forceFailBtn');
+            if (ffBtn) ffBtn.textContent = '✅ 已强制 0/0/59（点击解除）';
+            const ffMsg = document.getElementById('forceFailMsg');
+            if (ffMsg) ffMsg.innerHTML = '⚠️ 上报将锁定为：预习 0 分、操作 0 分、综合 59 分';
+            autoGrade();
+            showReportToast("✅ 已强制 0/0/59，上报分数锁定");
+        }
+
         // ========== 一键上报 ==========
         async function oneClickDataReport() {
             if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁后再执行上报"); return; }
@@ -1052,6 +1087,8 @@
             let preScoreRaw = parseFloat(document.getElementById('detailPreScore')?.innerText?.split('/')[0]) || 0;
             let opScoreRaw = parseFloat(document.getElementById('operationScore')?.value) || 0;
             let totalScoreRaw = parseFloat(document.getElementById('detailTotalScore')?.innerText?.split('/')[0]) || 0;
+            // 强制0/0/59（未做实验）：无视任何填写，上报分数锁定
+            if (forcedFail) { preScoreRaw = 0; opScoreRaw = 0; totalScoreRaw = 59; }
             const now = new Date();
             const fullDateTime = `${expDate} ${now.toLocaleTimeString('zh-CN', {hour12: false})}`;
             const reportLines = [
@@ -1353,6 +1390,8 @@
             localStorage.removeItem('evidenceImages');
             localStorage.removeItem('manualPlotImages');
             localStorage.removeItem('operationScore');
+            localStorage.removeItem('forcedFail');
+            forcedFail = false;
             showReportToast("🗑️ 数据已清除，页面将刷新");
             setTimeout(() => location.reload(), 1200);
         }
@@ -1405,6 +1444,22 @@
             });
             updateAllAnswerStatusIcons();
 
+            // 恢复强制0/0/59状态（按实验名匹配，不串实验）
+            try {
+                const ffRaw = localStorage.getItem('forcedFail');
+                if (ffRaw) {
+                    const ff = JSON.parse(ffRaw);
+                    const expKeyF2 = (document.title || "报告").split("|");
+                    const expKeyF2a = expKeyF2[0].trim();
+                    if (ff && ff.v && ff.k === expKeyF2a) {
+                        forcedFail = true;
+                        const ffBtn2 = document.getElementById('forceFailBtn');
+                        if (ffBtn2) ffBtn2.textContent = '✅ 已强制 0/0/59（点击解除）';
+                        const ffMsg2 = document.getElementById('forceFailMsg');
+                        if (ffMsg2) ffMsg2.innerHTML = '⚠️ 上报将锁定为：预习 0 分、操作 0 分、综合 59 分';
+                    }
+                }
+            } catch (e) {}
             const reportBtn = document.getElementById('oneClickReportBtn');
             if (reportBtn) reportBtn.addEventListener('click', oneClickDataReport);
             // 双保险：恢复上次上报数据条（返回本页时可再次复制）
