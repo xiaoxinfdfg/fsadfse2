@@ -1383,8 +1383,9 @@
             let pwd = document.getElementById('opPwd').value;
             if (pwd === "52501314") {
                 document.getElementById('opScoreDiv').style.display = 'block';
-                document.getElementById('opLockMsg').innerHTML = "✅ 密码正确，可评分及上报";
+                document.getElementById('opLockMsg').innerHTML = '✅ 密码正确，可评分及上报（10分钟内刷新免密码）';
                 opScoreLocked = true;
+                try { localStorage.setItem('opUnlockTime', Date.now()); } catch (e) {}
             } else { document.getElementById('opLockMsg').innerHTML = "❌ 密码错误";
                 opScoreLocked = false; }
         }
@@ -1753,17 +1754,38 @@
             if (data.cachedB) cachedB = data.cachedB;
             if (data.cachedR2) cachedR2 = data.cachedR2;
 
+        // ===== 10分钟免密码：刷新时自动恢复教师解锁状态 =====
+        let _opUnlocked = false;
+        try {
+            const _ut = localStorage.getItem('opUnlockTime');
+            if (_ut && (Date.now() - parseInt(_ut, 10)) <= 10 * 60 * 1000) _opUnlocked = true;
+        } catch (e) {}
         document.getElementById('operationScore').value = '0';
-            document.getElementById('currentOpScore').innerText = '0';
+        document.getElementById('currentOpScore').innerText = '0';
+        if (_opUnlocked) {
+            opScoreLocked = true;
+            document.getElementById('opScoreDiv').style.display = 'block';
+            document.getElementById('opLockMsg').innerHTML = '✅ 教师已解锁（10分钟内免密码）';
+        } else {
+            opScoreLocked = false;
             document.getElementById('opScoreDiv').style.display = 'none';
             document.getElementById('opLockMsg').innerHTML = '';
-            opScoreLocked = false;
-            document.getElementById('opPwd').value = '';
-            localStorage.removeItem('operationScore_photo');
+        }
+        document.getElementById('opPwd').value = '';
+        // ===== 刷新后操作分保留：从本地存储恢复，不删除 =====
+        try {
+            const _op = localStorage.getItem('operationScore_photo');
+            if (_op !== null && _op !== undefined) {
+                const _v = Math.min(20, Math.max(0, parseFloat(_op) || 0));
+                document.getElementById('operationScore').value = _v;
+                document.getElementById('currentOpScore').innerText = _v;
+            }
+        } catch (e) {}
+
 
             updateAllAnswerStatusIcons();
             ['s_slope','s_intercept','s_h','s_errh'].forEach(id => { if (data[id]) document.getElementById(id).value = data[id]; });
-            showReportToast("✅ 加载完成（操作分已重置，需教师重新验证密码）");
+            showReportToast("✅ 加载完成（操作分已保留）");
         }
 
         function exportData() {
@@ -1798,6 +1820,7 @@
             localStorage.removeItem('evidenceImages_photo');
             localStorage.removeItem('manualPlotImages_photo');
             localStorage.removeItem('operationScore_photo');
+            localStorage.removeItem('opUnlockTime');
             localStorage.removeItem('forcedFail');
             forcedFail = false;
             showReportToast("🗑️ 数据已清除，页面将刷新");
@@ -1871,13 +1894,34 @@
             // 自动设置日期为当天
         const _today = new Date();
         document.getElementById('expDate').value = _today.getFullYear() + '-' + String(_today.getMonth() + 1).padStart(2, '0') + '-' + String(_today.getDate()).padStart(2, '0');
+        // ===== 10分钟免密码：刷新时自动恢复教师解锁状态 =====
+        let _opUnlocked = false;
+        try {
+            const _ut = localStorage.getItem('opUnlockTime');
+            if (_ut && (Date.now() - parseInt(_ut, 10)) <= 10 * 60 * 1000) _opUnlocked = true;
+        } catch (e) {}
         document.getElementById('operationScore').value = '0';
-            document.getElementById('currentOpScore').innerText = '0';
+        document.getElementById('currentOpScore').innerText = '0';
+        if (_opUnlocked) {
+            opScoreLocked = true;
+            document.getElementById('opScoreDiv').style.display = 'block';
+            document.getElementById('opLockMsg').innerHTML = '✅ 教师已解锁（10分钟内免密码）';
+        } else {
+            opScoreLocked = false;
             document.getElementById('opScoreDiv').style.display = 'none';
             document.getElementById('opLockMsg').innerHTML = '';
-            opScoreLocked = false;
-            document.getElementById('opPwd').value = '';
-            localStorage.removeItem('operationScore_photo');
+        }
+        document.getElementById('opPwd').value = '';
+        // ===== 刷新后操作分保留：从本地存储恢复，不删除 =====
+        try {
+            const _op = localStorage.getItem('operationScore_photo');
+            if (_op !== null && _op !== undefined) {
+                const _v = Math.min(20, Math.max(0, parseFloat(_op) || 0));
+                document.getElementById('operationScore').value = _v;
+                document.getElementById('currentOpScore').innerText = _v;
+            }
+        } catch (e) {}
+
 
             document.querySelectorAll('.fill-blank').forEach(inp => {
                 inp.addEventListener('input', function(e) { updateAnswerStatusIcon(e.target); });
@@ -1897,6 +1941,8 @@
                         if (ffBtn2) ffBtn2.textContent = '✅ 已强制 0/0/59（点击解除）';
                         const ffMsg2 = document.getElementById('forceFailMsg');
                         if (ffMsg2) ffMsg2.innerHTML = '⚠️ 上报将锁定为：预习 0 分、操作 0 分、综合 59 分';
+                        const _opEl0 = document.getElementById('operationScore'); if (_opEl0) _opEl0.value = '0';
+                        const _opCur0 = document.getElementById('currentOpScore'); if (_opCur0) _opCur0.innerText = '0';
                     }
                 }
             } catch (e) {}
