@@ -979,7 +979,7 @@
             document.getElementById('opScoreDiv').style.display = 'block';
             document.getElementById('opLockMsg').innerHTML = '✅ 密码正确，可评分及上报（10分钟内刷新免密码）';
             opScoreLocked = true;
-            try { localStorage.setItem('opUnlockTime', Date.now()); } catch (e) {}
+            try { const _uk = (document.title || "报告").split("|")[0].trim(); localStorage.setItem('opUnlockTime_' + _uk, Date.now()); } catch (e) {}
         } else { document.getElementById('opLockMsg').innerHTML = "❌ 密码错误"; opScoreLocked = false; }
     }
     function saveOpScore() {
@@ -988,7 +988,7 @@
         if (isNaN(val)) val = 0;
         val = Math.min(20, Math.max(0, val));
         document.getElementById('operationScore').value = val;
-        try { localStorage.setItem('operationScore', val); } catch (e) { /* 存储满不影响操作分同步 */ }
+        try { const _ok = (document.title || "报告").split("|")[0].trim(); localStorage.setItem('operationScore_' + _ok, val); } catch (e) { /* 存储满不影响操作分同步 */ }
         document.getElementById('currentOpScore').innerText = val;
         showReportToast("✅ 操作分已保存");
         autoGrade();
@@ -1306,7 +1306,8 @@
         // ===== 10分钟免密码：刷新时自动恢复教师解锁状态 =====
         let _opUnlocked = false;
         try {
-            const _ut = localStorage.getItem('opUnlockTime');
+            const _uk = (document.title || "报告").split("|")[0].trim();
+            const _ut = localStorage.getItem('opUnlockTime_' + _uk);
             if (_ut && (Date.now() - parseInt(_ut, 10)) <= 10 * 60 * 1000) _opUnlocked = true;
         } catch (e) {}
         document.getElementById('operationScore').value = '0';
@@ -1323,7 +1324,7 @@
         document.getElementById('opPwd').value = '';
         // ===== 刷新后操作分保留：从本地存储恢复，不删除 =====
         try {
-            const _op = localStorage.getItem('operationScore');
+            const _op = localStorage.getItem('operationScore_' + (document.title || "报告").split("|")[0].trim());
             if (_op !== null && _op !== undefined) {
                 const _v = Math.min(20, Math.max(0, parseFloat(_op) || 0));
                 document.getElementById('operationScore').value = _v;
@@ -1362,8 +1363,8 @@
         localStorage.removeItem('fullReport_solar');
         localStorage.removeItem('evidenceImages');
         localStorage.removeItem('manualPlotImages');
-        localStorage.removeItem('operationScore');
-        localStorage.removeItem('opUnlockTime');
+        try { localStorage.removeItem('operationScore_' + (document.title || "报告").split("|")[0].trim()); } catch (e) {}
+        try { localStorage.removeItem('opUnlockTime_' + (document.title || "报告").split("|")[0].trim()); } catch (e) {}
         localStorage.removeItem('forcedFail');
         forcedFail = false;
         showReportToast("🗑️ 数据已清除，页面将刷新");
@@ -1416,7 +1417,8 @@
         // ===== 10分钟免密码：刷新时自动恢复教师解锁状态 =====
         let _opUnlocked = false;
         try {
-            const _ut = localStorage.getItem('opUnlockTime');
+            const _uk = (document.title || "报告").split("|")[0].trim();
+            const _ut = localStorage.getItem('opUnlockTime_' + _uk);
             if (_ut && (Date.now() - parseInt(_ut, 10)) <= 10 * 60 * 1000) _opUnlocked = true;
         } catch (e) {}
         document.getElementById('operationScore').value = '0';
@@ -1433,7 +1435,7 @@
         document.getElementById('opPwd').value = '';
         // ===== 刷新后操作分保留：从本地存储恢复，不删除 =====
         try {
-            const _op = localStorage.getItem('operationScore');
+            const _op = localStorage.getItem('operationScore_' + (document.title || "报告").split("|")[0].trim());
             if (_op !== null && _op !== undefined) {
                 const _v = Math.min(20, Math.max(0, parseFloat(_op) || 0));
                 document.getElementById('operationScore').value = _v;
