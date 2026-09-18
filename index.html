@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大学物理实验II智能实验报告</title>
+<style>
+  :root{
+    --primary:#1E5AA8;
+    --primary-dark:#153E78;
+    --primary-light:#3B82D6;
+    --accent:#21A179;
+    --accent-2:#E8A33D;
+    --bg:#EEF2F7;
+    --card:#FFFFFF;
+    --text:#1F2937;
+    --text-sub:#5B6B7F;
+    --line:#E3E9F1;
+    --radius:16px;
+    --shadow-sm:0 2px 10px rgba(21,62,120,.08);
+    --shadow-md:0 10px 28px rgba(21,62,120,.16);
+    --shadow-lg:0 18px 44px rgba(21,62,120,.24);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Segoe UI","Microsoft YaHei",Roboto,"Helvetica Neue",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    overflow:hidden;
+  }
+
+  /* ===== Header ===== */
+  .app-header{
+    position:fixed;top:0;left:0;right:0;z-index:100;
+    height:64px;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 22px;
+    background:linear-gradient(100deg,#122C52 0%,#1E5AA8 55%,#237A9B 100%);
+    color:#fff;
+    box-shadow:0 4px 18px rgba(18,44,82,.35);
+  }
+  .brand{display:flex;align-items:center;gap:13px;min-width:0}
+  .brand-logo{
+    width:40px;height:40px;flex:0 0 40px;border-radius:11px;
+    background:rgba(255,255,255,.14);
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid rgba(255,255,255,.25);
+  }
+  .brand-logo svg{width:24px;height:24px}
+  .brand-text{line-height:1.25;min-width:0}
+  .brand-text h1{font-size:19px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+  .brand-text h1 span{font-weight:400;opacity:.85;font-size:15px}
+  .brand-text p{font-size:11.5px;opacity:.72;letter-spacing:.4px;white-space:nowrap}
+  .header-actions{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+  #headerLabName{
+    font-size:13.5px;background:rgba(255,255,255,.13);
+    padding:7px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.22);
+    display:none;align-items:center;gap:7px;max-width:46vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .btn-home{
+    display:none;align-items:center;gap:6px;
+    background:#fff;color:var(--primary);
+    border:none;border-radius:20px;padding:8px 16px;font-size:13px;font-weight:600;
+    cursor:pointer;transition:transform .18s ease,box-shadow .18s ease;
+    box-shadow:0 3px 10px rgba(0,0,0,.18);
+  }
+  .btn-home:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(0,0,0,.26)}
+  .btn-home svg{width:15px;height:15px}
+
+  /* ===== Views ===== */
+  .view{position:fixed;top:64px;left:0;right:0;bottom:0;overflow:hidden}
+  .hidden{display:none !important}
+
+  /* ===== Home ===== */
+  #viewHome{overflow-y:auto;padding:26px 30px 40px}
+  .hero{
+    position:relative;border-radius:22px;overflow:hidden;
+    background:linear-gradient(120deg,#153E78 0%,#1E5AA8 55%,#21837F 100%);
+    color:#fff;padding:34px 38px;margin-bottom:28px;
+    box-shadow:var(--shadow-md);
+  }
+  .hero::after{
+    content:"";position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 70%);
+  }
+  .hero h2{font-size:27px;font-weight:700;letter-spacing:1px;margin-bottom:9px}
+  .hero p{font-size:14.5px;opacity:.86;max-width:620px;line-height:1.7}
+  .hero-stats{display:flex;gap:26px;margin-top:20px;flex-wrap:wrap}
+  .hero-stat{display:flex;align-items:center;gap:9px;font-size:13px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);padding:8px 15px;border-radius:22px;backdrop-filter:blur(2px)}
+  .hero-stat svg{width:16px;height:16px;flex:0 0 16px}
+  .section-title{display:flex;align-items:baseline;gap:10px;margin:4px 2px 16px}
+  .section-title h3{font-size:19px;color:var(--primary-dark)}
+  .section-title span{font-size:12.5px;color:var(--text-sub)}
+
+  .card-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(305px,1fr));
+    gap:22px;
+  }
+  .exp-card{
+    background:var(--card);border-radius:var(--radius);overflow:hidden;
+    box-shadow:var(--shadow-sm);cursor:pointer;
+    transition:transform .22s ease,box-shadow .22s ease;
+    border:1px solid var(--line);
+    display:flex;flex-direction:column;
+  }
+  .exp-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:#C9D8EE}
+  .exp-cover{position:relative;height:178px;overflow:hidden;background:#DFE7F1}
+  .exp-cover img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+  .exp-card:hover .exp-cover img{transform:scale(1.06)}
+  .exp-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,35,70,0) 55%,rgba(15,35,70,.34) 100%)}
+  .exp-no{
+    position:absolute;top:12px;left:12px;z-index:2;
+    background:rgba(255,255,255,.94);color:var(--primary);
+    font-weight:800;font-size:13px;padding:4px 11px;border-radius:14px;
+    box-shadow:0 2px 8px rgba(0,0,0,.2);letter-spacing:.5px;
+  }
+  .exp-badge{
+    position:absolute;top:12px;right:12px;z-index:2;
+    background:rgba(30,90,168,.92);color:#fff;font-size:11px;font-weight:600;
+    padding:4px 10px;border-radius:14px;letter-spacing:1px;
+  }
+  .exp-body{padding:16px 18px 17px;display:flex;flex-direction:column;flex:1}
+  .exp-body h4{font-size:16.5px;color:var(--primary-dark);line-height:1.4;margin-bottom:8px}
+  .exp-desc{font-size:12.8px;color:var(--text-sub);line-height:1.65;margin-bottom:12px;flex:1}
+  .exp-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+  .exp-tag{font-size:11.5px;color:var(--primary);background:#EAF1FB;border:1px solid #D5E4F7;padding:3px 10px;border-radius:12px;font-weight:500}
+  .exp-go{
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    background:linear-gradient(100deg,var(--primary) 0%,var(--primary-light) 100%);
+    color:#fff;font-size:13.5px;font-weight:600;
+    padding:10px 0;border-radius:12px;
+    transition:filter .18s ease,transform .18s ease;
+  }
+  .exp-card:hover .exp-go{filter:brightness(1.08)}
+  .exp-go svg{width:15px;height:15px;transition:transform .2s ease}
+  .exp-card:hover .exp-go svg{transform:translateX(3px)}
+
+  /* ===== Lab view ===== */
+  #viewLab{display:flex;flex-direction:column}
+  .lab-tabs{
+    flex:0 0 auto;
+    display:flex;gap:8px;align-items:center;
+    padding:11px 18px;background:#fff;border-bottom:1px solid var(--line);
+    overflow-x:auto;scrollbar-width:thin;
+  }
+  .lab-tab{
+    flex:0 0 auto;display:flex;align-items:center;gap:8px;
+    border:1px solid var(--line);background:#F6F9FD;color:var(--text-sub);
+    border-radius:22px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;
+    transition:all .18s ease;white-space:nowrap;
+  }
+  .lab-tab .tab-no{font-weight:800;color:var(--primary-light);font-size:12px}
+  .lab-tab:hover{border-color:#B9CFEC;background:#EAF1FB;color:var(--primary)}
+  .lab-tab.active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 4px 12px rgba(30,90,168,.3)}
+  .lab-tab.active .tab-no{color:#fff}
+  .lab-frame-wrap{flex:1 1 auto;position:relative;min-height:0}
+  #labFrame{width:100%;height:100%;border:none;display:block}
+  .frame-loading{
+    position:absolute;inset:0;background:rgba(238,242,247,.85);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    transition:opacity .3s ease;z-index:5;
+  }
+  .frame-loading.fade{opacity:0;pointer-events:none}
+  .spinner{
+    width:44px;height:44px;border-radius:50%;
+    border:4px solid #D5E4F7;border-top-color:var(--primary);
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .frame-loading p{font-size:14px;color:var(--primary-dark);font-weight:500}
+
+  footer{
+    display:none;
+  }
+
+  /* ===== 账号系统 ===== */
+  .login-wrap{
+    position:fixed;inset:0;z-index:300;
+    display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(1000px 500px at 85% -10%, rgba(59,130,214,.35), transparent 60%),
+      radial-gradient(800px 400px at -10% 110%, rgba(33,131,127,.3), transparent 60%),
+      linear-gradient(135deg,#0F2440 0%,#153E78 55%,#1E5AA8 100%);
+    padding:18px;overflow-y:auto;
+  }
+  .login-card{
+    width:380px;max-width:100%;
+    background:#fff;border-radius:24px;
+    box-shadow:0 30px 70px rgba(6,18,38,.55);
+    padding:36px 34px 30px;
+    animation:loginIn .45s ease;
+  }
+  @keyframes loginIn{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+  .login-logo{
+    width:58px;height:58px;border-radius:16px;margin:0 auto 14px;
+    background:linear-gradient(120deg,var(--primary) 0%,#21837F 100%);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 22px rgba(30,90,168,.35);
+  }
+  .login-logo svg{width:32px;height:32px}
+  .login-card h1{font-size:22px;color:var(--primary-dark);text-align:center;letter-spacing:1px}
+  .login-sub{text-align:center;font-size:12.5px;color:var(--text-sub);margin:6px 0 22px;letter-spacing:.5px}
+  .login-field{margin-bottom:15px}
+  .login-field label{display:block;font-size:12.5px;font-weight:600;color:var(--primary-dark);margin-bottom:6px}
+  .login-field label em{font-style:normal;font-weight:400;color:var(--text-sub);font-size:11px;margin-left:4px}
+  .login-field input{
+    width:100%;height:42px;border:1.5px solid var(--line);border-radius:11px;
+    padding:0 13px;font-size:14px;color:var(--text);background:#F8FAFD;
+    outline:none;transition:border-color .18s ease,box-shadow .18s ease;
+  }
+  .login-field input:focus{border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(59,130,214,.14);background:#fff}
+  .pwd-box{position:relative}
+  .pwd-box input{padding-right:42px}
+  .pwd-toggle{
+    position:absolute;right:6px;top:50%;transform:translateY(-50%);
+    width:32px;height:32px;border:none;background:transparent;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:#8AA0B8;border-radius:8px;
+  }
+  .pwd-toggle:hover{background:#EEF3FA;color:var(--primary)}
+  .pwd-toggle svg{width:18px;height:18px}
+  .login-error{min-height:20px;font-size:12.5px;color:#D64545;margin:2px 0 4px;line-height:1.5}
+  .login-btn{
+    width:100%;height:46px;border:none;border-radius:12px;cursor:pointer;
+    background:linear-gradient(100deg,var(--primary) 0%,var(--primary-light) 100%);
+    color:#fff;font-size:15.5px;font-weight:700;letter-spacing:6px;
+    box-shadow:0 8px 20px rgba(30,90,168,.32);
+    transition:filter .18s ease,transform .18s ease;
+  }
+  .login-btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .login-btn:active{transform:translateY(0)}
+  .login-hint{text-align:center;font-size:12px;color:var(--text-sub);margin-top:15px}
+  .login-hint b{color:var(--primary);font-weight:600}
+
+  /* 用户区 */
+  .user-box{display:flex;align-items:center;gap:9px}
+  .user-chip{
+    display:flex;align-items:center;gap:7px;
+    background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+    padding:7px 14px;border-radius:20px;font-size:13px;font-weight:600;
+    max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .user-chip svg{width:14px;height:14px;flex:0 0 14px;opacity:.9}
+  .btn-header{
+    background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4);
+    border-radius:20px;padding:7px 13px;font-size:12.5px;cursor:pointer;
+    transition:background .18s ease;white-space:nowrap;
+  }
+  .btn-header:hover{background:rgba(255,255,255,.16)}
+
+  /* 模态框 */
+  .modal-mask{
+    position:fixed;inset:0;z-index:400;background:rgba(10,22,42,.55);
+    display:flex;align-items:center;justify-content:center;padding:18px;
+    backdrop-filter:blur(3px);
+  }
+  .modal-card{
+    width:380px;max-width:100%;background:#fff;border-radius:20px;
+    box-shadow:0 26px 60px rgba(6,18,38,.45);
+    padding:28px 30px 24px;animation:loginIn .3s ease;
+  }
+  .modal-card h3{font-size:17.5px;color:var(--primary-dark);margin-bottom:18px;text-align:center}
+  .modal-actions{display:flex;gap:12px;margin-top:8px}
+  .btn-primary{
+    flex:1;height:42px;border:none;border-radius:11px;cursor:pointer;
+    background:linear-gradient(100deg,var(--primary) 0%,var(--primary-light) 100%);
+    color:#fff;font-size:14px;font-weight:600;
+    transition:filter .18s ease;
+  }
+  .btn-primary:hover{filter:brightness(1.08)}
+  .btn-ghost{
+    flex:1;height:42px;border:1.5px solid var(--line);border-radius:11px;cursor:pointer;
+    background:#F6F9FD;color:var(--text-sub);font-size:14px;font-weight:600;
+    transition:background .18s ease;
+  }
+  .btn-ghost:hover{background:#EDF2F9;color:var(--text)}
+  .toast{
+    position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);
+    background:rgba(15,35,70,.92);color:#fff;font-size:13.5px;
+    padding:11px 22px;border-radius:24px;z-index:500;opacity:0;pointer-events:none;
+    transition:opacity .25s ease,transform .25s ease;box-shadow:0 10px 26px rgba(0,0,0,.28);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* 登录切换Tab */
+  .login-tabs{
+    display:flex;background:#EEF3FA;border-radius:12px;padding:4px;margin:0 0 18px;
+  }
+  .ltab{
+    flex:1;border:none;background:transparent;border-radius:9px;padding:9px 0;
+    font-size:13.5px;font-weight:600;color:var(--text-sub);cursor:pointer;
+    transition:all .18s ease;
+  }
+  .ltab.active{background:#fff;color:var(--primary);box-shadow:0 2px 8px rgba(21,62,120,.12)}
+
+  /* 教师工作台 */
+  .tc-wrap{padding:24px 30px 40px;overflow-y:auto;height:100%}
+  .tc-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+  .tc-head h2{font-size:22px;color:var(--primary-dark)}
+  .tc-head p{font-size:12.5px;color:var(--text-sub);margin-top:5px}
+  .tc-actions{display:flex;gap:10px}
+  .tc-btn{
+    display:flex;align-items:center;gap:7px;border:none;border-radius:12px;
+    padding:10px 18px;font-size:13.5px;font-weight:600;cursor:pointer;
+    transition:filter .18s ease,transform .18s ease;
+  }
+  .tc-btn:hover{filter:brightness(1.07)}
+  .tc-btn svg{width:16px;height:16px}
+  .tc-btn.primary{background:linear-gradient(100deg,var(--primary) 0%,var(--primary-light) 100%);color:#fff;box-shadow:0 6px 16px rgba(30,90,168,.3)}
+  .tc-btn.ghost{background:#fff;color:var(--primary);border:1.5px solid #C9D8EE}
+  .tc-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:18px}
+  .tc-stat{
+    background:#fff;border:1px solid var(--line);border-radius:16px;
+    padding:16px 18px;box-shadow:var(--shadow-sm);text-align:center;
+  }
+  .tc-stat.warn{border-color:#F0C48A;background:#FFFBF3}
+  .tc-stat-num{font-size:26px;font-weight:800;color:var(--primary)}
+  .tc-stat.warn .tc-stat-num{color:#D9822B}
+  .tc-stat-label{font-size:12px;color:var(--text-sub);margin-top:3px}
+  .tc-table-card{
+    background:#fff;border:1px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow-sm);margin-bottom:18px;overflow:hidden;
+  }
+  .tc-table-title{font-size:15px;font-weight:700;color:var(--primary-dark);padding:14px 18px;border-bottom:1px solid var(--line)}
+  .tc-sub{font-weight:400;font-size:12px;color:var(--text-sub);margin-left:8px}
+  .tc-table-wrap{overflow-x:auto;max-height:52vh;overflow-y:auto}
+  .tc-table{width:100%;border-collapse:collapse;font-size:12.5px;white-space:nowrap}
+  .tc-table th{
+    position:sticky;top:0;background:#F3F7FC;color:var(--primary-dark);
+    padding:9px 10px;text-align:center;font-weight:700;border-bottom:1px solid var(--line);z-index:2;
+  }
+  .tc-table td{padding:8px 10px;text-align:center;border-bottom:1px solid #F0F4F9}
+  .tc-table tr:hover td{background:#F7FAFE}
+  .tc-table td.sid{font-weight:700;color:var(--primary)}
+  .tc-table td.empty{color:#B7C3D2}
+  .tc-table td.hasscore{color:var(--primary-dark);font-weight:600}
+  .tc-table td.miss{color:#D64545;font-weight:600}
+  .tc-table .avg{font-weight:800;color:var(--accent)}
+
+  @media (max-width:760px){
+    .tc-wrap{padding:16px 12px 30px}
+    .tc-head h2{font-size:18px}
+    .tc-actions{width:100%}
+    .tc-btn{flex:1;justify-content:center}
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width:760px){
+    .app-header{padding:0 14px}
+    .brand-text h1{font-size:15.5px}
+    .brand-text h1 span{display:none}
+    .brand-text p{display:none}
+    #viewHome{padding:16px 14px 30px}
+    .hero{padding:24px 20px}
+    .hero h2{font-size:21px}
+    .card-grid{grid-template-columns:1fr;gap:16px}
+    .lab-tabs{padding:10px 12px}
+    .user-chip{max-width:92px;padding:6px 10px;font-size:12px}
+    .btn-header{padding:6px 9px;font-size:11.5px}
+    #headerLabName{display:none !important}
+    .login-card{padding:28px 22px 24px}
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <div class="brand-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3.2"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4.2"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-60 12 12)"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1>大学物理实验II <span>智能实验报告</span></h1>
+      <p>数据记录 · 自动处理 · 智能评分 · 一键报告</p>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span id="headerLabName"></span>
+    <div class="user-box" id="userBox" style="display:none">
+      <span class="user-chip" id="userChip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span id="userChipText">用户</span>
+      </span>
+      <button class="btn-header" id="btnChangePwd">修改密码</button>
+      <button class="btn-header" id="btnLogout">退出</button>
+    </div>
+    <button class="btn-home" id="btnHome" title="返回实验列表">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M10 5l-7 7 7 7"/></svg>
+      返回首页
+    </button>
+  </div>
+</header>
+
+<!-- 首页视图 -->
+<main id="viewHome" class="view">
+  <section class="hero">
+    <h2>欢迎使用智能实验报告</h2>
+    <p>覆盖 7 个大学物理实验Ⅱ项目：填写原始数据，系统自动完成计算、绘图、误差分析与评分，一键生成完整实验报告。</p>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
+        7 个实验
+      </div>
+      <div class="hero-stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        自动计算与绘图
+      </div>
+      <div class="hero-stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.2H22l-6 4.6 2.3 7.2-6.3-4.5-6.3 4.5L8 13.8l-6-4.6h7.6z"/></svg>
+        自动评分
+      </div>
+      <div class="hero-stat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 15h6M9 11h2"/></svg>
+        一键生成报告
+      </div>
+    </div>
+  </section>
+
+  <div class="section-title">
+    <h3>实验列表</h3>
+    <span>点击卡片进入对应实验</span>
+  </div>
+
+  <div class="card-grid" id="cardGrid"></div>
+</main>
+
+<!-- 实验视图 -->
+<main id="viewLab" class="view hidden">
+  <nav class="lab-tabs" id="labTabs"></nav>
+  <div class="lab-frame-wrap">
+    <iframe id="labFrame" title="实验内容" allow="clipboard-read; clipboard-write"></iframe>
+    <div class="frame-loading" id="frameLoading">
+      <div class="spinner"></div>
+      <p>正在加载实验 …</p>
+    </div>
+  </div>
+</main>
+
+<!-- 教师工作台 -->
+<main id="viewTeacher" class="view hidden">
+  <div class="tc-wrap">
+    <div class="tc-head">
+      <div>
+        <h2>教师工作台</h2>
+        <p>学生实验数据汇总 · 自动采集自各实验页评分</p>
+      </div>
+      <div class="tc-actions">
+        <button class="tc-btn ghost" id="btnTeacherPreview" title="体验学生实验界面">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 9h18M9 21V9"/></svg>
+          实验预览
+        </button>
+        <button class="tc-btn primary" id="btnExportCsv" title="导出为 CSV，可用 Excel 打开">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          导出成绩表
+        </button>
+      </div>
+    </div>
+
+    <div class="tc-stats">
+      <div class="tc-stat"><div class="tc-stat-num" id="statStudents">0</div><div class="tc-stat-label">学生数</div></div>
+      <div class="tc-stat"><div class="tc-stat-num" id="statReports">0</div><div class="tc-stat-label">报告份数</div></div>
+      <div class="tc-stat"><div class="tc-stat-num" id="statAvg">—</div><div class="tc-stat-label">平均分</div></div>
+      <div class="tc-stat"><div class="tc-stat-num" id="statDone">0</div><div class="tc-stat-label">全部完成人数</div></div>
+      <div class="tc-stat warn"><div class="tc-stat-num" id="statIncomplete">0</div><div class="tc-stat-label">未完成项</div></div>
+    </div>
+
+    <div class="tc-table-card">
+      <div class="tc-table-title">成绩汇总（按学号升序）</div>
+      <div class="tc-table-wrap">
+        <table class="tc-table" id="tcTable"></table>
+      </div>
+    </div>
+
+    <div class="tc-table-card" id="tcMissCard" style="display:none">
+      <div class="tc-table-title">未完成名单 <span class="tc-sub" id="tcMissSub"></span></div>
+      <div class="tc-table-wrap">
+        <table class="tc-table" id="tcMissTable"></table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- 登录页 -->
+<div id="loginView" class="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3.2"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4.2"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(60 12 12)"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-60 12 12)"/>
+      </svg>
+    </div>
+    <h1>大学物理实验II</h1>
+    <p class="login-sub" id="loginSub">智能实验报告 · 学生登录</p>
+    <div class="login-tabs">
+      <button type="button" class="ltab active" id="ltabStudent">学生登录</button>
+      <button type="button" class="ltab" id="ltabTeacher">教师登录</button>
+    </div>
+    <div class="login-field">
+      <label id="loginIdLabel">学号</label>
+      <input id="loginId" type="text" placeholder="请输入学号" autocomplete="username" maxlength="20">
+    </div>
+    <div class="login-field">
+      <label>姓名<em>选填，自动填入实验报告</em></label>
+      <input id="loginName" type="text" placeholder="请输入姓名" maxlength="20">
+    </div>
+    <div class="login-field">
+      <label>密码</label>
+      <div class="pwd-box">
+        <input id="loginPwd" type="password" placeholder="请输入密码" autocomplete="current-password" maxlength="20">
+        <button type="button" class="pwd-toggle" data-target="loginPwd" title="显示/隐藏密码">
+          <svg class="ico-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="loginError" class="login-error"></div>
+    <button id="btnLogin" class="login-btn">登 录</button>
+    <p class="login-hint">初始密码 <b>123456</b> · 登录后可在右上角修改</p>
+  </div>
+</div>
+
+<!-- 修改密码模态框 -->
+<div id="pwdModal" class="modal-mask hidden">
+  <div class="modal-card">
+    <h3>修改密码</h3>
+    <div class="login-field">
+      <label>原密码</label>
+      <div class="pwd-box">
+        <input id="oldPwd" type="password" placeholder="请输入原密码" maxlength="20">
+        <button type="button" class="pwd-toggle" data-target="oldPwd" title="显示/隐藏密码">
+          <svg class="ico-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="login-field">
+      <label>新密码</label>
+      <div class="pwd-box">
+        <input id="newPwd" type="password" placeholder="6-20 位，建议含字母和数字" maxlength="20">
+        <button type="button" class="pwd-toggle" data-target="newPwd" title="显示/隐藏密码">
+          <svg class="ico-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="login-field">
+      <label>确认新密码</label>
+      <div class="pwd-box">
+        <input id="newPwd2" type="password" placeholder="再次输入新密码" maxlength="20">
+        <button type="button" class="pwd-toggle" data-target="newPwd2" title="显示/隐藏密码">
+          <svg class="ico-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="pwdError" class="login-error"></div>
+    <div class="modal-actions">
+      <button id="btnPwdCancel" class="btn-ghost">取消</button>
+      <button id="btnPwdOk" class="btn-primary">确认修改</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const EXPS = [
+  { id:'01', file:'experiments/01tyndc.html', img:'assets/01tyndc_tyndc.jpg',
+    name:'太阳能电池基本特性实验',
+    desc:'了解太阳能电池的工作原理，测量无光照下的伏安特性，以及光照下开路电压、短路电流随入射角的变化和输出功率与负载的关系。',
+    tags:['伏安特性','Uoc/Isc-θ','P-R 负载曲线'] },
+  { id:'02', file:'experiments/02mkex.html', img:'assets/02mkex_mkex.jpg',
+    name:'迈克尔逊干涉仪的调节与使用',
+    desc:'掌握迈克尔逊干涉仪的调节方法，通过数出条纹变化数、测量动镜位移，计算 He-Ne 激光波长并分析误差来源。',
+    tags:['干涉仪调节','条纹计数','测激光波长'] },
+  { id:'03', file:'experiments/03gmdz.html', img:'assets/03gmdz_gmdz.jpg',
+    name:'光敏电阻的特性实验',
+    desc:'了解光敏电阻的基本原理，测量不同光照度下光敏电阻的伏安特性、光照特性与光谱响应特性并绘制曲线。',
+    tags:['伏安特性','光照特性','光谱响应'] },
+  { id:'04', file:'experiments/04pnj.html', img:'assets/04pnj_pnj.jpg',
+    name:'PN结正向特性实验',
+    desc:'测量同一温度下 PN 结正向电压随电流的变化关系绘制曲线，并在恒定电流下测绘正向压降随温度的变化，求玻尔兹曼常数。',
+    tags:['V-I 曲线','温度特性','玻尔兹曼常数'] },
+  { id:'05', file:'experiments/05hexy.html', img:'assets/05hexy_hexy.jpg',
+    name:'霍尔效应的研究与应用',
+    desc:'了解霍尔效应的原理，测绘霍尔元件的特性曲线，通过对称测量法消除副效应，计算霍尔系数与载流子浓度。',
+    tags:['霍尔电压','对称测量法','霍尔系数'] },
+  { id:'06', file:'experiments/06gdxy.html', img:'assets/06gdxy_gdxy.png',
+    name:'光电效应实验',
+    desc:'了解光电效应的基本规律，验证爱因斯坦光电方程，由不同波长光照射下的截止电压线性拟合求普朗克常数。',
+    tags:['截止电压','爱因斯坦方程','普朗克常数'] },
+  { id:'07', file:'experiments/07dfys.html', img:'assets/07dfys_dsdfys.jpg',
+    name:'单缝和单丝衍射实验',
+    desc:'观察单缝与单丝的衍射现象，测量衍射图样的光强空间分布，学习用可移动光电探测器测定缝宽与丝径。',
+    tags:['光强分布','测缝宽','测丝径'] }
+];
+
+const $ = s => document.querySelector(s);
+const cardGrid = $('#cardGrid');
+const labTabs = $('#labTabs');
+const frame = $('#labFrame');
+const viewHome = $('#viewHome');
+const viewLab = $('#viewLab');
+const frameLoading = $('#frameLoading');
+const headerLabName = $('#headerLabName');
+const btnHome = $('#btnHome');
+let current = -1;
+
+/* ---------- 渲染首页卡片 ---------- */
+function renderCards(){
+  cardGrid.innerHTML = EXPS.map((e,i)=>`
+    <article class="exp-card" data-i="${i}" tabindex="0" role="button"
+             aria-label="进入${e.name}" onclick="openLab(${i})" onkeydown="if(event.key==='Enter')openLab(${i})">
+      <div class="exp-cover">
+        <img src="${e.img}" alt="${e.name}实验装置图" loading="lazy">
+        <span class="exp-no">实验 ${e.id}</span>
+        <span class="exp-badge">智能报告</span>
+      </div>
+      <div class="exp-body">
+        <h4>${e.name}</h4>
+        <p class="exp-desc">${e.desc}</p>
+        <div class="exp-tags">${e.tags.map(t=>`<span class="exp-tag">${t}</span>`).join('')}</div>
+        <div class="exp-go">
+          <span>进入实验</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </div>
+      </div>
+    </article>`).join('');
+}
+
+/* ---------- 渲染实验导航 tab ---------- */
+function renderTabs(){
+  labTabs.innerHTML = EXPS.map((e,i)=>`
+    <button class="lab-tab" data-i="${i}" onclick="openLab(${i})">
+      <span class="tab-no">${e.id}</span>${e.name.replace('实验','')}
+    </button>`).join('');
+}
+
+/* ---------- 打开实验 ---------- */
+function openLab(i){
+  if(i<0 || i>=EXPS.length) return;
+  const wasLab = !viewLab.classList.contains('hidden');
+  const same = (current === i);
+  current = i;
+  viewHome.classList.add('hidden');
+  viewLab.classList.remove('hidden');
+  $('#viewTeacher').classList.add('hidden');
+  btnHome.style.display = 'flex';
+  btnHome.textContent = (currentUser && currentUser.role === 'teacher') ? '返回工作台' : '返回首页';
+  headerLabName.style.display = 'flex';
+  headerLabName.textContent = '实验 ' + EXPS[i].id + ' · ' + EXPS[i].name;
+  document.querySelectorAll('.lab-tab').forEach(t=>t.classList.toggle('active', +t.dataset.i===i));
+  const t = labTabs.querySelector('.lab-tab.active');
+  if(t) t.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  /* 同一实验不重载，保留已填数据 */
+  if(!same || !wasLab){
+    frameLoading.style.display = 'flex';
+    frameLoading.classList.remove('fade');
+    frame.src = EXPS[i].file;
+  }
+  try{ localStorage.setItem('uphys2_last_lab', String(i)); }catch(e){}
+}
+
+/* ---------- 返回首页 / 返回工作台 ---------- */
+function goHome(){
+  if(currentUser && currentUser.role === 'teacher'){
+    $('#viewLab').classList.add('hidden');
+    $('#viewHome').classList.add('hidden');
+    $('#viewTeacher').classList.remove('hidden');
+    btnHome.style.display = 'none';
+    headerLabName.style.display = 'none';
+    current = -1;
+    renderTeacher();
+    return;
+  }
+  viewLab.classList.add('hidden');
+  viewHome.classList.remove('hidden');
+  btnHome.style.display = 'none';
+  headerLabName.style.display = 'none';
+  current = -1;
+}
+btnHome.addEventListener('click', goHome);
+
+/* ---------- 加载状态 ---------- */
+frame.addEventListener('load', ()=>{
+  frameLoading.classList.add('fade');
+  setTimeout(()=>frameLoading.style.display='none', 350);
+  fillStudentInfo();
+});
+frame.addEventListener('error', ()=>{
+  frameLoading.querySelector('p').textContent = '加载失败，请检查文件是否完整';
+});
+
+/* ================= 账号系统 ================= */
+const DEFAULT_PWD = '123456';
+const USERS_KEY = 'uphys2_users';
+const SESSION_KEY = 'uphys2_session';
+const SALT = 'uphys2-lab-2026';
+const RECORDS_KEY = 'uphys2_records';
+let currentUser = null;
+let loginRole = 'student';
+let previewAsTeacher = false;
+
+/* FNV-1a 哈希，避免明文存储密码 */
+function hashPwd(pwd, salt){
+  let h = 0x811c9dc5;
+  const s = String(pwd) + '::' + salt;
+  for(let i = 0; i < s.length; i++){
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(16);
+}
+function getUsers(){ try{ return JSON.parse(localStorage.getItem(USERS_KEY)) || {}; }catch(e){ return {}; } }
+function saveUsers(u){ try{ localStorage.setItem(USERS_KEY, JSON.stringify(u)); }catch(e){} }
+function getSession(){ try{ return sessionStorage.getItem(SESSION_KEY); }catch(e){ return null; } }
+function setSession(id){ try{ sessionStorage.setItem(SESSION_KEY, id); }catch(e){} }
+function clearSession(){ try{ sessionStorage.removeItem(SESSION_KEY); }catch(e){} }
+
+function showToast(msg){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function doLogin(){
+  const id = $('#loginId').value.trim();
+  const name = $('#loginName').value.trim();
+  const pwd = $('#loginPwd').value;
+  const err = $('#loginError');
+  err.textContent = '';
+  const isTeacher = (loginRole === 'teacher');
+  const idRule = isTeacher ? /^T\d{4,14}$/i : /^[A-Za-z0-9]{5,15}$/;
+  const idHint = isTeacher ? '工号格式：T 开头加 4-14 位数字' : '学号格式：5-15 位数字或字母';
+  if(!idRule.test(id)){ err.textContent = idHint; return; }
+  if(!pwd){ err.textContent = '请输入密码'; return; }
+  const users = getUsers();
+  const rec = users[id];
+  if(rec){
+    if(rec.pwd !== hashPwd(pwd, SALT + id)){ err.textContent = '密码错误，请重试'; return; }
+    if(rec.role !== (isTeacher ? 'teacher' : 'student')){
+      err.textContent = isTeacher ? '该工号已注册为学生账号，请切换到学生登录' : '该学号已注册为教师账号，请切换到教师登录';
+      return;
+    }
+    if(name && rec.name !== name){ rec.name = name; saveUsers(users); }
+  } else {
+    if(pwd !== DEFAULT_PWD){ err.textContent = '该账号首次登录，初始密码为 123456'; return; }
+    users[id] = { pwd: hashPwd(DEFAULT_PWD, SALT + id), name: name || '', role: isTeacher ? 'teacher' : 'student' };
+    saveUsers(users);
+  }
+  currentUser = { id: id, name: (rec && rec.name) || name || '', role: isTeacher ? 'teacher' : 'student' };
+  setSession(id);
+  try{ localStorage.setItem('uphys2_current_user', JSON.stringify(currentUser)); }catch(e){}
+  enterApp();
+  showToast((isTeacher ? '教师' : '学生') + '登录成功');
+}
+
+function setLoginRole(role){
+  loginRole = role;
+  $('#ltabStudent').classList.toggle('active', role === 'student');
+  $('#ltabTeacher').classList.toggle('active', role === 'teacher');
+  $('#loginSub').textContent = '智能实验报告 · ' + (role === 'teacher' ? '教师登录' : '学生登录');
+  $('#loginIdLabel').textContent = role === 'teacher' ? '工号' : '学号';
+  $('#loginId').placeholder = role === 'teacher' ? '请输入工号（T开头）' : '请输入学号';
+  $('#loginName').placeholder = role === 'teacher' ? '请输入姓名（选填）' : '请输入姓名';
+  $('#loginId').value = ''; $('#loginName').value = ''; $('#loginPwd').value = '';
+  $('#loginError').textContent = '';
+}
+
+function doLogout(){
+  clearSession();
+  try{ localStorage.removeItem('uphys2_current_user'); }catch(e){}
+  currentUser = null;
+  previewAsTeacher = false;
+  btnHome.textContent = '返回首页';
+  $('#userBox').style.display = 'none';
+  $('#viewHome').classList.add('hidden');
+  $('#viewLab').classList.add('hidden');
+  $('#viewTeacher').classList.add('hidden');
+  $('#loginView').classList.remove('hidden');
+  $('#loginId').value = '';
+  $('#loginName').value = '';
+  $('#loginPwd').value = '';
+  $('#loginError').textContent = '';
+  showToast('已退出登录');
+}
+
+/* 修改密码 */
+function openPwdModal(){
+  $('#oldPwd').value = ''; $('#newPwd').value = ''; $('#newPwd2').value = '';
+  $('#pwdError').textContent = '';
+  $('#pwdModal').classList.remove('hidden');
+  setTimeout(()=>$('#oldPwd').focus(), 60);
+}
+function closePwdModal(){ $('#pwdModal').classList.add('hidden'); }
+function changePwd(){
+  const oldP = $('#oldPwd').value;
+  const n1 = $('#newPwd').value;
+  const n2 = $('#newPwd2').value;
+  const err = $('#pwdError');
+  err.textContent = '';
+  if(!currentUser){ closePwdModal(); return; }
+  const users = getUsers();
+  const rec = users[currentUser.id];
+  if(!rec || rec.pwd !== hashPwd(oldP, SALT + currentUser.id)){ err.textContent = '原密码不正确'; return; }
+  if(n1.length < 6 || n1.length > 20){ err.textContent = '新密码长度应为 6-20 位'; return; }
+  if(n1 !== n2){ err.textContent = '两次输入的新密码不一致'; return; }
+  rec.pwd = hashPwd(n1, SALT + currentUser.id);
+  saveUsers(users);
+  closePwdModal();
+  showToast('密码修改成功');
+}
+
+/* 密码可见性切换 */
+document.querySelectorAll('.pwd-toggle').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const inp = document.getElementById(btn.dataset.target);
+    if(!inp) return;
+    inp.type = (inp.type === 'password') ? 'text' : 'password';
+  });
+});
+
+/* 事件绑定 */
+$('#btnLogin').addEventListener('click', doLogin);
+$('#btnLogout').addEventListener('click', doLogout);
+$('#btnChangePwd').addEventListener('click', openPwdModal);
+$('#btnPwdOk').addEventListener('click', changePwd);
+$('#btnPwdCancel').addEventListener('click', closePwdModal);
+$('#ltabStudent').addEventListener('click', ()=>setLoginRole('student'));
+$('#ltabTeacher').addEventListener('click', ()=>setLoginRole('teacher'));
+$('#btnTeacherPreview').addEventListener('click', ()=>{
+  previewAsTeacher = true;
+  btnHome.textContent = '返回工作台';
+  btnHome.style.display = 'flex';
+  headerLabName.style.display = 'none';
+  $('#viewTeacher').classList.add('hidden');
+  $('#viewHome').classList.remove('hidden');
+  current = -1;
+});
+$('#btnExportCsv').addEventListener('click', exportCsv);
+$('#loginView').addEventListener('keydown', e=>{ if(e.key === 'Enter') doLogin(); });
+$('#pwdModal').addEventListener('keydown', e=>{ if(e.key === 'Enter') changePwd(); });
+
+/* 将登录信息自动填入实验报告 */
+function fillStudentInfo(){
+  if(!currentUser) return;
+  try{
+    const d = frame.contentDocument;
+    if(!d) return;
+    const si = d.getElementById('studentId');
+    if(si && !si.value) si.value = currentUser.id;
+    if(currentUser.name){
+      const sn = d.getElementById('studentName');
+      if(sn && !sn.value) sn.value = currentUser.name;
+    }
+  }catch(e){ /* 跨域受限时静默跳过，学生可手动填写 */ }
+}
+
+/* 登录后进入主界面 */
+function enterApp(){
+  $('#loginView').classList.add('hidden');
+  $('#userBox').style.display = 'flex';
+  $('#userChipText').textContent = currentUser.id;
+  try{ localStorage.setItem('uphys2_current_user', JSON.stringify(currentUser)); }catch(e){}
+  if(currentUser.role === 'teacher'){
+    previewAsTeacher = false;
+    $('#viewHome').classList.add('hidden');
+    $('#viewLab').classList.add('hidden');
+    $('#viewTeacher').classList.remove('hidden');
+    btnHome.style.display = 'none';
+    headerLabName.style.display = 'none';
+    renderTeacher();
+  }else{
+    $('#viewTeacher').classList.add('hidden');
+    try{
+      const last = parseInt(localStorage.getItem('uphys2_last_lab'),10);
+      if(!isNaN(last) && last>=0 && last<EXPS.length) openLab(last);
+    }catch(e){}
+  }
+}
+
+/* ================= 教师工作台 ================= */
+function getRecords(){ try{ return JSON.parse(localStorage.getItem(RECORDS_KEY)) || {}; }catch(e){ return {}; } }
+function getStudentList(users, recs){
+  const set = new Set();
+  Object.keys(users).forEach(k=>{ if((users[k]||{}).role !== 'teacher') set.add(k); });
+  Object.keys(recs).forEach(k=>set.add(k));
+  return [...set].sort((a,b)=>a.localeCompare(b, 'zh-CN', {numeric:true}));
+}
+const EXP_SHORT = { '01':'太阳能电池','02':'迈克尔逊','03':'光敏电阻','04':'PN结','05':'霍尔效应','06':'光电效应','07':'单缝衍射' };
+function fmtTime(ts){
+  if(!ts) return '—';
+  const d = new Date(ts);
+  const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function parseScoreTxt(v){
+  if(v == null) return null;
+  const m = String(v).match(/(\d+(?:\.\d+)?)/);
+  return m ? parseFloat(m[1]) : null;
+}
+function renderTeacher(){
+  const users = getUsers();
+  const recs = getRecords();
+  const sids = getStudentList(users, recs);
+  let reports = 0, sum = 0, cnt = 0, doneAll = 0, miss = 0;
+  const rowsHtml = sids.map(sid=>{
+    const exps = (recs[sid] && recs[sid].exps) || {};
+    const name = (recs[sid] && recs[sid].name) || (users[sid] && users[sid].name) || '';
+    let tsum = 0, tc = 0, lastTs = 0;
+    const cells = EXPS.map(e=>{
+      const r = exps[e.id];
+      if(!r){ miss++; return '<td class="empty">—</td>'; }
+      const t = parseScoreTxt(r.total);
+      if(t != null){ tsum += t; tc++; }
+      if(r.time > lastTs) lastTs = r.time;
+      const detail = [
+        ['预习', r.pre], ['数据', r.data], ['计算', r.calc], ['绘图', r.autoPlot],
+        ['手绘', r.manualPlot], ['思考', r.thought], ['小结', r.summary],
+        ['证据', r.evidence], ['操作', r.op]
+      ].filter(x=>x[1] != null).map(x=>`${x[0]} ${x[1]}`).join(' · ');
+      return `<td class="hasscore" title="${detail}">${t != null ? t : '—'}</td>`;
+    }).join('');
+    reports += tc;
+    sum += tsum; cnt += tc;
+    if(tc >= EXPS.length) doneAll++;
+    const avg = tc ? (tsum/tc).toFixed(1) : '—';
+    return `<tr><td class="sid">${sid}</td><td>${name || '—'}</td>${cells}<td>${tc}/${EXPS.length}</td><td class="avg">${avg}</td><td>${fmtTime(lastTs)}</td></tr>`;
+  }).join('');
+  $('#statStudents').textContent = sids.length;
+  $('#statReports').textContent = reports;
+  $('#statAvg').textContent = cnt ? (sum/cnt).toFixed(1) : '—';
+  $('#statDone').textContent = doneAll;
+  $('#statIncomplete').textContent = miss;
+  $('#tcTable').innerHTML =
+    `<tr><th>学号</th><th>姓名</th>${EXPS.map(e=>`<th>${EXP_SHORT[e.id]||e.id}</th>`).join('')}<th>完成</th><th>平均分</th><th>最后提交</th></tr>` + rowsHtml;
+  /* 未完成名单 */
+  const missing = [];
+  sids.forEach(sid=>{
+    const exps = (recs[sid] && recs[sid].exps) || {};
+    const name = (recs[sid] && recs[sid].name) || (users[sid] && users[sid].name) || '';
+    EXPS.forEach(e=>{ if(!exps[e.id]) missing.push({sid, name, exp:e}); });
+  });
+  if(missing.length){
+    $('#tcMissCard').style.display = '';
+    $('#tcMissSub').textContent = `共 ${missing.length} 项`;
+    $('#tcMissTable').innerHTML =
+      `<tr><th>学号</th><th>姓名</th><th>缺失实验</th></tr>` +
+      missing.map(m=>`<tr><td class="sid">${m.sid}</td><td>${m.name || '—'}</td><td class="miss">实验${m.exp.id} ${EXP_SHORT[m.exp.id]||''}</td></tr>`).join('');
+  }else{
+    $('#tcMissCard').style.display = 'none';
+  }
+}
+
+function exportCsv(){
+  const users = getUsers();
+  const recs = getRecords();
+  const sids = getStudentList(users, recs);
+  if(!sids.length){ showToast('暂无学生数据可导出'); return; }
+  const esc = v => {
+    const s = String(v == null ? '' : v);
+    return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  const head = ['学号','姓名'].concat(EXPS.map(e=>e.name), ['完成实验数','平均分','最后提交时间']);
+  const lines = [head.map(esc).join(',')];
+  sids.forEach(sid=>{
+    const exps = (recs[sid] && recs[sid].exps) || {};
+    const name = (recs[sid] && recs[sid].name) || (users[sid] && users[sid].name) || '';
+    let tsum = 0, tc = 0, lastTs = 0;
+    const cells = EXPS.map(e=>{
+      const r = exps[e.id];
+      if(!r) return '';
+      const t = parseScoreTxt(r.total);
+      if(t != null){ tsum += t; tc++; }
+      if(r.time > lastTs) lastTs = r.time;
+      return t != null ? t : '';
+    });
+    const avg = tc ? (tsum/tc).toFixed(1) : '';
+    lines.push([sid, name].concat(cells, [tc, avg, fmtTime(lastTs) === '—' ? '' : fmtTime(lastTs)]).map(esc).join(','));
+  });
+  const csv = '\uFEFF' + lines.join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  const d = new Date();
+  const p = n => String(n).padStart(2,'0');
+  a.href = URL.createObjectURL(blob);
+  a.download = `大学物理实验II成绩汇总_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 300);
+  showToast(`已导出 ${sids.length} 名学生成绩（CSV，可用 Excel 打开）`);
+}
+
+/* ---------- 初始化 ---------- */
+renderCards();
+renderTabs();
+const savedSession = getSession();
+if(savedSession && getUsers()[savedSession]){
+  const u = getUsers()[savedSession];
+  currentUser = { id: savedSession, name: u.name || '', role: u.role || 'student' };
+  enterApp();
+}else{
+  clearSession();
+  $('#loginView').classList.remove('hidden');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1753 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>霍尔效应的研究与应用 | 智能实验报告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(2px);
+            padding: 30px 20px;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+        }
+        h1 {
+            color: #1e466e;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.9rem;
+        }
+        h2 {
+            color: #2c5a2e;
+            border-left: 6px solid #4CAF50;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.5rem;
+        }
+        h3 {
+            color: #1565C0;
+            margin: 20px 0 10px 0;
+        }
+        .fill-blank {
+            border: none;
+            border-bottom: 2px solid #3498db;
+            background: #f0f8ff;
+            padding: 4px 10px;
+            text-align: center;
+            min-width: 110px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: 0.1s;
+        }
+        .fill-blank:focus {
+            outline: none;
+            background: #e3f2fd;
+        }
+        .fill-blank-container {
+            position: relative;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .answer-status {
+            margin-left: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: inline-block;
+            width: 20px;
+            text-align: left;
+        }
+        .correct-icon { color: #2e7d32; }
+        .incorrect-icon { color: #c62828; }
+        .empty-icon { color: #757575; }
+        .data-input {
+            width: 70px;
+            text-align: center;
+            border: 1px solid #b0bec5;
+            border-radius: 8px;
+            padding: 4px;
+            background: white;
+            font-size: 0.82rem;
+        }
+        .data-input:focus {
+            outline: 2px solid #1e88e5;
+            border-color: transparent;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px 0;
+            border-radius: 20px;
+            border: 1px solid #e0e0e0;
+            background: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+            font-size: 0.85rem;
+        }
+        th {
+            background: #2c5a2e;
+            color: white;
+            padding: 10px 6px;
+            font-weight: 600;
+            white-space: nowrap;
+            text-align: center;
+        }
+        td {
+            border: 1px solid #cfd8dc;
+            padding: 6px 4px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        th:first-child, td:first-child {
+            font-weight: 600;
+        }
+        .score-btn, .chart-btn, .auto-grade-btn, .save-btn, .upload-btn {
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 600;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .chart-btn { background: linear-gradient(135deg, #1565C0, #0d47a1); }
+        .auto-grade-btn { background: linear-gradient(135deg, #e65100, #bf360c); }
+        .submit-report-btn {
+            background: linear-gradient(135deg, #0f4c5c, #0b3b48);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            margin: 5px 0 0 0;
+            font-weight: 600;
+            transition: 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .submit-report-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #1a6f85, #0f4c5c);
+        }
+        .thought-input {
+            width: 100%;
+            min-height: 80px;
+            border: 1px solid #cfd8dc;
+            border-radius: 16px;
+            padding: 10px;
+            margin: 8px 0;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+        .summary-box {
+            width: 100%;
+            min-height: 80px;
+            border: 1px solid #cfd8dc;
+            border-radius: 16px;
+            padding: 10px;
+            margin: 8px 0;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            background: white;
+        }
+        .score-details {
+            background: #f1f8e9;
+            border-radius: 24px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #a5d6a7;
+        }
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px dashed #c8e6c9;
+            padding: 8px;
+        }
+        .operator-panel {
+            background: #e0f2f1;
+            border-radius: 24px;
+            padding: 18px;
+            margin: 20px 0;
+            border: 1px solid #00897b;
+        }
+        .evidence-area {
+            background: #f3e5f5;
+            border-radius: 28px;
+            padding: 20px;
+            margin: 25px 0;
+            border: 1px dashed #ab47bc;
+        }
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 15px;
+        }
+        .img-card {
+            position: relative;
+            width: 130px;
+            border-radius: 16px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            padding: 6px;
+            text-align: center;
+        }
+        .img-card img {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        .del-img {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #c62828;
+            color: white;
+            border-radius: 30px;
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+            font-weight: bold;
+            line-height: 24px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .chart-container {
+            margin: 20px 0;
+            background: white;
+            padding: 15px;
+            border-radius: 28px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+        }
+        .calculation-result {
+            background: #e8f0fe;
+            padding: 5px 12px;
+            border-radius: 24px;
+            display: inline-block;
+            margin: 6px 0;
+            font-size: 0.85rem;
+        }
+        .thought-answer {
+            display: none;
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 16px;
+            margin: 6px 0;
+            font-size: 0.9rem;
+        }
+        .save-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .info-input {
+            border: none;
+            border-bottom: 2px solid #90a4ae;
+            background: #fafafa;
+            padding: 6px 12px;
+            min-width: 130px;
+            border-radius: 8px;
+        }
+        .info-input:read-only {
+            background: #e9ecef;
+            cursor: default;
+            color: #2c3e50;
+        }
+        #class { width: 300px; }
+        button:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.02);
+        }
+        .experiment-step {
+            background: rgba(240,248,255,0.7);
+            padding: 8px 12px;
+            border-left: 4px solid #3498db;
+            margin: 10px 0;
+            border-radius: 12px;
+        }
+        .question-item {
+            margin: 12px 0;
+            line-height: 1.8;
+        }
+        .report-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e466e;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            z-index: 2000;
+            font-weight: bold;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+            animation: fadeOut 2.6s ease forwards;
+            font-size: 0.95rem;
+            pointer-events: none;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            75% { opacity: 1; }
+            100% { opacity: 0; transform: translateX(-50%) translateY(20px); visibility: hidden; }
+        }
+        @media (max-width: 700px) {
+            .container { padding: 20px 12px; }
+            th, td { font-size: 0.72rem; padding: 4px 2px; }
+            .fill-blank { min-width: 70px; font-size: 0.75rem; }
+            #class { width: 200px; }
+            .data-input { width: 55px; font-size: 0.72rem; }
+        }
+        .result-display {
+            background: #e3f2fd;
+            padding: 5px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 4px 0;
+        }
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .manual-plot-area {
+            background: #f0f4c3;
+            border-radius: 24px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px dashed #f57f17;
+        }
+        .param-input {
+            width: 80px;
+            text-align: center;
+            border: 1px solid #ff9800;
+            border-radius: 8px;
+            padding: 4px;
+            background: #fff8e1;
+            font-size: 0.85rem;
+        }
+        .student-input { width: 105px; text-align: center; border: 2px solid #f57c00; border-radius: 8px; padding: 5px; background: #fff3e0; font-size: 0.88rem; font-weight: 600; color: #bf360c; }
+        .student-input:focus { outline: 2px solid #ff9800; border-color: transparent; }
+        .student-calc-box { background: #fff3e0; border: 2px dashed #f57c00; border-radius: 20px; padding: 16px 18px; margin: 16px 0; }
+        .student-calc-box p { margin: 8px 0; line-height: 1.9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧲 霍尔效应的研究与应用 · 智能实验报告</h1>
+
+        <div class="save-toolbar">
+            <div class="save-time" id="lastSaveTime">📁 上次保存：未保存</div>
+            <button class="save-btn" onclick="manualSave()">💾 手动保存报告</button>
+            <button class="save-btn" onclick="manualLoad()">📂 加载上次数据</button>
+            <button class="save-btn" onclick="exportData()">📎 导出备份(JSON)</button>
+            <button class="save-btn" onclick="importData()">📤 导入备份</button>
+            <button class="save-btn danger" onclick="clearSavedData()" style="background:#c62828;">🗑️ 重置所有数据</button>
+        </div>
+
+        <div class="basic-info" style="background: #f8f9fa; padding: 15px; border-radius: 24px; margin-bottom: 20px;">
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                <div>实验名称：<input type="text" class="info-input" id="expName" value="霍尔效应的研究与应用" readonly></div>
+                <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-01"></div>
+                <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名"></div>
+                <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号"></div>
+                <div>指导教师：<input type="text" class="info-input" id="instructor" value="马厂"></div>
+                <div>专业班级：<input type="text" class="info-input" id="class" placeholder="专业班级" style="width:400px"></div>
+            </div>
+        </div>
+
+        <!-- 预习填空 -->
+        <h2>一、实验目的</h2>
+        <div class="question-item">1．了解霍尔效应的 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose1" data-answer="基本原理"><span class="answer-status"></span></span> ；</div>
+        <div class="question-item">2．测绘霍尔元件的 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose2" data-answer="V_H-I_S"><span class="answer-status"></span></span> 、<span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose3" data-answer="V_H-I_M"><span class="answer-status"></span></span> 曲线；</div>
+        <div class="question-item">3．学习利用霍尔效应测量磁感应强度 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose4" data-answer="B"><span class="answer-status"></span></span> ；</div>
+        <div class="question-item">4．学习用“对称交换测量法”消除 <span class="fill-blank-container"><input type="text" class="fill-blank" id="purpose5" data-answer="副效应"><span class="answer-status"></span></span> 产生的系统误差。</div>
+
+        <h2>二、实验仪器</h2>
+        <img src="../assets/05hexy_hexy.jpg" 
+             alt="实验仪器示意图" 
+             class="apparatus-img"
+             style="max-width: 80%; margin: 20px auto; display: block; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+
+        <div class="question-item">
+            霍尔效应实验仪（包括 <span class="fill-blank-container"><input type="text" class="fill-blank" id="instrument1" data-answer="电磁铁"><span class="answer-status"></span></span> 、数字特斯拉计、霍尔元件、工作电流源、励磁电流源、数字电压表、移动尺等）。
+        </div>
+
+        <h2>三、实验原理</h2>
+        <div class="question-item">1．霍尔电压 \(V_H = K_H I_S B\) ，其中 \(K_H\) 称为霍尔元件的 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory1" data-answer="灵敏度"><span class="answer-status"></span></span> 。</div>
+        <div class="question-item">2．霍尔系数 \(R_H = \frac{1}{ne}\) ，霍尔灵敏度 \(K_H = \) <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory2" data-answer="R_H"><span class="answer-status"></span></span> \( / d\) ，其中 \(d\) 为霍尔元件厚度。</div>
+        <div class="question-item">3．副效应包括 <span class="fill-blank-container"><input type="text" class="fill-blank" id="theory3" data-answer="不等位电势"><span class="answer-status"></span></span> 、热磁效应等，采用对称交换测量法（改变 \(I_S\) 和 \(B\) 方向）取平均可消除。</div>
+
+        <h2>四、实验内容</h2>
+        <div class="experiment-step">1．测量霍尔电压 \(V_H\) 与工作电流 \(I_S\) 的关系（固定 \(I_M\)），测绘 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure1" data-answer="I_S-V_H"><span class="answer-status"></span></span> 曲线。</div>
+        <div class="experiment-step">2．测量霍尔电压 \(V_H\) 与励磁电流 \(I_M\) 的关系（固定 \(I_S\)），测绘 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure2" data-answer="I_M-V_H"><span class="answer-status"></span></span> 曲线。</div>
+        <div class="experiment-step">3．计算霍尔元件的灵敏度 <span class="fill-blank-container"><input type="text" class="fill-blank" id="procedure3" data-answer="K_H"><span class="answer-status"></span></span> 。</div>
+        <div class="experiment-step">4．测量电磁铁磁场沿水平方向分布（选做）。</div>
+
+        <!-- 五、原始数据记录 -->
+        <h2>五、原始数据记录</h2>
+        <div class="section-title" style="font-weight: bold; font-size: 1.1rem; margin: 10px 0 5px 0;">
+            表22-1 \(I_S-V_H\) 关系（\(I_M =\) <input type="text" id="im_fixed1" class="param-input" placeholder="mA"> mA，\(B\) 由 \(I_M\) 确定）
+        </div>
+        <div class="table-wrapper">
+            <table id="table1">
+                <thead>
+                    <tr><th rowspan="2">序号</th><th rowspan="2">\(I_S\) (mA)</th><th colspan="4">\(V_1,V_2,V_3,V_4\) (mV)</th><th rowspan="2">\(V_H\) (mV)<br>（平均）</th></tr>
+                    <tr><th>\(V_1\)</th><th>\(V_2\)</th><th>\(V_3\)</th><th>\(V_4\)</th></tr>
+                </thead>
+                <tbody id="table1Body">
+                    <tr><td>1</td><td><input class="data-input" id="is1" placeholder="mA"></td>
+                        <td><input class="data-input" id="v1_1" placeholder="mV"></td>
+                        <td><input class="data-input" id="v1_2" placeholder="mV"></td>
+                        <td><input class="data-input" id="v1_3" placeholder="mV"></td>
+                        <td><input class="data-input" id="v1_4" placeholder="mV"></td>
+                        <td><input class="data-input" id="vh1" placeholder="mV"></td></tr>
+                    <tr><td>2</td><td><input class="data-input" id="is2" placeholder="mA"></td>
+                        <td><input class="data-input" id="v2_1" placeholder="mV"></td>
+                        <td><input class="data-input" id="v2_2" placeholder="mV"></td>
+                        <td><input class="data-input" id="v2_3" placeholder="mV"></td>
+                        <td><input class="data-input" id="v2_4" placeholder="mV"></td>
+                        <td><input class="data-input" id="vh2" placeholder="mV"></td></tr>
+                    <tr><td>3</td><td><input class="data-input" id="is3" placeholder="mA"></td>
+                        <td><input class="data-input" id="v3_1" placeholder="mV"></td>
+                        <td><input class="data-input" id="v3_2" placeholder="mV"></td>
+                        <td><input class="data-input" id="v3_3" placeholder="mV"></td>
+                        <td><input class="data-input" id="v3_4" placeholder="mV"></td>
+                        <td><input class="data-input" id="vh3" placeholder="mV"></td></tr>
+                    <tr><td>4</td><td><input class="data-input" id="is4" placeholder="mA"></td>
+                        <td><input class="data-input" id="v4_1" placeholder="mV"></td>
+                        <td><input class="data-input" id="v4_2" placeholder="mV"></td>
+                        <td><input class="data-input" id="v4_3" placeholder="mV"></td>
+                        <td><input class="data-input" id="v4_4" placeholder="mV"></td>
+                        <td><input class="data-input" id="vh4" placeholder="mV"></td></tr>
+                    <tr><td>5</td><td><input class="data-input" id="is5" placeholder="mA"></td>
+                        <td><input class="data-input" id="v5_1" placeholder="mV"></td>
+                        <td><input class="data-input" id="v5_2" placeholder="mV"></td>
+                        <td><input class="data-input" id="v5_3" placeholder="mV"></td>
+                        <td><input class="data-input" id="v5_4" placeholder="mV"></td>
+                        <td><input class="data-input" id="vh5" placeholder="mV"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-title" style="font-weight: bold; font-size: 1.1rem; margin: 10px 0 5px 0;">
+            表22-2 \(I_M-V_H\) 关系（\(I_S =\) <input type="text" id="is_fixed2" class="param-input" placeholder="mA"> mA）
+        </div>
+        <div class="table-wrapper">
+            <table id="table2">
+                <thead>
+                    <tr><th rowspan="2">序号</th><th rowspan="2">\(I_M\) (mA)</th><th colspan="4">\(V_1,V_2,V_3,V_4\) (mV)</th><th rowspan="2">\(V_H\) (mV)<br>（平均）</th></tr>
+                    <tr><th>\(V_1\)</th><th>\(V_2\)</th><th>\(V_3\)</th><th>\(V_4\)</th></tr>
+                </thead>
+                <tbody id="table2Body">
+                    <tr><td>1</td><td><input class="data-input" id="im1" placeholder="mA"></td>
+                        <td><input class="data-input" id="v1m_1" placeholder="mV"></td>
+                        <td><input class="data-input" id="v1m_2" placeholder="mV"></td>
+                        <td><input class="data-input" id="v1m_3" placeholder="mV"></td>
+                        <td><input class="data-input" id="v1m_4" placeholder="mV"></td>
+                        <td><input class="data-input" id="vhm1" placeholder="mV"></td></tr>
+                    <tr><td>2</td><td><input class="data-input" id="im2" placeholder="mA"></td>
+                        <td><input class="data-input" id="v2m_1" placeholder="mV"></td>
+                        <td><input class="data-input" id="v2m_2" placeholder="mV"></td>
+                        <td><input class="data-input" id="v2m_3" placeholder="mV"></td>
+                        <td><input class="data-input" id="v2m_4" placeholder="mV"></td>
+                        <td><input class="data-input" id="vhm2" placeholder="mV"></td></tr>
+                    <tr><td>3</td><td><input class="data-input" id="im3" placeholder="mA"></td>
+                        <td><input class="data-input" id="v3m_1" placeholder="mV"></td>
+                        <td><input class="data-input" id="v3m_2" placeholder="mV"></td>
+                        <td><input class="data-input" id="v3m_3" placeholder="mV"></td>
+                        <td><input class="data-input" id="v3m_4" placeholder="mV"></td>
+                        <td><input class="data-input" id="vhm3" placeholder="mV"></td></tr>
+                    <tr><td>4</td><td><input class="data-input" id="im4" placeholder="mA"></td>
+                        <td><input class="data-input" id="v4m_1" placeholder="mV"></td>
+                        <td><input class="data-input" id="v4m_2" placeholder="mV"></td>
+                        <td><input class="data-input" id="v4m_3" placeholder="mV"></td>
+                        <td><input class="data-input" id="v4m_4" placeholder="mV"></td>
+                        <td><input class="data-input" id="vhm4" placeholder="mV"></td></tr>
+                    <tr><td>5</td><td><input class="data-input" id="im5" placeholder="mA"></td>
+                        <td><input class="data-input" id="v5m_1" placeholder="mV"></td>
+                        <td><input class="data-input" id="v5m_2" placeholder="mV"></td>
+                        <td><input class="data-input" id="v5m_3" placeholder="mV"></td>
+                        <td><input class="data-input" id="v5m_4" placeholder="mV"></td>
+                        <td><input class="data-input" id="vhm5" placeholder="mV"></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align:center; margin: 10px 0 20px;">
+            <p style="text-align:center; color:#bf360c; font-weight:bold;">✏️ 请学生根据 \(V_1,V_2,V_3,V_4\) 自行计算平均 \(V_H\) 并填入两表（系统不再显示计算结果）。</p>
+        </div>
+
+        <!-- 六、数据处理与分析 -->
+        <h2>六、数据处理与分析</h2>
+        <div class="calculation-section" style="background:#eef2fc; padding: 20px; border-radius: 24px;">
+
+            <h3>1. \(I_S-V_H\) 线性拟合（固定 \(I_M\)）</h3>
+            <p>由 \(V_H = K_H B \cdot I_S\)，斜率 = \(K_H B\)。若已知磁感应强度 \(B\)（可由特斯拉计测量或由 \(I_M\) 计算），则可求 \(K_H\)。</p>
+            <div class="flex-row">
+                <span>请输入该 \(I_M\) 下的磁感应强度 \(B\) (mT)：<input type="text" id="b_value" class="param-input" placeholder="mT"></span>
+            </div>
+            <div class="flex-row">
+                <span>✏️ 拟合斜率 \(k_1 = \) <input type="number" id="s_slope1" class="student-input" step="0.0001" placeholder="mV/mA"> (mV/mA)</span>
+                <span>✏️ 截距 \(b_1 = \) <input type="number" id="s_intercept1" class="student-input" step="0.01" placeholder="mV"> (mV)</span>
+            </div>
+            <div class="flex-row">
+                <span>✏️ 霍尔灵敏度 \(K_H = \) <input type="number" id="s_kh" class="student-input" step="0.0001" placeholder="V/(A·T)"> V/(A·T)（即 mV/(mA·T)，注意 B 需由 mT 换算为 T）</span>
+            </div>
+
+            <h3>2. \(I_M-V_H\) 线性拟合（固定 \(I_S\)）</h3>
+            <p>由 \(V_H = K_H I_S \cdot B\)，且 \(B \propto I_M\)（在磁路线性范围内），故 \(V_H \propto I_M\)。斜率反映 \(K_H I_S\) 与 \(B/I_M\) 的关系。</p>
+            <div class="flex-row">
+                <span>✏️ 拟合斜率 \(k_2 = \) <input type="number" id="s_slope2" class="student-input" step="0.0001" placeholder="mV/mA"> (mV/mA)</span>
+                <span>✏️ 截距 \(b_2 = \) <input type="number" id="s_intercept2" class="student-input" step="0.01" placeholder="mV"> (mV)</span>
+            </div>
+
+            <div style="margin-top:20px; font-style:italic;">※ 数据处理评分标准（满分20分）：\(V_H\) 平均值计算(表22-1、表22-2各4分)，拟合斜率(各3分，共6分)，\(K_H\) 计算(4分)，曲线规律描述(2分)。评分以本人原始数据正确计算值为参考（\(V_H\) 取 \( |V_1|+|V_2|+|V_3|+|V_4| \) 平均，斜率和灵敏度按最小二乘拟合），允许实验合理误差：误差≤2%满分，≤5%得95%，≤8%得90%，≤10%得80%，≤15%得60%，≤20%得40%，>20%得0分。</div>
+
+            <div style="margin-top: 30px; text-align:center;">
+                <button class="chart-btn" onclick="drawChart1()">📈 绘制 \(I_S-V_H\) 拟合曲线</button>
+                <button class="chart-btn" onclick="drawChart2()">📈 绘制 \(I_M-V_H\) 拟合曲线</button>
+            </div>
+            <div class="chart-container"><canvas id="chart1" style="width:100%; height:auto; max-width:800px; margin:0 auto; display:block;"></canvas></div>
+            <div class="chart-container"><canvas id="chart2" style="width:100%; height:auto; max-width:800px; margin:0 auto; display:block;"></canvas></div>
+            <div id="conclusionText" style="margin-top:20px; font-weight:bold;"></div>
+        </div>
+
+        <h2>七、思考题</h2>
+        <div>1．霍尔效应中副效应有哪些？它们是如何产生的？如何消除？<textarea id="thought1" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(1)">显示参考答案</button><div id="answer1" class="thought-answer">答：副效应包括不等位电势（由于霍尔电极位置不对称）、热磁效应（如爱廷豪森效应、能斯特效应等）。它们主要由电极不对称、温度梯度等因素产生。消除方法：采用对称交换测量法，即分别改变 \(I_S\) 和 \(B\) 的方向，取四次测量的平均值，可消除副效应的影响。</div></div>
+        <div>2．为什么霍尔电压与 \(I_S\) 和 \(B\) 成正比？这一关系成立的条件是什么？<textarea id="thought2" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(2)">显示参考答案</button><div id="answer2" class="thought-answer">答：霍尔电压 \(V_H = K_H I_S B\) 是在载流子漂移速度与电场满足 \(v = \mu E\) 且磁场不太强的条件下推导出的，此时洛伦兹力与电场力平衡，载流子浓度恒定，故 \(V_H\) 与 \(I_S\) 和 \(B\) 成正比。成立条件：弱磁场、均匀磁场、载流子浓度恒定、霍尔元件工作在线性区。</div></div>
+        <div>3．本实验中如何用霍尔元件测量磁感应强度？如果已知 \(K_H\)，怎样由 \(V_H\) 和 \(I_S\) 求得 \(B\)？<textarea id="thought3" class="thought-input" rows="2"></textarea><button class="thought-answer-btn" onclick="toggleAnswer(3)">显示参考答案</button><div id="answer3" class="thought-answer">答：将霍尔元件置于待测磁场中，通以恒定工作电流 \(I_S\)，测量霍尔电压 \(V_H\)，由 \(B = V_H / (K_H I_S)\) 即可求得磁感应强度。需确保霍尔元件平面与磁场方向垂直，且工作在标准条件下。</div></div>
+
+        <h2>八、实验小结</h2>
+        <textarea id="summary" class="summary-box" placeholder="总结实验结论、误差来源、改进建议..."></textarea>
+
+        <!-- 手工绘图上传 -->
+        <div class="manual-plot-area">
+            <strong>✏️ 手工图形绘制上传 (权重10%)</strong>
+            <p>请上传您手绘的 \(I_S-V_H\) 或 \(I_M-V_H\) 曲线图（照片或扫描件）。</p>
+            <input type="file" id="manualPlotUpload" accept="image/*" multiple>
+            <button onclick="uploadManualPlots()" class="upload-btn" style="background:#f57f17;">➕ 上传手绘图形</button>
+            <div id="manualPlotPreview" class="image-preview"></div>
+            <small style="color: #4a148c;">* 上传手绘图形可获得额外分数，至少一张。</small>
+        </div>
+
+        <!-- 实验证据 -->
+        <div class="evidence-area">
+            <strong>📸 实验证据图片上传（权重5%）</strong>
+            <div style="margin: 12px 0;"><input type="file" id="evidenceUpload" accept="image/*" multiple><button class="upload-btn" onclick="uploadEvidenceImages()" style="background:#7b1fa2;">➕ 添加图片</button></div>
+            <div id="imagePreviewContainer" class="image-preview"></div>
+            <small style="color: #4a148c;">* 上传实验现场照片（仪器数据与人同框且与表格数据相同），至少上传一张可获得5%分数。</small>
+        </div>
+
+        <!-- 操作分 -->
+        <div class="operator-panel">
+            <strong>🔐 实验操作分 (权重20%，仅教师可操作) & 一键数据上报</strong><br>
+            <input type="password" id="opPwd" placeholder="教师密码" autocomplete="off">
+            <button onclick="unlockOpScore()" class="chart-btn">验证并解锁</button>
+            <span id="opLockMsg" style="color:#b71c1c;"></span>
+            <div id="opScoreDiv" style="display:none; margin-top: 12px;">
+                <label>操作分数 (0~20): </label>
+                <input type="number" id="operationScore" min="0" max="20" step="1" value="0">
+                <button onclick="saveOpScore()" class="save-btn">💾 保存操作分</button>
+                <button id="forceFailBtn" onclick="toggleForceFail()" class="save-btn" style="background:#c62828; margin-left: 8px;">⚠️ 强制 0/0/59（未做实验）</button>
+                <span id="forceFailMsg" style="display:block; margin-top:6px; font-size:0.85rem; color:#c62828;"></span>
+                <button id="oneClickReportBtn" class="submit-report-btn" style="margin-left: 12px;">📤 一键数据上报</button>
+            </div>
+            <div>📋 当前操作分：<span id="currentOpScore">0</span> 分</div>
+            <div style="margin-top: 8px; font-size:0.85rem; color:#00695c;">🔔 教师验证密码后，上方将显示"一键数据上报"按钮，可导出专业班级、学号、姓名、预习得分、操作得分、综合得分及日期（预习和操作已换算为百分制）。</div>
+        </div>
+
+        <h2>九、自动评分 & 实验评语</h2>
+        <div class="score-section" style="text-align:center;">
+            <button class="auto-grade-btn" onclick="autoGrade()">✨ 自动评分并生成评语</button>
+            <div id="scoreDetails" class="score-details" style="display:none;">
+                <div class="score-item"><span>📖 预习填空 (10%)</span><span id="detailPreScore">0/10</span></div>
+                <div class="score-item"><span>📝 数据记录 (10%)</span><span id="detailDataScore">0/10</span></div>
+                <div class="score-item"><span>📐 数据处理 (20%)</span><span id="detailCalcScore">0/20</span></div>
+                <div class="score-item"><span>📊 自动绘图 (5%)</span><span id="detailAutoPlotScore">0/5</span></div>
+                <div class="score-item"><span>✏️ 手工绘图 (10%)</span><span id="detailManualPlotScore">0/10</span></div>
+                <div class="score-item"><span>💡 思考题 (10%)</span><span id="detailThoughtScore">0/10</span></div>
+                <div class="score-item"><span>📄 实验小结 (10%)</span><span id="detailSummaryScore">0/10</span></div>
+                <div class="score-item"><span>📸 实验证据 (5%)</span><span id="detailEvidenceScore">0/5</span></div>
+                <div class="score-item"><span>🔧 实验操作 (20%)</span><span id="detailOpScore">0/20</span></div>
+                <div class="score-item" style="font-weight:bold; border-top:2px solid #4caf50;"><span>🏆 总分</span><span id="detailTotalScore">0/100</span></div>
+            </div>
+            <div id="commentContent" style="background:#fff8e7; border-radius: 28px; padding: 20px; margin-top: 20px; text-align: left;"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========== Toast ==========
+        function showReportToast(msg) {
+            let toast = document.createElement('div');
+            toast.className = 'report-toast';
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2600);
+        }
+
+        // ========== 答案映射 ==========
+        const answers = {
+            "基本原理": ["基本原理"],
+            "V_H-I_S": ["V_H-I_S", "VH-IS"],
+            "V_H-I_M": ["V_H-I_M", "VH-IM"],
+            "B": ["B"],
+            "副效应": ["副效应"],
+            "电磁铁": ["电磁铁"],
+            "灵敏度": ["灵敏度"],
+            "R_H": ["R_H", "RH"],
+            "不等位电势": ["不等位电势", "不等位电压"],
+            "I_S-V_H": ["I_S-V_H", "IS-VH"],
+            "I_M-V_H": ["I_M-V_H", "IM-VH"],
+            "K_H": ["K_H", "KH"]
+        };
+
+        // ========== 状态 ==========
+        let chart1Instance = null, chart2Instance = null;
+        let opScoreLocked = false;
+        let forcedFail = false; // 强制0/0/59（未做实验）锁定标记
+        let imageList = [];
+        let manualPlotImages = [];
+        let hasDrawn1 = false, hasDrawn2 = false;
+        let fit1 = { slope: 0, intercept: 0, r2: 0 };
+        let fit2 = { slope: 0, intercept: 0, r2: 0 };
+        let cachedVH = {}; let cachedVHM = {}; let cachedKH = 0; // 后台真实值（评分用，不显示）
+
+        // ========== 填空状态 ==========
+        function updateAnswerStatusIcon(inputElement) {
+            const container = inputElement.parentElement;
+            const statusSpan = container.querySelector('.answer-status');
+            if (!statusSpan) return;
+            const userAnswer = inputElement.value.trim();
+            const correctAnswers = answers[inputElement.dataset.answer];
+            let status = 'empty';
+            if (userAnswer === '') status = 'empty';
+            else if (correctAnswers && correctAnswers.some(ans => {
+                    const user = userAnswer.toLowerCase().replace(/\s+/g, '');
+                    const correct = ans.toLowerCase().replace(/\s+/g, '');
+                    return user === correct || user.includes(correct) || correct.includes(user);
+                })) status = 'correct';
+            else status = 'incorrect';
+            statusSpan.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
+            if (status === 'correct') { statusSpan.textContent = '✓'; statusSpan.classList.add('correct-icon'); }
+            else if (status === 'incorrect') { statusSpan.textContent = '✗'; statusSpan.classList.add('incorrect-icon'); }
+            else { statusSpan.textContent = '○'; statusSpan.classList.add('empty-icon'); }
+        }
+        function updateAllAnswerStatusIcons() { document.querySelectorAll('.fill-blank').forEach(inp => updateAnswerStatusIcon(inp)); }
+
+        // ========== 线性拟合 ==========
+        function linearFit(x, y) {
+            let n = x.length;
+            if (n < 2) return { slope: 0, intercept: 0, r2: 0 };
+            let sumX = x.reduce((a,b)=>a+b,0);
+            let sumY = y.reduce((a,b)=>a+b,0);
+            let sumXY = x.reduce((a,b,i)=>a+b*y[i],0);
+            let sumX2 = x.reduce((a,b)=>a+b*b,0);
+            let sumY2 = y.reduce((a,b)=>a+b*b,0);
+            let slope = (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX);
+            let intercept = (sumY - slope*sumX) / n;
+            let r2 = (n*sumXY - sumX*sumY)**2 / ((n*sumX2 - sumX*sumX)*(n*sumY2 - sumY*sumY));
+            return { slope, intercept, r2 };
+        }
+
+        // ========== 数据处理 ==========
+        function processData() {
+            // 表22-1 计算平均 V_H
+            let is_arr = [], vh_arr = [];
+            for (let i=1; i<=5; i++) {
+                let is_val = parseFloat(document.getElementById('is'+i).value);
+                let v1 = parseFloat(document.getElementById('v'+i+'_1').value);
+                let v2 = parseFloat(document.getElementById('v'+i+'_2').value);
+                let v3 = parseFloat(document.getElementById('v'+i+'_3').value);
+                let v4 = parseFloat(document.getElementById('v'+i+'_4').value);
+                if (!isNaN(is_val) && !isNaN(v1) && !isNaN(v2) && !isNaN(v3) && !isNaN(v4)) {
+                    let avg = (Math.abs(v1) + Math.abs(v2) + Math.abs(v3) + Math.abs(v4)) / 4;
+                    cachedVH[i] = avg; // 后台记录真实值用于评分，不显示（V2/V4 为反向测量，取绝对值后平均）
+                    is_arr.push(is_val);
+                    vh_arr.push(avg);
+                } else {
+                    cachedVH[i] = 0;
+                }
+            }
+            // 表22-2 计算平均 V_H
+            let im_arr = [], vhm_arr = [];
+            for (let i=1; i<=5; i++) {
+                let im_val = parseFloat(document.getElementById('im'+i).value);
+                let v1 = parseFloat(document.getElementById('v'+i+'m_1').value);
+                let v2 = parseFloat(document.getElementById('v'+i+'m_2').value);
+                let v3 = parseFloat(document.getElementById('v'+i+'m_3').value);
+                let v4 = parseFloat(document.getElementById('v'+i+'m_4').value);
+                if (!isNaN(im_val) && !isNaN(v1) && !isNaN(v2) && !isNaN(v3) && !isNaN(v4)) {
+                    let avg = (Math.abs(v1) + Math.abs(v2) + Math.abs(v3) + Math.abs(v4)) / 4;
+                    cachedVHM[i] = avg; // 后台记录真实值用于评分，不显示（V2/V4 为反向测量，取绝对值后平均）
+                    im_arr.push(im_val);
+                    vhm_arr.push(avg);
+                } else {
+                    cachedVHM[i] = 0;
+                }
+            }
+
+            // 拟合表1
+            if (is_arr.length >= 2) {
+                fit1 = linearFit(is_arr, vh_arr);
+                // 拟合结果仅后台记录用于评分，不显示给学生
+                let b_val = parseFloat(document.getElementById('b_value').value);
+                if (!isNaN(b_val) && b_val > 0) {
+                    let kh = fit1.slope * 1000 / b_val; // mV/(mA·mT) → V/(A·T)
+                    cachedKH = kh; // 后台记录真实值用于评分，不显示
+                } else {
+                    cachedKH = 0;
+                }
+            } else {
+                // 数据不足时无真实值
+            }
+
+            // 拟合表2
+            if (im_arr.length >= 2) {
+                fit2 = linearFit(im_arr, vhm_arr);
+                // 拟合结果仅后台记录用于评分，不显示给学生
+            } else {
+                // 数据不足时无真实值
+            }
+
+            drawChart1();
+            drawChart2();
+            manualSave();
+            showReportToast("✅ 数据处理完成，图表已更新");
+        }
+
+        // ========== 绘图 ==========
+        function drawChart1() {
+            let is_arr=[], vh_arr=[];
+            for (let i=1; i<=5; i++) {
+                let is_val = parseFloat(document.getElementById('is'+i).value);
+                let vh_text = document.getElementById('vh'+i).value;
+                if (!isNaN(is_val) && vh_text !== '') {
+                    is_arr.push(is_val);
+                    vh_arr.push(parseFloat(vh_text));
+                }
+            }
+            if (is_arr.length < 2) { showReportToast("⚠️ 表22-1有效数据不足，请检查"); return; }
+            // 用当前绘图数据重新计算拟合，避免使用未更新/过期的全局 fit1（否则直线为水平线）
+            fit1 = linearFit(is_arr, vh_arr);
+            let ctx = document.getElementById('chart1').getContext('2d');
+            if (chart1Instance) chart1Instance.destroy();
+            let xMin = Math.min(...is_arr), xMax = Math.max(...is_arr);
+            let xFit = [xMin, xMax];
+            let yFit = xFit.map(x => fit1.slope * x + fit1.intercept);
+            chart1Instance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '实验数据 (I_S-V_H)',
+                        data: is_arr.map((x,i) => ({x: x, y: vh_arr[i]})),
+                        backgroundColor: '#e53935',
+                        pointRadius: 6,
+                    }, {
+                        label: '拟合直线',
+                        data: xFit.map((x,i) => ({x: x, y: yFit[i]})),
+                        type: 'line',
+                        borderColor: '#1e88e5',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        x: { title: { display: true, text: 'I_S (mA)' }, beginAtZero: true },
+                        y: { title: { display: true, text: 'V_H (mV)' }, beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        title: { display: true, text: 'I_S - V_H 拟合曲线' }
+                    }
+                }
+            });
+            hasDrawn1 = true;
+        }
+
+        function drawChart2() {
+            let im_arr=[], vhm_arr=[];
+            for (let i=1; i<=5; i++) {
+                let im_val = parseFloat(document.getElementById('im'+i).value);
+                let vh_text = document.getElementById('vhm'+i).value;
+                if (!isNaN(im_val) && vh_text !== '') {
+                    im_arr.push(im_val);
+                    vhm_arr.push(parseFloat(vh_text));
+                }
+            }
+            if (im_arr.length < 2) { showReportToast("⚠️ 表22-2有效数据不足，请检查"); return; }
+            // 用当前绘图数据重新计算拟合，避免使用未更新/过期的全局 fit2（否则直线为水平线）
+            fit2 = linearFit(im_arr, vhm_arr);
+            let ctx = document.getElementById('chart2').getContext('2d');
+            if (chart2Instance) chart2Instance.destroy();
+            let xMin = Math.min(...im_arr), xMax = Math.max(...im_arr);
+            let xFit = [xMin, xMax];
+            let yFit = xFit.map(x => fit2.slope * x + fit2.intercept);
+            chart2Instance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: '实验数据 (I_M-V_H)',
+                        data: im_arr.map((x,i) => ({x: x, y: vhm_arr[i]})),
+                        backgroundColor: '#43a047',
+                        pointRadius: 6,
+                    }, {
+                        label: '拟合直线',
+                        data: xFit.map((x,i) => ({x: x, y: yFit[i]})),
+                        type: 'line',
+                        borderColor: '#ff6f00',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        x: { title: { display: true, text: 'I_M (mA)' }, beginAtZero: true },
+                        y: { title: { display: true, text: 'V_H (mV)' }, beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        title: { display: true, text: 'I_M - V_H 拟合曲线' }
+                    }
+                }
+            });
+            hasDrawn2 = true;
+        }
+
+            // 压缩图片：最长边限制 maxSide，JPEG 质量 quality，防止 localStorage 被照片撑爆
+            function compressImage(dataUrl, maxSide, quality) {
+                return new Promise(function(resolve) {
+                    try {
+                        var img = new Image();
+                        img.onload = function() {
+                            try {
+                                var w = img.width, h = img.height;
+                                var scale = Math.min(1, maxSide / Math.max(w, h));
+                                var cw = Math.max(1, Math.round(w * scale));
+                                var ch = Math.max(1, Math.round(h * scale));
+                                var canvas = document.createElement('canvas');
+                                canvas.width = cw; canvas.height = ch;
+                                var ctx = canvas.getContext('2d');
+                                ctx.drawImage(img, 0, 0, cw, ch);
+                                resolve(canvas.toDataURL('image/jpeg', quality));
+                            } catch (err) { resolve(dataUrl); }
+                        };
+                        img.onerror = function() { resolve(dataUrl); };
+                        img.src = dataUrl;
+                    } catch (err) { resolve(dataUrl); }
+                });
+            }
+
+        // ========== 手工绘图上传 ==========
+        function uploadManualPlots() {
+            let files = document.getElementById('manualPlotUpload').files;
+            if (!files.length) return;
+            for (let file of files) {
+                if (!file.type.startsWith('image/')) continue;
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    compressImage(e.target.result, 1280, 0.7).then(function(compressed) {
+                        manualPlotImages.push(compressed);
+                        displayManualPlots();
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+            document.getElementById('manualPlotUpload').value = '';
+        }
+        function displayManualPlots() {
+            let container = document.getElementById('manualPlotPreview');
+            container.innerHTML = '';
+            manualPlotImages.forEach((imgSrc, idx) => {
+                let div = document.createElement('div');
+                div.className = 'img-card';
+                div.innerHTML = `<img src="${imgSrc}" alt="手工绘图"><div class="del-img" onclick="removeManualPlot(${idx})">✕</div>`;
+                container.appendChild(div);
+            });
+            try { localStorage.setItem('manualPlotImages', JSON.stringify(manualPlotImages)); }
+            catch (e) { showReportToast("⚠️ 图片存储空间不足，预览不受影响"); }
+        }
+        function removeManualPlot(idx) { manualPlotImages.splice(idx,1); displayManualPlots(); }
+
+        // ========== 实验证据上传 ==========
+        function uploadEvidenceImages() {
+            let files = document.getElementById('evidenceUpload').files;
+            if (!files.length) return;
+            for (let file of files) {
+                if (!file.type.startsWith('image/')) continue;
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    compressImage(e.target.result, 1280, 0.7).then(function(compressed) {
+                        imageList.push(compressed);
+                        displayImages();
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+            document.getElementById('evidenceUpload').value = '';
+        }
+        function displayImages() {
+            let container = document.getElementById('imagePreviewContainer');
+            container.innerHTML = '';
+            imageList.forEach((imgSrc, idx) => {
+                let div = document.createElement('div');
+                div.className = 'img-card';
+                div.innerHTML = `<img src="${imgSrc}" alt="实验证据"><div class="del-img" onclick="removeImage(${idx})">✕</div>`;
+                container.appendChild(div);
+            });
+            try { localStorage.setItem('evidenceImages', JSON.stringify(imageList)); }
+            catch (e) { showReportToast("⚠️ 图片存储空间不足，预览不受影响"); }
+        }
+        function removeImage(idx) { imageList.splice(idx,1); displayImages(); }
+
+        // ========== 评分 ==========
+        function gradePre() {
+            let inputs = document.querySelectorAll('.fill-blank');
+            let correct = 0;
+            inputs.forEach(inp => {
+                let ans = answers[inp.dataset.answer];
+                let val = inp.value.trim().toLowerCase();
+                if (val && ans && ans.some(a => {
+                        const user = val.replace(/\s+/g,'');
+                        const correct = a.toLowerCase().replace(/\s+/g,'');
+                        return user === correct || user.includes(correct) || correct.includes(user);
+                    })) correct++;
+            });
+            return Math.round((correct / inputs.length) * 10);
+        }
+
+        function gradeDataRecord() {
+            let valid = 0, total = 0;
+            // 表22-1 (5行 * 5个输入：Is + 4个V)
+            for (let i=1; i<=5; i++) {
+                let is = document.getElementById('is'+i).value.trim();
+                let v1 = document.getElementById('v'+i+'_1').value.trim();
+                let v2 = document.getElementById('v'+i+'_2').value.trim();
+                let v3 = document.getElementById('v'+i+'_3').value.trim();
+                let v4 = document.getElementById('v'+i+'_4').value.trim();
+                total += 5;
+                if (is && !isNaN(parseFloat(is)) && parseFloat(is)>0) valid++;
+                if (v1 && !isNaN(parseFloat(v1))) valid++;
+                if (v2 && !isNaN(parseFloat(v2))) valid++;
+                if (v3 && !isNaN(parseFloat(v3))) valid++;
+                if (v4 && !isNaN(parseFloat(v4))) valid++;
+            }
+            // 表22-2
+            for (let i=1; i<=5; i++) {
+                let im = document.getElementById('im'+i).value.trim();
+                let v1 = document.getElementById('v'+i+'m_1').value.trim();
+                let v2 = document.getElementById('v'+i+'m_2').value.trim();
+                let v3 = document.getElementById('v'+i+'m_3').value.trim();
+                let v4 = document.getElementById('v'+i+'m_4').value.trim();
+                total += 5;
+                if (im && !isNaN(parseFloat(im)) && parseFloat(im)>0) valid++;
+                if (v1 && !isNaN(parseFloat(v1))) valid++;
+                if (v2 && !isNaN(parseFloat(v2))) valid++;
+                if (v3 && !isNaN(parseFloat(v3))) valid++;
+                if (v4 && !isNaN(parseFloat(v4))) valid++;
+            }
+            let score = total > 0 ? (valid / total) * 10 : 0;
+            return Math.min(10, Math.round(score));
+        }
+
+        // 相对误差评分：以本人原始数据的正确计算值为参考，允许实验合理误差
+        function errFrac(relErr) {
+            if (relErr <= 0.02) return 1;
+            if (relErr <= 0.05) return 0.95;
+            if (relErr <= 0.08) return 0.9;
+            if (relErr <= 0.10) return 0.8;
+            if (relErr <= 0.15) return 0.6;
+            if (relErr <= 0.20) return 0.4;
+            return 0;
+        }
+        function groupErrScore(inputs, trues, maxPts) {
+            let s = 0, cnt = 0;
+            for (let i = 0; i < inputs.length; i++) {
+                let u = parseFloat(inputs[i]);
+                if (isNaN(u) || !(trues[i] > 0)) continue;
+                s += errFrac(Math.abs(u - trues[i]) / trues[i]);
+                cnt++;
+            }
+            return cnt ? (s / cnt) * maxPts : 0;
+        }
+        function gradeDataProcess() {
+            let score = 0;
+            processData(); // 更新真实值缓存（内部计算，不显示）
+            // VH 平均值 表22-1 (4分)
+            let vhInputs = [], vhTrues = [];
+            for (let i=1; i<=5; i++) { vhInputs.push(document.getElementById('vh'+i).value); vhTrues.push(cachedVH[i]); }
+            score += groupErrScore(vhInputs, vhTrues, 4);
+            // VH 平均值 表22-2 (4分)
+            let vhmInputs = [], vhmTrues = [];
+            for (let i=1; i<=5; i++) { vhmInputs.push(document.getElementById('vhm'+i).value); vhmTrues.push(cachedVHM[i]); }
+            score += groupErrScore(vhmInputs, vhmTrues, 4);
+            // 拟合斜率1 (3分)
+            let s1 = parseFloat(document.getElementById('s_slope1').value);
+            if (!isNaN(s1) && fit1.slope !== 0) score += errFrac(Math.abs(s1 - fit1.slope) / Math.abs(fit1.slope)) * 3;
+            // 拟合斜率2 (3分)
+            let s2 = parseFloat(document.getElementById('s_slope2').value);
+            if (!isNaN(s2) && fit2.slope !== 0) score += errFrac(Math.abs(s2 - fit2.slope) / Math.abs(fit2.slope)) * 3;
+            // KH (4分)
+            let khUser = parseFloat(document.getElementById('s_kh').value);
+            if (!isNaN(khUser) && cachedKH > 0) score += errFrac(Math.abs(khUser - cachedKH) / cachedKH) * 4;
+            // 规律描述 (2分)
+            let summary = document.getElementById('summary').value.trim();
+            if (summary.length > 30 && (summary.includes("线性") || summary.includes("正比") || summary.includes("斜率"))) score += 2;
+            return Math.min(20, Math.round(score));
+        }
+
+        function gradeAutoPlot() {
+            let s = 0;
+            if (hasDrawn1) s += 2.5;
+            if (hasDrawn2) s += 2.5;
+            return Math.min(5, Math.round(s));
+        }
+
+        function gradeManualPlot() {
+            // 手工绘图满分10分
+            return manualPlotImages.length > 0 ? 10 : 0;
+        }
+
+        function gradeThought() {
+            let t1 = document.getElementById('thought1').value.trim();
+            let t2 = document.getElementById('thought2').value.trim();
+            let t3 = document.getElementById('thought3').value.trim();
+            let score = 0;
+            if (t1.length > 20) score += 3; else if (t1.length > 8) score += 1;
+            if (t2.length > 20) score += 3; else if (t2.length > 8) score += 1;
+            if (t3.length > 20) score += 4; else if (t3.length > 10) score += 2;
+            return Math.min(10, score);
+        }
+
+        function gradeSummary() {
+            let sum = document.getElementById('summary').value.trim();
+            if (sum.length > 150 && (sum.includes("霍尔") || sum.includes("线性") || sum.includes("灵敏度") || sum.includes("误差"))) return 10;
+            if (sum.length > 90) return 8;
+            if (sum.length > 50) return 6;
+            if (sum.length > 20) return 4;
+            return 0;
+        }
+
+        function gradeEvidence() { return imageList.length > 0 ? 5 : 0; }
+
+        function autoGrade() {
+            let preSc = gradePre();
+            let dataSc = gradeDataRecord();
+            let calcSc = gradeDataProcess();
+            let autoPlotSc = gradeAutoPlot();
+            let manualPlotSc = gradeManualPlot();
+            let thoughtSc = gradeThought();
+            let summarySc = gradeSummary();
+            let evidenceSc = gradeEvidence();
+            let opScore = parseFloat(document.getElementById('operationScore').value);
+            if (isNaN(opScore)) opScore = 0;
+            opScore = Math.min(20, Math.max(0, opScore));
+            let total = preSc + dataSc + calcSc + autoPlotSc + manualPlotSc + thoughtSc + summarySc + evidenceSc + opScore;
+            // 强制0/0/59（未做实验）：预习、操作、总分锁定为 0/0/59
+            if (forcedFail) { preSc = 0; opScore = 0; total = 59; }
+            document.getElementById('detailPreScore').innerText = `${preSc}/10`;
+            document.getElementById('detailDataScore').innerText = `${dataSc}/10`;
+            document.getElementById('detailCalcScore').innerText = `${calcSc}/20`;
+            document.getElementById('detailAutoPlotScore').innerText = `${autoPlotSc}/5`;
+            document.getElementById('detailManualPlotScore').innerText = `${manualPlotSc}/10`;
+            document.getElementById('detailThoughtScore').innerText = `${thoughtSc}/10`;
+            document.getElementById('detailSummaryScore').innerText = `${summarySc}/10`;
+            document.getElementById('detailEvidenceScore').innerText = `${evidenceSc}/5`;
+            document.getElementById('detailOpScore').innerText = `${opScore}/20`;
+            document.getElementById('detailTotalScore').innerText = `${Math.round(total)}/100`;
+            document.getElementById('scoreDetails').style.display = 'block';
+            let teacher = document.getElementById('instructor').value.trim() || "马厂";
+            let now = new Date();
+            let dateTimeStr = `${now.toLocaleDateString('zh-CN')} ${now.toLocaleTimeString('zh-CN', {hour12: false})}`;
+            let comment =
+                `📊 实验报告得分 ${Math.round(total)}/100。预习${preSc}/10，数据记录${dataSc}/10，数据处理${calcSc}/20，自动绘图${autoPlotSc}/5，手工绘图${manualPlotSc}/10，思考题${thoughtSc}/10，小结${summarySc}/10，实验证据${evidenceSc}/5，操作分${opScore}/20。<br><br>教师签名：${teacher}<br>评语日期：${dateTimeStr}`;
+            if (total >= 90) comment += "<br>⭐ 优秀！实验严谨，分析透彻。";
+            else if (total >= 75) comment += "<br>👍 良好，可进一步提升精度。";
+            else if (total >= 60) comment += "<br>⚠️ 合格，注意数据处理与误差分析。";
+            else comment += "<br>❌ 需重做实验或补充数据，认真分析误差。";
+            document.getElementById('commentContent').innerHTML = comment;
+            let b_show = parseFloat(document.getElementById('b_value').value) || 0;
+            let kh_show = (fit1.slope !== 0 && b_show > 0) ? (fit1.slope * 1000 / b_show).toFixed(4) : '—';
+            let conclusion = `实验结论：通过实验验证了霍尔电压与工作电流和励磁电流的线性关系。拟合斜率分别为 k1 = ${fit1.slope.toFixed(4)} mV/mA，k2 = ${fit2.slope.toFixed(4)} mV/mA，相关系数 R² 分别为 ${fit1.r2.toFixed(4)} 和 ${fit2.r2.toFixed(4)}，线性良好。霍尔灵敏度 K_H = ${kh_show} V/(A·T)。${total>=60?"实验数据合理，验证了霍尔效应规律。":"误差较大，建议检查实验操作。"}`;
+            document.getElementById('conclusionText').innerHTML = conclusion;
+            manualSave();
+        }
+
+        // ========== 操作分 ==========
+        function unlockOpScore() {
+            let pwd = document.getElementById('opPwd').value;
+            if (pwd === "403404") {
+                document.getElementById('opScoreDiv').style.display = 'block';
+                document.getElementById('opLockMsg').innerHTML = '✅ 密码正确，可评分及上报（10分钟内刷新免密码）';
+                opScoreLocked = true;
+                try { const _uk = (document.title || "报告").split("|")[0].trim(); localStorage.setItem('opUnlockTime_' + _uk, Date.now()); } catch (e) {}
+            } else { document.getElementById('opLockMsg').innerHTML = "❌ 密码错误"; opScoreLocked = false; }
+        }
+        function saveOpScore() {
+            if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁"); return; }
+            let val = parseFloat(document.getElementById('operationScore').value);
+            if (isNaN(val)) val = 0;
+            val = Math.min(20, Math.max(0, val));
+            document.getElementById('operationScore').value = val;
+            try { const _ok = (document.title || "报告").split("|")[0].trim(); localStorage.setItem('operationScore_' + _ok, val); } catch (e) { /* 存储满不影响操作分同步 */ }
+            document.getElementById('currentOpScore').innerText = val;
+            showReportToast("✅ 操作分已保存");
+            autoGrade();
+        }
+
+        // ========== 强制0/0/59（未做实验） ==========
+        function toggleForceFail() {
+            if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁"); return; }
+            if (forcedFail) {
+                forcedFail = false;
+                try { localStorage.removeItem('forcedFail'); } catch (e) {}
+                const ffBtn0 = document.getElementById('forceFailBtn');
+                if (ffBtn0) ffBtn0.textContent = '⚠️ 强制 0/0/59（未做实验）';
+                const ffMsg0 = document.getElementById('forceFailMsg');
+                if (ffMsg0) ffMsg0.innerHTML = '已解除强制，恢复自动评分';
+                autoGrade();
+                showReportToast("✅ 已解除强制，恢复自动评分");
+            return;
+            }
+            forcedFail = true;
+            const expKeyF = (document.title || "报告").split("|");
+            const expKeyF0 = expKeyF[0].trim();
+            try { localStorage.setItem('forcedFail', JSON.stringify({ k: expKeyF0, v: 1 })); } catch (e) {}
+            const opInputF = document.getElementById('operationScore');
+            if (opInputF) opInputF.value = '0';
+            const curOpF = document.getElementById('currentOpScore');
+            if (curOpF) curOpF.innerText = '0';
+            const ffBtn = document.getElementById('forceFailBtn');
+            if (ffBtn) ffBtn.textContent = '✅ 已强制 0/0/59（点击解除）';
+            const ffMsg = document.getElementById('forceFailMsg');
+            if (ffMsg) ffMsg.innerHTML = '⚠️ 上报将锁定为：预习 0 分、操作 0 分、综合 59 分';
+            autoGrade();
+            showReportToast("✅ 已强制 0/0/59，上报分数锁定");
+        }
+
+        // ========== 一键上报 ==========
+        async function oneClickDataReport() {
+            if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁后再执行上报"); return; }
+            try { autoGrade(); } catch (e) { /* 评分异常不阻塞上报 */ }
+            const className = document.getElementById('class')?.value.trim() || "未填专业班级";
+            const studentId = document.getElementById('studentId')?.value.trim() || "未填学号";
+            const studentName = document.getElementById('studentName')?.value.trim() || "未填姓名";
+            const expDate = document.getElementById('expDate')?.value.trim() || new Date().toLocaleDateString('zh-CN');
+            let preScoreRaw = parseFloat(document.getElementById('detailPreScore')?.innerText?.split('/')[0]) || 0;
+            let opScoreRaw = parseFloat(document.getElementById('operationScore')?.value) || 0;
+            let totalScoreRaw = parseFloat(document.getElementById('detailTotalScore')?.innerText?.split('/')[0]) || 0;
+            // 强制0/0/59（未做实验）：无视任何填写，上报分数锁定
+            if (forcedFail) { preScoreRaw = 0; opScoreRaw = 0; totalScoreRaw = 59; }
+            const now = new Date();
+            const fullDateTime = `${expDate} ${now.toLocaleTimeString('zh-CN', {hour12: false})}`;
+            const reportLines = [
+                "霍尔效应的研究与应用",
+                `专业班级: ${className}`,
+                `学号: ${studentId}`,
+                `姓名: ${studentName}`,
+                `预习得分: ${preScoreRaw.toFixed(1)} `,
+                `操作得分: ${opScoreRaw.toFixed(1)} `,
+                `综合得分: ${totalScoreRaw.toFixed(1)} `,
+                `实验日期: ${fullDateTime}`,
+                `指导教师: ${document.getElementById('instructor')?.value || "马厂"}`,
+                `ϞҨӃҖӜ™`,
+            ];
+            const reportText = reportLines.join("\n");
+            // ⑤ 持久化并展示上报数据（返回本页时可再次复制，双保险）
+            const expKey1 = (document.title || "报告").split("|")[0].trim();
+            try { localStorage.setItem("lastReportText", JSON.stringify({ k: expKey1, t: reportText, ts: Date.now() })); } catch (e) {}
+            showReportDataBar(reportText);
+            // ① 先同步复制到剪贴板（textarea+execCommand，页面聚焦时即成功，不依赖异步权限）
+            let copied = copyReportTextSync(reportText);
+            // ② 立即打开上报表单（同步调用，用户激活最充分，QQ浏览器拦截概率最低）
+            openReportForm();
+            // ③ 同步复制失败时，用 Clipboard API 兜底
+            if (!copied) {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(reportText);
+                        copied = true;
+                    }
+                } catch (e) { copied = false; }
+            }
+            if (copied) {
+                // ④ 终极兜底：新页未打开时（本页仍在前台），800ms 后同页跳转，保证必达统计平台
+                setTimeout(function () {
+                    try {
+                        if (!(document.hidden || document.visibilityState === 'hidden')) {
+                            window.location.href = "https://qrbgda8w.jsjform.com/f/uJfvvZ";
+                        }
+                    } catch (e) { /* 忽略 */ }
+                }, 800);
+                showReportToast("✅ 数据已复制！请在上报页面粘贴提交");
+            } else {
+                showReportContentModal(reportText);
+            }
+        }
+
+        // 打开上报表单：优先新窗口，被拦截则用链接点击兜底，保证手机端必有反应
+        function openReportForm() {
+            const reportUrl = "https://qrbgda8w.jsjform.com/f/uJfvvZ";
+            let opened = false;
+            try { opened = !!window.open(reportUrl, '_blank'); } catch (e) { opened = false; }
+            if (!opened) {
+                try {
+                    const a = document.createElement('a');
+                    a.href = reportUrl;
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } catch (e) { /* 已尽力，兜底弹窗仍可打开 */ }
+            }
+        }
+
+        // 复制数据：Clipboard API 优先，失败回退传统方式，返回是否成功
+        function copyReportTextSync(text) {
+            try {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.setAttribute('readonly', '');
+                textarea.style.position = 'fixed';
+                textarea.style.top = '-9999px';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                textarea.setSelectionRange(0, textarea.value.length);
+                const ok = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                return !!ok;
+            } catch (e) { return false; }
+        }
+
+        // 上报数据常驻条（双保险）：返回本页时可直接复制，再进统计平台粘贴
+        function showReportDataBar(text) {
+            let bar = document.getElementById('reportDataBar');
+            if (!bar) {
+                bar = document.createElement('div');
+                bar.id = 'reportDataBar';
+                bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#fff;border-top:2px solid #1976d2;box-shadow:0 -4px 12px rgba(0,0,0,0.15);padding:10px 14px 12px;font-family:inherit;';
+                let title = document.createElement('div');
+                title.style.cssText = 'font-size:13px;font-weight:700;color:#1976d2;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;';
+                title.innerHTML = '📋 上报数据（返回本页可复制，用后失效）';
+                let closeBtn = document.createElement('span');
+                closeBtn.textContent = '✕';
+                closeBtn.style.cssText = 'cursor:pointer;font-size:14px;color:#999;padding:2px 8px;';
+                closeBtn.onclick = function () {
+                    bar.remove();
+                    try { document.body.style.paddingBottom = ""; } catch (e) {}
+                    try { localStorage.removeItem("lastReportText"); } catch (e) {}
+                };
+                title.appendChild(closeBtn);
+                let ta = document.createElement('textarea');
+                ta.id = 'reportDataBarText';
+                ta.readOnly = true;
+                ta.value = text;
+                ta.style.cssText = 'width:100%;height:110px;box-sizing:border-box;font-size:12px;border:1px solid #ccc;border-radius:8px;padding:8px;background:#fafafa;color:#222;white-space:pre;resize:none;';
+                let btn = document.createElement('button');
+                btn.textContent = '📋 复制上报数据';
+                btn.style.cssText = 'width:100%;margin-top:8px;padding:10px;border:none;border-radius:8px;background:#1976d2;color:#fff;font-size:14px;font-weight:600;';
+                btn.onclick = async function () {
+                    ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+                    let ok = false;
+                    try { ok = copyReportTextSync(text); } catch (e) { ok = false; }
+                    if (!ok) {
+                        try {
+                            if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); ok = true; }
+                        } catch (e) { ok = false; }
+                    }
+                    showReportToast(ok ? "✅ 已复制！请到统计平台粘贴" : "⚠️ 自动复制失败，请长按文字手动复制");
+                };
+                let openBtn = document.createElement('button');
+                openBtn.textContent = '🚀 再次进入统计平台';
+                openBtn.style.cssText = 'width:100%;margin-top:6px;padding:10px;border:none;border-radius:8px;background:#2e7d32;color:#fff;font-size:14px;font-weight:600;';
+                openBtn.onclick = function () {
+                    // 一次性使用：点“再次进入统计平台”即消耗常驻条，防止反复进平台刷分
+                    try { bar.remove(); } catch (e) {}
+                    try { document.body.style.paddingBottom = ""; } catch (e) {}
+                    try { localStorage.removeItem("lastReportText"); } catch (e) {}
+                    let op = false;
+                    try { op = !!window.open('https://qrbgda8w.jsjform.com/f/uJfvvZ', '_blank'); } catch (e) { op = false; }
+                    if (!op) {
+                        try {
+                            const a = document.createElement('a');
+                            a.href = 'https://qrbgda8w.jsjform.com/f/uJfvvZ';
+                            a.target = '_blank';
+                            a.rel = 'noopener';
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                        } catch (e) {}
+                    }
+                    setTimeout(function () {
+                        try {
+                            if (!(document.hidden || document.visibilityState === 'hidden')) {
+                                window.location.href = 'https://qrbgda8w.jsjform.com/f/uJfvvZ';
+                            }
+                        } catch (e) {}
+                    }, 800);
+                };
+                bar.appendChild(title); bar.appendChild(ta); bar.appendChild(btn); bar.appendChild(openBtn);
+                document.body.appendChild(bar);
+                try { document.body.style.paddingBottom = '200px'; } catch (e) {}
+            } else {
+                let ta2 = document.getElementById('reportDataBarText');
+                if (ta2) ta2.value = text;
+            }
+        }
+
+        // 兜底弹窗：剪贴板不可用时展示报告内容，支持长按复制
+        function showReportContentModal(text) {
+            let mask = document.createElement('div');
+            mask.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;';
+            let box = document.createElement('div');
+            box.style.cssText = 'background:#fff;border-radius:14px;max-width:420px;width:100%;padding:18px;box-sizing:border-box;font-size:14px;color:#222;';
+            let title = document.createElement('div');
+            title.style.cssText = 'font-weight:700;font-size:15px;margin-bottom:10px;';
+            title.textContent = '📋 请长按下方内容复制，再粘贴到上报页面';
+            let ta = document.createElement('textarea');
+            ta.readOnly = true;
+            ta.value = text;
+            ta.style.cssText = 'width:100%;height:200px;box-sizing:border-box;font-size:13px;border:1px solid #ccc;border-radius:8px;padding:8px;background:#fafafa;color:#222;white-space:pre;resize:none;';
+            let btnRow = document.createElement('div');
+            btnRow.style.cssText = 'margin-top:12px;display:flex;gap:8px;';
+            let btnCopy = document.createElement('button');
+            btnCopy.textContent = '复制';
+            btnCopy.style.cssText = 'flex:1;padding:9px;border:none;border-radius:8px;background:#1976d2;color:#fff;font-size:14px;';
+            let btnOpen = document.createElement('button');
+            btnOpen.textContent = '打开上报页面';
+            btnOpen.style.cssText = 'flex:1;padding:9px;border:none;border-radius:8px;background:#2e7d32;color:#fff;font-size:14px;';
+            let btnClose = document.createElement('button');
+            btnClose.textContent = '关闭';
+            btnClose.style.cssText = 'padding:9px 14px;border:none;border-radius:8px;background:#eee;color:#555;font-size:14px;';
+            btnRow.appendChild(btnCopy); btnRow.appendChild(btnOpen); btnRow.appendChild(btnClose);
+            box.appendChild(title); box.appendChild(ta); box.appendChild(btnRow);
+            mask.appendChild(box);
+            document.body.appendChild(mask);
+            ta.addEventListener('click', function () { ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); });
+            btnCopy.addEventListener('click', async function () {
+                ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+                let ok = false;
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); ok = true; }
+                    else { ok = document.execCommand('copy'); }
+                } catch (e) { ok = false; }
+                if (!ok) { try { ok = document.execCommand('copy'); } catch (e) { ok = false; } }
+                showReportToast(ok ? "✅ 已复制！请到上报页面粘贴" : "⚠️ 自动复制失败，请长按文字手动复制");
+            });
+            btnOpen.addEventListener('click', function () { window.location.href = "https://qrbgda8w.jsjform.com/f/uJfvvZ"; });
+            btnClose.addEventListener('click', function () { mask.remove(); });
+            mask.addEventListener('click', function (e) { if (e.target === mask) mask.remove(); });
+        }
+
+        // ========== 保存/加载 ==========
+        function manualSave() {
+            let data = { info: {}, blanks: {}, is: {}, v: {}, im: {}, vm: {}, vh: {}, vhm: {}, thoughts: {},
+                summary: document.getElementById('summary').value,
+                opScore: document.getElementById('operationScore').value,
+                im_fixed1: document.getElementById('im_fixed1').value,
+                is_fixed2: document.getElementById('is_fixed2').value,
+                b_value: document.getElementById('b_value').value,
+                images: imageList, manualPlots: manualPlotImages,
+                hasDrawn1, hasDrawn2 };
+            document.querySelectorAll('.info-input').forEach(i => { if (i.id !== 'expName') data.info[i.id] = i.value; });
+            document.querySelectorAll('.fill-blank').forEach(i => data.blanks[i.id] = i.value);
+            for (let i=1; i<=5; i++) {
+                data.is['is'+i] = document.getElementById('is'+i).value;
+                for (let j=1; j<=4; j++) {
+                    data.v['v'+i+'_'+j] = document.getElementById('v'+i+'_'+j).value;
+                    data.vm['v'+i+'m_'+j] = document.getElementById('v'+i+'m_'+j).value;
+                }
+                data.im['im'+i] = document.getElementById('im'+i).value;
+                data.vh['vh'+i] = document.getElementById('vh'+i).value;
+                data.vhm['vhm'+i] = document.getElementById('vhm'+i).value;
+            }
+            document.querySelectorAll('.thought-input').forEach(i => data.thoughts[i.id] = i.value);
+            data.s_slope1 = document.getElementById('s_slope1').value;
+            data.s_intercept1 = document.getElementById('s_intercept1').value;
+            data.s_kh = document.getElementById('s_kh').value;
+            data.s_slope2 = document.getElementById('s_slope2').value;
+            data.s_intercept2 = document.getElementById('s_intercept2').value;
+            try { localStorage.setItem('fullReport_hall', JSON.stringify(data)); }
+            catch (e) { showReportToast("⚠️ 存储空间不足，报告未保存（照片过大），可删除部分照片后重试"); }
+            document.getElementById('lastSaveTime').innerText = `📁 上次保存：${new Date().toLocaleTimeString()}`;
+            showReportToast("✅ 报告已手动保存");
+        }
+
+        function manualLoad() {
+            let raw = localStorage.getItem('fullReport_hall');
+            if (!raw) { showReportToast("⚠️ 无保存记录"); return; }
+            let data = JSON.parse(raw);
+            Object.entries(data.info || {}).forEach(([id, val]) => {
+                let e = document.getElementById(id);
+                if (e && id !== 'expName' && id !== 'operationScore') e.value = val;
+            });
+            Object.entries(data.blanks || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+            Object.entries(data.is || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+            Object.entries(data.v || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+            Object.entries(data.im || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+            Object.entries(data.vm || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+            Object.entries(data.vh || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+            Object.entries(data.vhm || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+            Object.entries(data.thoughts || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+            if (data.summary) document.getElementById('summary').value = data.summary;
+            ['s_slope1','s_intercept1','s_kh','s_slope2','s_intercept2'].forEach(id => { if (data[id]) document.getElementById(id).value = data[id]; });
+            if (data.im_fixed1) document.getElementById('im_fixed1').value = data.im_fixed1;
+            if (data.is_fixed2) document.getElementById('is_fixed2').value = data.is_fixed2;
+            if (data.b_value) document.getElementById('b_value').value = data.b_value;
+            if (data.images) { imageList = data.images; displayImages(); }
+            if (data.manualPlots) { manualPlotImages = data.manualPlots; displayManualPlots(); }
+            if (data.hasDrawn1 !== undefined) hasDrawn1 = data.hasDrawn1;
+            if (data.hasDrawn2 !== undefined) hasDrawn2 = data.hasDrawn2;
+
+        // ===== 10分钟免密码：刷新时自动恢复教师解锁状态 =====
+        let _opUnlocked = false;
+        try {
+            const _uk = (document.title || "报告").split("|")[0].trim();
+            const _ut = localStorage.getItem('opUnlockTime_' + _uk);
+            if (_ut && (Date.now() - parseInt(_ut, 10)) <= 10 * 60 * 1000) _opUnlocked = true;
+        } catch (e) {}
+        document.getElementById('operationScore').value = '0';
+        document.getElementById('currentOpScore').innerText = '0';
+        if (_opUnlocked) {
+            opScoreLocked = true;
+            document.getElementById('opScoreDiv').style.display = 'block';
+            document.getElementById('opLockMsg').innerHTML = '✅ 教师已解锁（10分钟内免密码）';
+        } else {
+            opScoreLocked = false;
+            document.getElementById('opScoreDiv').style.display = 'none';
+            document.getElementById('opLockMsg').innerHTML = '';
+        }
+        document.getElementById('opPwd').value = '';
+        // ===== 刷新后操作分保留：从本地存储恢复，不删除 =====
+        try {
+            const _op = localStorage.getItem('operationScore_' + (document.title || "报告").split("|")[0].trim());
+            if (_op !== null && _op !== undefined) {
+                const _v = Math.min(20, Math.max(0, parseFloat(_op) || 0));
+                document.getElementById('operationScore').value = _v;
+                document.getElementById('currentOpScore').innerText = _v;
+            }
+        } catch (e) {}
+
+
+            updateAllAnswerStatusIcons();
+            if (hasDrawn1 || hasDrawn2) {
+                processData();
+            }
+            showReportToast("✅ 加载完成（操作分已保留）");
+        }
+
+        function exportData() {
+            let d = localStorage.getItem('fullReport_hall');
+            if (d) { let blob = new Blob([d], {type:'application/json'}); let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'hall_exp_backup.json'; a.click(); } else showReportToast("⚠️ 无数据");
+        }
+        function importData() {
+            let inp = document.createElement('input');
+            inp.type = 'file';
+            inp.accept = '.json';
+            inp.onchange = function(e) {
+                let f = e.target.files[0];
+                if (!f) return;
+                let reader = new FileReader();
+                reader.onload = function(ev) {
+                    localStorage.setItem('fullReport_hall', ev.target.result);
+                    showReportToast("✅ 导入成功，即将刷新页面");
+                    setTimeout(() => location.reload(), 1500);
+                };
+                reader.readAsText(f);
+            };
+            inp.click();
+        }
+        function clearSavedData() {
+            localStorage.removeItem('fullReport_hall');
+            localStorage.removeItem('evidenceImages');
+            localStorage.removeItem('manualPlotImages');
+            try { localStorage.removeItem('operationScore_' + (document.title || "报告").split("|")[0].trim()); } catch (e) {}
+            try { localStorage.removeItem('opUnlockTime_' + (document.title || "报告").split("|")[0].trim()); } catch (e) {}
+            localStorage.removeItem('forcedFail');
+            forcedFail = false;
+            showReportToast("🗑️ 数据已清除，页面将刷新");
+            setTimeout(() => location.reload(), 1200);
+        }
+
+        function toggleAnswer(n) {
+            let ansDiv = document.getElementById(`answer${n}`);
+            if (ansDiv.style.display === 'block') ansDiv.style.display = 'none';
+            else ansDiv.style.display = 'block';
+        }
+
+        // ========== 初始化 ==========
+        window.onload = function() {
+            let raw = localStorage.getItem('fullReport_hall');
+            if (raw) {
+                try {
+                    let data = JSON.parse(raw);
+                    Object.entries(data.info || {}).forEach(([id, val]) => {
+                        let e = document.getElementById(id);
+                        if (e && id !== 'expName' && id !== 'operationScore') e.value = val;
+                    });
+                    Object.entries(data.blanks || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                    Object.entries(data.is || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                    Object.entries(data.v || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                    Object.entries(data.im || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                    Object.entries(data.vm || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                    Object.entries(data.vh || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                    Object.entries(data.vhm || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                    Object.entries(data.thoughts || {}).forEach(([id, val]) => { let e = document.getElementById(id); if (e) e.value = val; });
+                    if (data.summary) document.getElementById('summary').value = data.summary;
+                    ['s_slope1','s_intercept1','s_kh','s_slope2','s_intercept2'].forEach(id => { if (data[id]) document.getElementById(id).value = data[id]; });
+                    if (data.im_fixed1) document.getElementById('im_fixed1').value = data.im_fixed1;
+                    if (data.is_fixed2) document.getElementById('is_fixed2').value = data.is_fixed2;
+                    if (data.b_value) document.getElementById('b_value').value = data.b_value;
+                    if (data.images) { imageList = data.images; displayImages(); }
+                    if (data.manualPlots) { manualPlotImages = data.manualPlots; displayManualPlots(); }
+                    if (data.hasDrawn1 !== undefined) hasDrawn1 = data.hasDrawn1;
+                    if (data.hasDrawn2 !== undefined) hasDrawn2 = data.hasDrawn2;
+                } catch(e) {}
+            }
+            // 自动设置日期为当天
+        const _today = new Date();
+        document.getElementById('expDate').value = _today.getFullYear() + '-' + String(_today.getMonth() + 1).padStart(2, '0') + '-' + String(_today.getDate()).padStart(2, '0');
+        // ===== 10分钟免密码：刷新时自动恢复教师解锁状态 =====
+        let _opUnlocked = false;
+        try {
+            const _uk = (document.title || "报告").split("|")[0].trim();
+            const _ut = localStorage.getItem('opUnlockTime_' + _uk);
+            if (_ut && (Date.now() - parseInt(_ut, 10)) <= 10 * 60 * 1000) _opUnlocked = true;
+        } catch (e) {}
+        document.getElementById('operationScore').value = '0';
+        document.getElementById('currentOpScore').innerText = '0';
+        if (_opUnlocked) {
+            opScoreLocked = true;
+            document.getElementById('opScoreDiv').style.display = 'block';
+            document.getElementById('opLockMsg').innerHTML = '✅ 教师已解锁（10分钟内免密码）';
+        } else {
+            opScoreLocked = false;
+            document.getElementById('opScoreDiv').style.display = 'none';
+            document.getElementById('opLockMsg').innerHTML = '';
+        }
+        document.getElementById('opPwd').value = '';
+        // ===== 刷新后操作分保留：从本地存储恢复，不删除 =====
+        try {
+            const _op = localStorage.getItem('operationScore_' + (document.title || "报告").split("|")[0].trim());
+            if (_op !== null && _op !== undefined) {
+                const _v = Math.min(20, Math.max(0, parseFloat(_op) || 0));
+                document.getElementById('operationScore').value = _v;
+                document.getElementById('currentOpScore').innerText = _v;
+            }
+        } catch (e) {}
+
+
+            document.querySelectorAll('.fill-blank').forEach(inp => {
+                inp.addEventListener('input', function(e) { updateAnswerStatusIcon(e.target); });
+            });
+            updateAllAnswerStatusIcons();
+
+            // 恢复强制0/0/59状态（按实验名匹配，不串实验）
+            try {
+                const ffRaw = localStorage.getItem('forcedFail');
+                if (ffRaw) {
+                    const ff = JSON.parse(ffRaw);
+                    const expKeyF2 = (document.title || "报告").split("|");
+                    const expKeyF2a = expKeyF2[0].trim();
+                    if (ff && ff.v && ff.k === expKeyF2a) {
+                        forcedFail = true;
+                        const ffBtn2 = document.getElementById('forceFailBtn');
+                        if (ffBtn2) ffBtn2.textContent = '✅ 已强制 0/0/59（点击解除）';
+                        const ffMsg2 = document.getElementById('forceFailMsg');
+                        if (ffMsg2) ffMsg2.innerHTML = '⚠️ 上报将锁定为：预习 0 分、操作 0 分、综合 59 分';
+                        const _opEl0 = document.getElementById('operationScore'); if (_opEl0) _opEl0.value = '0';
+                        const _opCur0 = document.getElementById('currentOpScore'); if (_opCur0) _opCur0.innerText = '0';
+                    }
+                }
+            } catch (e) {}
+            const reportBtn = document.getElementById('oneClickReportBtn');
+            if (reportBtn) reportBtn.addEventListener('click', oneClickDataReport);
+            // 双保险：恢复上次上报数据条（返回本页时可再次复制）
+            try {
+                const lastRaw = localStorage.getItem('lastReportText');
+                if (lastRaw) {
+                    const obj = JSON.parse(lastRaw);
+                    const expKey2 = (document.title || "报告").split("|")[0].trim();
+                    if (obj && obj.t && obj.k === expKey2 && obj.ts && (Date.now() - obj.ts) <= 30 * 60 * 1000) showReportDataBar(obj.t);
+                    else if (obj && obj.k === expKey2) { try { localStorage.removeItem("lastReportText"); } catch (e) {} }
+                }
+            } catch (e) {}
+
+            if (raw) showReportToast("📂 已自动加载上次保存的数据");
+            if (hasDrawn1 || hasDrawn2) {
+                processData();
+            }
+        };
+    </script>
+<script>
+(function(){
+  function __fillUser(){
+    try{
+      var u=JSON.parse(localStorage.getItem('uphys2_current_user')||'null');
+      if(!u) return;
+      var si=document.getElementById('studentId'), sn=document.getElementById('studentName');
+      if(si && si.value !== u.id) si.value = u.id;
+      if(sn && !sn.value && u.name) sn.value = u.name;
+    }catch(e){}
+  }
+  __fillUser();
+  if(document.readyState==='complete'){ __fillUser(); }
+  else{ window.addEventListener('load', function(){ setTimeout(__fillUser, 300); }); }
+  setTimeout(__fillUser, 800);
+})();
+</script>
+<script>
+(function(){
+  var EXP_NO = '05';
+  function __toNum(x){ var m=String(x==null?'':x).match(/(\d+(?:\.\d+)?)/); return m?parseFloat(m[1]):null; }
+  function __collectScore(){
+    try{
+      var u = JSON.parse(localStorage.getItem('uphys2_current_user')||'null');
+      if(!u || (u.role && u.role==='teacher')) return;
+      function gv(id){ var el=document.getElementById(id); return el?el.textContent.trim():null; }
+      var rec = {
+        pre:__toNum(gv('detailPreScore')), data:__toNum(gv('detailDataScore')), calc:__toNum(gv('detailCalcScore')),
+        autoPlot:__toNum(gv('detailAutoPlotScore')), manualPlot:__toNum(gv('detailManualPlotScore')),
+        thought:__toNum(gv('detailThoughtScore')), summary:__toNum(gv('detailSummaryScore')),
+        evidence:__toNum(gv('detailEvidenceScore')), op:__toNum(gv('detailOpScore')),
+        total:__toNum(gv('detailTotalScore')), time:Date.now()
+      };
+      if(rec.total==null) return;
+      var any = [rec.pre,rec.data,rec.calc,rec.autoPlot,rec.manualPlot,rec.thought,rec.summary,rec.evidence,rec.op]
+        .some(function(s){ return s!=null && s>0; });
+      if(rec.total===0 && !any) return;
+      var store = JSON.parse(localStorage.getItem('uphys2_records')||'{}');
+      store[u.id] = store[u.id] || {name:''};
+      if(u.name) store[u.id].name = u.name;
+      store[u.id].exps = store[u.id].exps || {};
+      store[u.id].exps[EXP_NO] = rec;
+      localStorage.setItem('uphys2_records', JSON.stringify(store));
+    }catch(e){}
+  }
+  var __orig = window.autoGrade;
+  if(typeof __orig === 'function'){
+    window.autoGrade = function(){ var r = __orig.apply(this, arguments); setTimeout(__collectScore, 150); return r; };
+  }
+  setTimeout(__collectScore, 1500);
+  window.addEventListener('pagehide', __collectScore);
+  window.addEventListener('beforeunload', __collectScore);
+})();
+</script>
+
+<script>
+(function(){
+  var DATA = {"title":"霍尔效应的研究与应用","tips":["测 V_H-I_S：固定励磁电流 I_M，改变工作电流 I_S；测 V_H-I_M：固定 I_S 改变 I_M。","采用对称交换测量法：I_S 与磁场 B 分别换向，测 V1、V2、V3、V4 四个值。","霍尔电压取 V_H = (V1 − V2 + V3 − V4)/4，可消除不等位电势等副效应。","保持霍尔片平面垂直于磁场方向，各电流不得超过元件额定值。","计算灵敏度 K_H = V_H/(I_S·B)，注意 B 由励磁电流按标定关系给出。"],"formulas":[{"f":"V_H = K_H·I_S·B","n":"霍尔电压与工作电流、磁感应强度成正比"},{"f":"K_H = 1 / (n·q·d)","n":"霍尔灵敏度（n 载流子浓度，d 片厚）"},{"f":"V_H = (V1 − V2 + V3 − V4) / 4","n":"对称测量法消除副效应"},{"f":"B = V_H / (K_H·I_S)","n":"已知灵敏度时由 V_H、I_S 测磁场"}],"thoughts":[{"q":"霍尔效应中的副效应有哪些？如何消除？","a":"不等位电势（电极不对称）和热磁效应（爱廷豪森、能斯特等）。消除方法：对称交换测量法，分别改变 I_S 和 B 方向，取四次测量平均值。"},{"q":"为什么 V_H 与 I_S、B 成正比？成立条件？","a":"载流子漂移满足 v=μE 且磁场不太强时洛伦兹力与电场力平衡、载流子浓度恒定，故 V_H=K_H·I_S·B。条件：弱磁场、均匀磁场、浓度恒定、工作在线性区。"},{"q":"如何用霍尔元件测量磁感应强度？","a":"将霍尔片置于待测磁场中，通恒定工作电流 I_S，测 V_H，由 B = V_H/(K_H·I_S) 求得。需保证片平面与磁场垂直、工作条件标准。"}]};
+  var style = document.createElement('style');
+  style.textContent = [
+    '.__ua-btn{position:fixed;right:18px;bottom:18px;width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;z-index:99999;background:linear-gradient(135deg,#1E5AA8,#21A179);color:#fff;font-size:22px;font-weight:800;box-shadow:0 8px 22px rgba(21,62,120,.4);display:flex;align-items:center;justify-content:center;transition:transform .2s ease,box-shadow .2s ease;font-family:inherit}',
+    '.__ua-btn:hover{transform:scale(1.08);box-shadow:0 12px 28px rgba(21,62,120,.5)}',
+    '.__ua-panel{position:fixed;right:18px;bottom:86px;width:352px;max-width:calc(100vw - 36px);max-height:min(62vh,560px);background:#fff;border-radius:16px;box-shadow:0 20px 50px rgba(15,35,70,.35);z-index:99999;display:none;flex-direction:column;overflow:hidden;border:1px solid #E3E9F1;font-family:"Segoe UI","Microsoft YaHei",sans-serif}',
+    '.__ua-panel.open{display:flex}',
+    '.__ua-head{background:linear-gradient(100deg,#153E78,#1E5AA8);color:#fff;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;flex:0 0 auto}',
+    '.__ua-head b{font-size:14.5px;letter-spacing:.3px}',
+    '.__ua-close{border:none;background:rgba(255,255,255,.16);color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;flex:0 0 26px}',
+    '.__ua-close:hover{background:rgba(255,255,255,.3)}',
+    '.__ua-tabs{display:flex;border-bottom:1px solid #E3E9F1;background:#F6F9FD;flex:0 0 auto}',
+    '.__ua-tab{flex:1;padding:10px 0;border:none;background:transparent;font-size:13px;font-weight:600;color:#5B6B7F;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit}',
+    '.__ua-tab.active{color:#1E5AA8;border-bottom-color:#1E5AA8;background:#fff}',
+    '.__ua-body{overflow-y:auto;padding:14px 16px;font-size:13px;color:#1F2937;line-height:1.7}',
+    '.__ua-tip{display:flex;gap:9px;margin-bottom:9px;align-items:flex-start}',
+    '.__ua-tip .n{flex:0 0 21px;height:21px;border-radius:50%;background:#EAF1FB;color:#1E5AA8;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px}',
+    '.__ua-formula{background:#F0F6FF;border:1px solid #D5E4F7;border-radius:10px;padding:9px 12px;margin-bottom:9px}',
+    '.__ua-formula .f{font-weight:700;color:#153E78;font-size:13.5px;letter-spacing:.2px}',
+    '.__ua-formula .n{font-size:11.8px;color:#5B6B7F;margin-top:2px}',
+    '.__ua-q{background:#FFFBF3;border:1px solid #F0E0C0;border-radius:10px;padding:10px 12px;margin-bottom:9px}',
+    '.__ua-q .q{font-weight:600;color:#7A5A1E;margin-bottom:6px;line-height:1.55}',
+    '.__ua-q summary{font-size:12px;color:#1E5AA8;cursor:pointer;font-weight:600;outline:none}',
+    '.__ua-q .a{color:#4A5560;font-size:12.5px;margin-top:7px;padding-top:7px;border-top:1px dashed #E8D9B5;line-height:1.7}',
+    '.__ua-empty{color:#B7C3D2;font-size:12.5px;text-align:center;padding:18px 0}'
+  ].join('');
+  document.head.appendChild(style);
+
+  var btn = document.createElement('button');
+  btn.className = '__ua-btn';
+  btn.title = '学习辅助';
+  btn.textContent = '辅';
+  var panel = document.createElement('div');
+  panel.className = '__ua-panel';
+  panel.innerHTML =
+    '<div class="__ua-head"><b>' + DATA.title + ' · 学习辅助</b><button class="__ua-close" title="关闭">✕</button></div>' +
+    '<div class="__ua-tabs">' +
+      '<button class="__ua-tab active" data-t="tips">操作要点</button>' +
+      '<button class="__ua-tab" data-t="formulas">公式速查</button>' +
+      '<button class="__ua-tab" data-t="thoughts">思考题</button>' +
+    '</div><div class="__ua-body" id="__uaBody"></div>';
+  document.body.appendChild(btn);
+  document.body.appendChild(panel);
+
+  function render(tab){
+    var body = panel.querySelector('#__uaBody');
+    if(tab === 'tips'){
+      body.innerHTML = DATA.tips.map(function(t,i){
+        return '<div class="__ua-tip"><span class="n">' + (i+1) + '</span><span>' + t + '</span></div>';
+      }).join('');
+    } else if(tab === 'formulas'){
+      body.innerHTML = DATA.formulas.map(function(f){
+        return '<div class="__ua-formula"><div class="f">' + f.f + '</div><div class="n">' + f.n + '</div></div>';
+      }).join('') || '<div class="__ua-empty">本实验暂无公式</div>';
+    } else {
+      body.innerHTML = DATA.thoughts.map(function(t){
+        return '<div class="__ua-q"><div class="q">' + t.q + '</div><details><summary>查看参考思路</summary><div class="a">' + t.a + '</div></details></div>';
+      }).join('') || '<div class="__ua-empty">本实验暂无思考题</div>';
+    }
+  }
+  panel.querySelectorAll('.__ua-tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      panel.querySelectorAll('.__ua-tab').forEach(function(x){ x.classList.remove('active'); });
+      t.classList.add('active');
+      render(t.dataset.t);
+    });
+  });
+  btn.addEventListener('click', function(){
+    var open = panel.classList.toggle('open');
+    if(open) render(panel.querySelector('.__ua-tab.active').dataset.t);
+  });
+  panel.querySelector('.__ua-close').addEventListener('click', function(){ panel.classList.remove('open'); });
+  render('tips');
+})();
+</script>
+
+</body>
+</html>
