@@ -344,6 +344,51 @@
             color: white;
             transform: translateY(-2px);
         }
+        .preset-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #eef7f3;
+            border-radius: 40px;
+            padding: 6px 8px 6px 16px;
+            border: 1px solid #bfd7e5;
+        }
+        .preset-item:hover {
+            border-color: #2a9d8f;
+        }
+        .preset-load {
+            font-weight: 600;
+            cursor: pointer;
+            color: #1e466e;
+            font-size: 0.85rem;
+        }
+        .preset-load:hover {
+            color: #2a9d8f;
+        }
+        .preset-meta {
+            color: #6b8aa3;
+            font-size: 0.72rem;
+            font-weight: 400;
+            margin-left: 4px;
+        }
+        .preset-del {
+            width: 22px;
+            height: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #8a9bad;
+            cursor: pointer;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+            user-select: none;
+        }
+        .preset-del:hover {
+            background: #e63946;
+            color: white;
+        }
         .toast-msg {
             position: fixed;
             bottom: 24px;
@@ -469,9 +514,19 @@
                         <div class="form-group"><label>📋 目标2 对应毕业要求/指标点</label><input type="text" id="obj2-indicator" value="2.1能够运用数学、物理学的基本原理，对复杂工程问题进行建模、分析和表达。"></div>
                         <div class="form-group"><label>📋 目标3 对应毕业要求/指标点</label><input type="text" id="obj3-indicator" value="4.1能够采用科学方法对应用物理学领域各相关物理现象进行研究和实验验证。"></div>
                     </div>
-                    <div class="filter-note" style="margin-top:8px"><strong>💡 提示：</strong> 修改目标描述或权重后，点击【保存课程配置】，所有分析及报告将同步更新。</div>
+                    <div class="filter-note" style="margin-top:8px"><strong>💡 提示：</strong> 修改目标描述或权重后，点击【保存课程配置】，所有分析及报告将同步更新，且下次打开本页面自动恢复；也可在下方「课程配置保存库」中另存为模板，换课时一键填充。</div>
                 </div>
                 <button onclick="saveBasicInfo()">💾 保存课程配置</button>
+                <div style="background: #eef7f3; border-radius: 20px; padding: 18px; margin: 12px 0;">
+                    <h4>🗂️ 课程配置保存库（切换课程一键填充）</h4>
+                    <p style="margin:0 0 10px; font-size:0.85rem; color:#2c3e66;">将课程基本信息（含课程目标、毕业要求/指标点、权重等全部字段）保存为模板，换另一门课时点击模板即可全部恢复，无需重新填写。</p>
+                    <div class="btn-group">
+                        <button onclick="saveCoursePreset()">📥 保存当前配置为模板</button>
+                        <button onclick="renderPresetList()" class="btn-success">🔄 刷新模板列表</button>
+                    </div>
+                    <div class="course-list" id="preset-list"></div>
+                    <div class="admin-note"><strong>💡 说明：</strong> 点击模板名称一键加载该课程配置；点击 ✕ 删除模板。模板保存在本浏览器（localStorage）中，清除浏览器数据会丢失。点击「保存课程配置」会记录为最近使用，下次打开本页面自动恢复。</div>
+                </div>
             </div>
         </div>
 
@@ -1052,7 +1107,121 @@
         function importFromExcel() { document.getElementById('file-input').click(); }
 
         function saveBasicInfo() { syncFromTable();
-            alert('课程信息及目标定义已保存，达成度重新计算。'); }
+            const cfg = collectCourseConfig();
+            localStorage.setItem(CURRENT_KEY, JSON.stringify(cfg));
+            alert('课程信息及目标定义已保存，达成度重新计算。\n下次打开本页面将自动恢复该配置。'); }
+
+        // ============================================================
+        // 课程配置保存库（多课程模板，切换课程一键填充）
+        // ============================================================
+        const PRESETS_KEY = 'course_config_presets_v1';
+        const CURRENT_KEY = 'course_config_current_v1';
+
+        function collectCourseConfig() {
+            const ids = ['course-name', 'course-code', 'teacher-name', 'class-name', 'course-hours',
+                'course-credits', 'department', 'semester', 'course-type', 'gamma1', 'gamma2', 'gamma3',
+                'usual-coefficient', 'final-coefficient', 'obj1-desc', 'obj2-desc', 'obj3-desc',
+                'obj1-indicator', 'obj2-indicator', 'obj3-indicator'
+            ];
+            const cfg = {};
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) cfg[id] = el.value;
+            });
+            return cfg;
+        }
+
+        function applyCourseConfig(cfg) {
+            if (!cfg) return;
+            Object.entries(cfg).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            });
+            syncFromTable();
+        }
+
+        function getPresets() {
+            try { return JSON.parse(localStorage.getItem(PRESETS_KEY)) || {}; } catch (e) { return {}; }
+        }
+
+        function renderPresetList() {
+            const container = document.getElementById('preset-list');
+            if (!container) return;
+            const presets = getPresets();
+            const entries = Object.entries(presets).sort((a, b) => (b[1].savedAt || '').localeCompare(a[1].savedAt || ''));
+            container.innerHTML = '';
+            if (entries.length === 0) {
+                container.innerHTML = '<span style="color:#4a6a85; font-size:0.85rem; padding:4px 0;">暂无已保存的课程模板。填写课程信息后点击「保存当前配置为模板」。</span>';
+                return;
+            }
+            entries.forEach(([name, cfg]) => {
+                const item = document.createElement('div');
+                item.className = 'preset-item';
+                const load = document.createElement('span');
+                load.className = 'preset-load';
+                load.textContent = name;
+                load.title = '点击加载该课程配置';
+                load.addEventListener('click', () => loadPreset(name));
+                const meta = document.createElement('span');
+                meta.className = 'preset-meta';
+                meta.textContent = cfg['course-code'] || '';
+                const del = document.createElement('span');
+                del.className = 'preset-del';
+                del.textContent = '✕';
+                del.title = '删除该模板';
+                del.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deletePreset(name);
+                });
+                item.appendChild(load);
+                if (meta.textContent) item.appendChild(meta);
+                item.appendChild(del);
+                container.appendChild(item);
+            });
+        }
+
+        function saveCoursePreset() {
+            syncFromTable();
+            const cfg = collectCourseConfig();
+            const defName = (document.getElementById('course-name').value || '').trim() || '未命名课程';
+            const name = (prompt('请输入该课程配置的保存名称（便于识别）：', defName) || '').trim();
+            if (!name) return;
+            const presets = getPresets();
+            if (presets[name] && !confirm(`已存在名为“${name}”的课程配置，是否覆盖？`)) return;
+            presets[name] = Object.assign({}, cfg, { savedAt: new Date().toISOString() });
+            localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+            localStorage.setItem(CURRENT_KEY, JSON.stringify(cfg));
+            renderPresetList();
+            showToast(`✅ 已保存课程配置“${name}”`);
+        }
+
+        function loadPreset(name) {
+            const presets = getPresets();
+            const cfg = presets[name];
+            if (!cfg) { showToast('⚠️ 未找到该配置'); return; }
+            applyCourseConfig(cfg);
+            localStorage.setItem(CURRENT_KEY, JSON.stringify(cfg));
+            showToast(`✅ 已加载“${name}”的课程配置`);
+        }
+
+        function deletePreset(name) {
+            if (!confirm(`确定删除课程配置“${name}”吗？`)) return;
+            const presets = getPresets();
+            delete presets[name];
+            localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+            renderPresetList();
+            showToast('🗑️ 已删除课程配置');
+        }
+
+        function restoreCurrentConfig() {
+            try {
+                const raw = localStorage.getItem(CURRENT_KEY);
+                if (!raw) return;
+                const cfg = JSON.parse(raw);
+                if (!cfg || typeof cfg !== 'object') return;
+                applyCourseConfig(cfg);
+            } catch (e) { /* 忽略损坏数据 */ }
+        }
 
         function loadDemoData() {
             const gamma = getGamma();
@@ -2040,10 +2209,12 @@
         // 初始化
         // ============================================================
         document.addEventListener('DOMContentLoaded', () => {
+            restoreCurrentConfig();
             loadNormConfig();
             initNormBoard();
             initChart();
             loadDemoData();
+            renderPresetList();
 
             document.getElementById('input-data')?.addEventListener('change', syncFromTable);
             document.getElementById('input-data')?.addEventListener('input', syncFromTable);
@@ -2074,6 +2245,10 @@
             window.removeSelectedStudents = removeSelectedStudents;
             window.importFromExcel = importFromExcel;
             window.saveBasicInfo = saveBasicInfo;
+            window.saveCoursePreset = saveCoursePreset;
+            window.loadPreset = loadPreset;
+            window.deletePreset = deletePreset;
+            window.renderPresetList = renderPresetList;
             window.clearAllFilters = clearAllFilters;
             window.toggleDataset = toggleDataset;
             window.generateWordReport = generateWordReport;
