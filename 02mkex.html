@@ -260,7 +260,7 @@
         <p>绘制 \(\Delta d\) 随 \(m\) 的变化曲线，通过线性拟合可得到斜率，从而求得激光波长 \(\lambda = 2 \times \text{斜率}\)。</p>
         <p>下方已自动生成该散点图及拟合直线，请查看。</p>
 
-        <div style="margin-top:20px; font-style:italic;">※ 数据处理评分标准（满分20分）：各次波长计算(6分)，平均波长(6分)，相对误差(4分)，\(\Delta d-m\) 图及线性拟合(4分)。评分严格：误差≤1%满分，≤2%得85%，≤5%得65%，≤10%得40%，≤20%得15%，>20%得0分。</div>
+        <div style="margin-top:20px; font-style:italic;">※ 数据处理评分标准（满分20分，两项相加）：<br>① 算得对（8分）：根据表中条纹变化数 \(m\) 与 \(M_1\) 移动距离 \(\Delta d\)，用公式 \(\lambda = 2\Delta d / m\) 计算各次波长，计算结果无误即得分（四舍五入误差≤1%视为无误）；<br>② 算得准（12分）：计算结果与标准值 632.8 nm 比较，评分严格：误差≤3%得满分，≤6%得85%，≤10%得65%，≤20%得40%，≤30%得15%，>30%得0分。</div>
 
         <div style="margin-top: 30px; text-align:center;">
             <button class="chart-btn" onclick="drawChart()">📈 绘制 \(\Delta d - m\) 拟合曲线</button>
@@ -320,6 +320,8 @@
             <div class="score-item"><span>📖 预习填空 (10%)</span><span id="detailPreScore">0/10</span></div>
             <div class="score-item"><span>📝 数据记录 (10%)</span><span id="detailDataScore">0/10</span></div>
             <div class="score-item"><span>📐 数据处理 (20%)</span><span id="detailCalcScore">0/20</span></div>
+            <div class="score-item" style="padding-left:28px; border-bottom:none; color:#455a64;"><span>① 算得对（公式计算无误）</span><span id="detailCalcCorrect">0/8</span></div>
+            <div class="score-item" style="padding-left:28px; color:#455a64;"><span>② 算得准（与标准值632.8nm比较）</span><span id="detailCalcAccurate">0/12</span></div>
             <div class="score-item"><span>📊 自动绘图 (5%)</span><span id="detailAutoPlotScore">0/5</span></div>
             <div class="score-item"><span>✏️ 手工绘图 (10%)</span><span id="detailManualPlotScore">0/10</span></div>
             <div class="score-item"><span>💡 思考题 (10%)</span><span id="detailThoughtScore">0/10</span></div>
@@ -610,53 +612,39 @@
         return Math.min(10, Math.round(score));
     }
 
-    // 严格评分：相对误差越小得分越高
-    function errFrac(relErr) {
-        if (relErr <= 0.01) return 1;
-        if (relErr <= 0.02) return 0.85;
-        if (relErr <= 0.05) return 0.65;
-        if (relErr <= 0.10) return 0.40;
-        if (relErr <= 0.20) return 0.15;
-        return 0;
-    }
-    function groupErrScore(inputs, trues, maxPts) {
-        let s = 0, cnt = 0;
-        for (let i = 0; i < inputs.length; i++) {
-            let u = parseFloat(inputs[i]);
-            if (isNaN(u) || !(trues[i] > 0)) continue;
-            s += errFrac(Math.abs(u - trues[i]) / trues[i]);
-            cnt++;
-        }
-        return cnt ? (s / cnt) * maxPts : 0;
-    }
-    function gradeDataProcess() {
-        let score = 0;
-        calculateData(); // 更新真实值缓存
-        // 各次波长计算 (6分)
-        let lInputs = [], lTrues = [];
+    // ========== 数据处理评分（满分20分） ==========
+    // ① 算得对（8分）：根据表中条纹变化数m与M1移动距离Δd，用公式λ=2Δd/m计算各次波长，无误即得分（四舍五入误差≤1%视为无误）
+    function gradeCalcCorrect() {
+        let correctRows = 0, validRows = 0;
         for (let i = 1; i <= 10; i++) {
-            lInputs.push(document.getElementById('lambda' + i).value);
-            lTrues.push(cachedLambda[i]);
+            let m = parseFloat(document.getElementById('m' + i).value);
+            let d = parseFloat(document.getElementById('d' + i).value);
+            if (!(m > 0) || !(d > 0)) continue; // 该行数据不完整，不参与计分
+            let trueLambda = 2 * d * 1000000 / m; // 由公式计算得到的波长（nm）
+            let userLambda = parseFloat(document.getElementById('lambda' + i).value);
+            validRows++;
+            if (!isNaN(userLambda) && trueLambda > 0 && Math.abs(userLambda - trueLambda) / trueLambda <= 0.01) correctRows++;
         }
-        score += groupErrScore(lInputs, lTrues, 6);
-        // 平均波长 (6分)
-        let avgUser = parseFloat(document.getElementById('s_avglambda').value);
-        if (!isNaN(avgUser) && avgLaser > 0) score += errFrac(Math.abs(avgUser - avgLaser) / avgLaser) * 6;
-        // 相对误差 (4分)
-        let errUser = parseFloat(document.getElementById('s_err').value);
-        if (!isNaN(errUser) && cachedErr >= 0) {
-            let diff = Math.abs(errUser - cachedErr); // 百分点差
-            let f;
-            if (diff <= 0.1) f = 1;
-            else if (diff <= 0.2) f = 0.85;
-            else if (diff <= 0.5) f = 0.65;
-            else if (diff <= 1.0) f = 0.40;
-            else if (diff <= 2.0) f = 0.15;
-            else f = 0;
-            score += f * 4;
-        }
-        // 绘图拟合 (4分)
-        if (hasDrawnChart) score += 4;
+        return validRows > 0 ? (correctRows / validRows) * 8 : 0;
+    }
+
+    // ② 算得准（12分）：计算结果（由表中数据算得的平均波长）与标准值632.8nm比较，评分严格
+    function gradeCalcAccurate() {
+        if (!(avgLaser > 0)) return 0;
+        let relErr = Math.abs(avgLaser - 632.8) / 632.8;
+        let f;
+        if (relErr <= 0.03) f = 1;         // ≤3% 满分
+        else if (relErr <= 0.06) f = 0.85; // ≤6% 得85%
+        else if (relErr <= 0.10) f = 0.65; // ≤10% 得65%
+        else if (relErr <= 0.20) f = 0.40; // ≤20% 得40%
+        else if (relErr <= 0.30) f = 0.15; // ≤30% 得15%
+        else f = 0;                        // >30% 得0分
+        return f * 12;
+    }
+
+    function gradeDataProcess() {
+        calculateData(); // 更新真实值缓存（avgLaser、cachedLambda、cachedErr）
+        let score = gradeCalcCorrect() + gradeCalcAccurate();
         return Math.min(20, Math.round(score));
     }
 
@@ -695,6 +683,8 @@
         let preSc = gradePre();
         let dataSc = gradeDataRecord();
         let calcSc = gradeDataProcess();
+        let calcCorrectSc = gradeCalcCorrect();
+        let calcAccurateSc = gradeCalcAccurate();
         let autoPlotSc = gradeAutoPlot();
         let manualPlotSc = gradeManualPlot();
         let thoughtSc = gradeThought();
@@ -709,6 +699,8 @@
         document.getElementById('detailPreScore').innerText = `${preSc}/10`;
         document.getElementById('detailDataScore').innerText = `${dataSc}/10`;
         document.getElementById('detailCalcScore').innerText = `${calcSc}/20`;
+        document.getElementById('detailCalcCorrect').innerText = `${Math.round(calcCorrectSc * 10) / 10}/8`;
+        document.getElementById('detailCalcAccurate').innerText = `${Math.round(calcAccurateSc * 10) / 10}/12`;
         document.getElementById('detailAutoPlotScore').innerText = `${autoPlotSc}/5`;
         document.getElementById('detailManualPlotScore').innerText = `${manualPlotSc}/10`;
         document.getElementById('detailThoughtScore').innerText = `${thoughtSc}/10`;
