@@ -209,7 +209,7 @@
         }
         .img-card {
             position: relative;
-            width: 130px;
+            width: 390px; max-width: 100%;
             border-radius: 16px;
             background: white;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -218,8 +218,8 @@
         }
         .img-card img {
             width: 100%;
-            height: 90px;
-            object-fit: cover;
+            height: 270px;
+            object-fit: contain;
             border-radius: 12px;
         }
         .del-img {
@@ -524,7 +524,7 @@
         <div class="manual-plot-area">
             <strong>✏️ 手工图形绘制上传 (权重10%)</strong>
             <p>请上传您手绘的 \(\ln I_F - V_F\) 或 \(V_F - T\) 曲线图（照片或扫描件）。</p>
-            <input type="file" id="manualPlotUpload" accept="image/*" multiple>
+            <input type="file" id="manualPlotUpload" accept="image/*" multiple onchange="uploadManualPlots()">
             <button onclick="uploadManualPlots()" class="upload-btn" style="background:#f57f17;">➕ 上传手绘图形</button>
             <div id="manualPlotPreview" class="image-preview"></div>
             <small style="color: #4a148c;">* 上传手绘图形可获得额外分数，至少一张。</small>
@@ -533,7 +533,7 @@
         <!-- 实验证据 -->
         <div class="evidence-area">
             <strong>📸 实验证据图片上传（权重5%）</strong>
-            <div style="margin: 12px 0;"><input type="file" id="evidenceUpload" accept="image/*" multiple><button class="upload-btn" onclick="uploadEvidenceImages()" style="background:#7b1fa2;">➕ 添加图片</button></div>
+            <div style="margin: 12px 0;"><input type="file" id="evidenceUpload" accept="image/*" multiple onchange="uploadEvidenceImages()"><button class="upload-btn" onclick="uploadEvidenceImages()" style="background:#7b1fa2;">➕ 添加图片</button></div>
             <div id="imagePreviewContainer" class="image-preview"></div>
             <small style="color: #4a148c;">* 上传实验现场照片（仪器数据与人同框且与表格数据相同），至少上传一张可获得5%分数。</small>
         </div>
@@ -602,6 +602,7 @@
             chartVFInstance = null;
         let opScoreLocked = false;
         let forcedFail = false; // 强制0/0/59（未做实验）锁定标记
+        let opLocked = false; // 操作分保存后锁定（防学生返回修改）
         let imageList = [];
         let manualPlotImages = [];
         let hasDrawnIV = false,
@@ -1025,17 +1026,38 @@
             manualSave();
         }
 
+        // ========== 操作分锁定（保存后防学生修改） ==========
+        function opLockKey() { return 'opLocked_' + (document.title || "报告").split("|")[0].trim(); }
+        function isOpLocked() { try { return localStorage.getItem(opLockKey()) === '1'; } catch (e) { return false; } }
+        function setOpLocked() {
+            opLocked = true;
+            try { localStorage.setItem(opLockKey(), '1'); } catch (e) {}
+            const _in = document.getElementById('operationScore'); if (_in) _in.disabled = true;
+            const _sv = document.querySelector('button[onclick="saveOpScore()"]'); if (_sv) _sv.disabled = true;
+            const _ff = document.getElementById('forceFailBtn'); if (_ff) _ff.disabled = true;
+            const _msg = document.getElementById('opLockMsg'); if (_msg) _msg.innerHTML = '🔒 操作分已保存并锁定（不可修改）；如需修改请教师重新验证密码';
+        }
+        function releaseOpLock() {
+            opLocked = false;
+            try { localStorage.removeItem(opLockKey()); } catch (e) {}
+            const _in = document.getElementById('operationScore'); if (_in) _in.disabled = false;
+            const _sv = document.querySelector('button[onclick="saveOpScore()"]'); if (_sv) _sv.disabled = false;
+            const _ff = document.getElementById('forceFailBtn'); if (_ff) _ff.disabled = false;
+        }
         // ========== 操作分 ==========
         function unlockOpScore() {
             let pwd = document.getElementById('opPwd').value;
+            document.getElementById('opPwd').value = ''; // 验证后立即清空密码框，防止学生直接复用
             if (pwd === "314159") {
                 document.getElementById('opScoreDiv').style.display = 'block';
+                releaseOpLock(); // 教师重新验证密码：解除操作分锁定（允许重新评分）
                 document.getElementById('opLockMsg').innerHTML = '✅ 密码正确，可评分及上报（10分钟内刷新免密码）';
                 opScoreLocked = true;
                 try { const _uk = (document.title || "报告").split("|")[0].trim(); localStorage.setItem('opUnlockTime_' + _uk, Date.now()); } catch (e) {}
             } else { document.getElementById('opLockMsg').innerHTML = "❌ 密码错误"; opScoreLocked = false; }
         }
         function saveOpScore() {
+            if (opLocked) { showReportToast("🔒 操作分已锁定，如需修改请教师重新验证密码"); return; }
             if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁"); return; }
             let val = parseFloat(document.getElementById('operationScore').value);
             if (isNaN(val)) val = 0;
@@ -1044,11 +1066,13 @@
             try { const _ok = (document.title || "报告").split("|")[0].trim(); localStorage.setItem('operationScore_' + _ok, val); } catch (e) { /* 存储满不影响操作分同步 */ }
             document.getElementById('currentOpScore').innerText = val;
             showReportToast("✅ 操作分已保存");
+            setOpLocked(); // 保存后直接锁定，防止学生返回修改
             autoGrade();
         }
 
         // ========== 强制0/0/59（未做实验） ==========
         function toggleForceFail() {
+            if (opLocked) { showReportToast("🔒 操作分已锁定，如需修改请教师重新验证密码"); return; }
             if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁"); return; }
             if (forcedFail) {
                 forcedFail = false;
@@ -1075,6 +1099,7 @@
             if (ffMsg) ffMsg.innerHTML = '⚠️ 上报将锁定为：预习 0 分、操作 0 分、综合 59 分';
             autoGrade();
             showReportToast("✅ 已强制 0/0/59，上报分数锁定");
+            setOpLocked(); // 强制锁定后同样锁定操作分
         }
 
         // ========== 一键上报 ==========
@@ -1379,6 +1404,9 @@
             }
         } catch (e) {}
 
+        // ===== 保存后锁定：恢复锁定状态（防学生返回修改） =====
+        if (isOpLocked()) { setOpLocked(); }
+
 
             updateAllAnswerStatusIcons();
             if (hasDrawnIV || hasDrawnVF) {
@@ -1416,6 +1444,8 @@
             try { localStorage.removeItem('opUnlockTime_' + (document.title || "报告").split("|")[0].trim()); } catch (e) {}
             localStorage.removeItem('forcedFail');
             forcedFail = false;
+            try { localStorage.removeItem('opLocked_' + (document.title || "报告").split("|")[0].trim()); } catch (e) {}
+            opLocked = false;
             showReportToast("🗑️ 数据已清除，页面将刷新");
             setTimeout(() => location.reload(), 1200);
         }
@@ -1483,6 +1513,9 @@
                 document.getElementById('currentOpScore').innerText = _v;
             }
         } catch (e) {}
+
+        // ===== 保存后锁定：恢复锁定状态（防学生返回修改） =====
+        if (isOpLocked()) { setOpLocked(); }
 
 
             document.querySelectorAll('.fill-blank').forEach(inp => {
