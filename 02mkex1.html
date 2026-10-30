@@ -219,9 +219,10 @@
     <div class="basic-info" style="background: #f8f9fa; padding: 15px; border-radius: 24px; margin-bottom: 20px;">
         <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
             <div>实验名称：<input type="text" class="info-input" id="expName" value="迈克尔逊干涉仪的调节与使用" readonly></div>
-            <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-01"></div>
-            <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名"></div>
-            <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号"></div>
+            <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-01" readonly></div>
+            <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名" oninput="updateTeacherGate()"></div>
+            <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号" oninput="checkStudentId(this); updateTeacherGate()"><span id="studentIdHint" style="color:#c62828; font-size:0.8rem; margin-left:6px;"></span></div>
+            <div>上课开始时间：<select id="classStartTime" class="info-input" onchange="updateTeacherGate()"><option value="">请选择</option><option value="8:00">8:00</option><option value="10:10">10:10</option><option value="14:30">14:30</option><option value="16:40">16:40</option><option value="18:50">18:50</option></select></div>
             <div>指导教师：<input type="text" class="info-input" id="instructor" value="马厂"></div>
             <div>专业班级：<input type="text" class="info-input" id="class" placeholder="专业班级" style="width:400px"></div>
         </div>
@@ -783,7 +784,53 @@
         const _ff = document.getElementById('forceFailBtn'); if (_ff) _ff.disabled = false;
     }
     // ========== 操作分 ==========
+    // ========== 教师评分闸门：必填项校验 + 上课后60分钟保护 ==========
+    function getClassStartDate() {
+        const dStr = (document.getElementById('expDate')?.value || '').trim();
+        const tStr = (document.getElementById('classStartTime')?.value || '').trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dStr) || !/^\d{1,2}:\d{2}$/.test(tStr)) return null;
+        const _hm = tStr.split(':');
+        const _hh = String(parseInt(_hm[0], 10) || 0).padStart(2, '0');
+        const _mm = String(parseInt(_hm[1], 10) || 0).padStart(2, '0');
+        const dt = new Date(dStr + 'T' + _hh + ':' + _mm + ':00');
+        return isNaN(dt.getTime()) ? null : dt;
+    }
+    function teacherGateBlockReason() {
+        const _nm = (document.getElementById('studentName')?.value || '').trim();
+        const _id = (document.getElementById('studentId')?.value || '').trim();
+        const _tm = (document.getElementById('classStartTime')?.value || '').trim();
+        if (!_nm || !_id || !_tm) return '请先填写姓名、学号和上课开始时间';
+        if (_id && !/^20\d{10}$/.test(_id)) return '学号输入有误（须为20开头的12位数字）';
+        const _st = getClassStartDate();
+        if (!_st) return '上课开始时间无效，请重新选择';
+        const _gate = new Date(_st.getTime() + 60 * 60 * 1000);
+        if (Date.now() < _gate.getTime()) {
+            const _hh2 = String(_gate.getHours()).padStart(2, '0');
+            const _mm2 = String(_gate.getMinutes()).padStart(2, '0');
+            return '上课开始后60分钟内不可评分，请于 ' + _hh2 + ':' + _mm2 + ' 后再试';
+        }
+        return '';
+    }
+    function checkStudentId(inp) {
+        const _h = document.getElementById('studentIdHint');
+        if (!_h || !inp) return;
+        const _v = inp.value.trim();
+        if (_v && !/^20\d{10}$/.test(_v)) _h.textContent = '学号输入有误';
+        else _h.textContent = '';
+    }
+    function updateTeacherGate() {
+        const _pw = document.getElementById('opPwd');
+        const _btn = document.querySelector('button[onclick="unlockOpScore()"]');
+        const _msg = document.getElementById('opLockMsg');
+        const _reason = teacherGateBlockReason();
+        if (_pw) _pw.disabled = !!_reason;
+        if (_btn) _btn.disabled = !!_reason;
+        if (_msg && _reason) _msg.innerHTML = '🔒 ' + _reason;
+    }
+
     function unlockOpScore() {
+        const _gr = teacherGateBlockReason();
+        if (_gr) { document.getElementById('opLockMsg').innerHTML = '🔒 ' + _gr; return; }
         let pwd = document.getElementById('opPwd').value;
         document.getElementById('opPwd').value = ''; // 验证后立即清空密码框，防止学生直接复用
         if (pwd === "314159") {
@@ -1111,7 +1158,7 @@
         } catch (e) {}
         document.getElementById('operationScore').value = '0';
         document.getElementById('currentOpScore').innerText = '0';
-        if (_opUnlocked) {
+        if (_opUnlocked && !teacherGateBlockReason()) {
             opScoreLocked = true;
             document.getElementById('opScoreDiv').style.display = 'block';
             document.getElementById('opLockMsg').innerHTML = '✅ 教师已解锁（10分钟内免密码）';
@@ -1227,7 +1274,7 @@
         } catch (e) {}
         document.getElementById('operationScore').value = '0';
         document.getElementById('currentOpScore').innerText = '0';
-        if (_opUnlocked) {
+        if (_opUnlocked && !teacherGateBlockReason()) {
             opScoreLocked = true;
             document.getElementById('opScoreDiv').style.display = 'block';
             document.getElementById('opLockMsg').innerHTML = '✅ 教师已解锁（10分钟内免密码）';
@@ -1276,6 +1323,7 @@
         } catch (e) {}
         const reportBtn = document.getElementById('oneClickReportBtn');
         if (reportBtn) reportBtn.addEventListener('click', oneClickDataReport);
+        updateTeacherGate();
         // 双保险：恢复上次上报数据条（返回本页时可再次复制）
         try {
             const lastRaw = localStorage.getItem('lastReportText');
