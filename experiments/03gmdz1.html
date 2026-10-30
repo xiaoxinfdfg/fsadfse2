@@ -219,9 +219,10 @@
     <div class="basic-info" style="background: #f8f9fa; padding: 15px; border-radius: 24px; margin-bottom: 20px;">
         <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
             <div>实验名称：<input type="text" class="info-input" id="expName" value="光敏电阻的特性实验" readonly></div>
-            <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-01"></div>
-            <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名"></div>
-            <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号"></div>
+            <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-01" readonly></div>
+            <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名" oninput="updateTeacherGate()"></div>
+            <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号" oninput="checkStudentId(this); updateTeacherGate()"><span id="studentIdHint" style="color:#c62828; font-size:0.8rem; margin-left:6px;"></span></div>
+            <div>上课开始时间：<select id="classStartTime" class="info-input" onchange="updateTeacherGate()"><option value="">请选择</option><option value="8:00">8:00</option><option value="10:10">10:10</option><option value="14:30">14:30</option><option value="16:40">16:40</option><option value="18:50">18:50</option></select></div>
             <div>指导教师：<input type="text" class="info-input" id="instructor" value="马厂"></div>
             <div>专业班级：<input type="text" class="info-input" id="class" placeholder="专业班级" style="width:400px"></div>
         </div>
@@ -358,20 +359,21 @@
     </div>
 <!-- 操作分 -->
     <div class="operator-panel">
-        <strong>🔐 实验操作分 (权重20%，仅教师可操作) & 一键数据上报</strong><br>
+        <strong>🔐 实验操作分 (权重20%，仅教师可操作) & 提交成绩</strong><br>
         <input type="password" id="opPwd" placeholder="教师密码" autocomplete="off">
         <button onclick="unlockOpScore()" class="chart-btn">验证并解锁</button>
         <span id="opLockMsg" style="color:#b71c1c;"></span>
+        <div style="margin-top: 8px; font-size:0.85rem; color:#b71c1c; font-weight:600;">⚠️ 成绩提交提醒：非管理员用户同一时段提交不同实验成绩，会被系统甄别，后果自负。</div>
         <div id="opScoreDiv" style="display:none; margin-top: 12px;">
             <label>操作分数 (0~20): </label>
             <input type="number" id="operationScore" min="0" max="20" step="1" value="0">
             <button onclick="saveOpScore()" class="save-btn">💾 保存操作分</button>
-            <button id="forceFailBtn" onclick="toggleForceFail()" class="save-btn" style="background:#c62828; margin-left: 8px;">⚠️ 强制 0/0/59（未做实验）</button>
+            <button id="forceFailBtn" onclick="toggleForceFail()" class="save-btn" style="background:#c62828; margin-left: 8px;">⚠️ 强制 0/0/59（教师判定数据抄袭）</button>
             <span id="forceFailMsg" style="display:block; margin-top:6px; font-size:0.85rem; color:#c62828;"></span>
-            <button id="oneClickReportBtn" class="submit-report-btn" style="margin-left: 12px;">📤 一键数据上报</button>
+            <button id="oneClickReportBtn" class="submit-report-btn" style="margin-left: 12px;">📤 提交成绩</button>
         </div>
         <div>📋 当前操作分：<span id="currentOpScore">0</span> 分</div>
-        <div style="margin-top: 8px; font-size:0.85rem; color:#00695c;">🔔 教师验证密码后，上方将显示"一键数据上报"按钮，可导出专业班级、学号、姓名、预习得分、操作得分、综合得分及日期（预习和操作已换算为百分制）。</div>
+        <div style="margin-top: 8px; font-size:0.85rem; color:#00695c;">🔔 教师验证密码后，上方将显示"提交成绩"按钮，可导出专业班级、学号、姓名、预习得分、操作得分、综合得分及日期（预习和操作已换算为百分制）。</div>
     </div>
 
     <h2>九、自动评分 & 实验评语</h2>
@@ -882,7 +884,9 @@
         const _in = document.getElementById('operationScore'); if (_in) _in.disabled = true;
         const _sv = document.querySelector('button[onclick="saveOpScore()"]'); if (_sv) _sv.disabled = true;
         const _ff = document.getElementById('forceFailBtn'); if (_ff) _ff.disabled = true;
-        const _msg = document.getElementById('opLockMsg'); if (_msg) _msg.innerHTML = '🔒 操作分已保存并锁定（不可修改）；如需修改请教师重新验证密码';
+        const _nm0 = document.getElementById('studentName'); if (_nm0) _nm0.disabled = true;
+        const _id0 = document.getElementById('studentId'); if (_id0) _id0.disabled = true;
+        const _msg = document.getElementById('opLockMsg'); if (_msg) _msg.innerHTML = '✅ 操作分已保存并锁定。请先提交成绩，然后保存长图-转PDF-学习通提交PDF（如果不会操作，请看学习通章节操作视频）';
     }
     function releaseOpLock() {
         opLocked = false;
@@ -890,9 +894,57 @@
         const _in = document.getElementById('operationScore'); if (_in) _in.disabled = false;
         const _sv = document.querySelector('button[onclick="saveOpScore()"]'); if (_sv) _sv.disabled = false;
         const _ff = document.getElementById('forceFailBtn'); if (_ff) _ff.disabled = false;
+        const _nm0 = document.getElementById('studentName'); if (_nm0) _nm0.disabled = false;
+        const _id0 = document.getElementById('studentId'); if (_id0) _id0.disabled = false;
     }
     // ========== 操作分 ==========
+    // ========== 教师评分闸门：必填项校验 + 上课后60分钟保护 ==========
+    function getClassStartDate() {
+        const dStr = (document.getElementById('expDate')?.value || '').trim();
+        const tStr = (document.getElementById('classStartTime')?.value || '').trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dStr) || !/^\d{1,2}:\d{2}$/.test(tStr)) return null;
+        const _hm = tStr.split(':');
+        const _hh = String(parseInt(_hm[0], 10) || 0).padStart(2, '0');
+        const _mm = String(parseInt(_hm[1], 10) || 0).padStart(2, '0');
+        const dt = new Date(dStr + 'T' + _hh + ':' + _mm + ':00');
+        return isNaN(dt.getTime()) ? null : dt;
+    }
+    function teacherGateBlockReason() {
+        const _nm = (document.getElementById('studentName')?.value || '').trim();
+        const _id = (document.getElementById('studentId')?.value || '').trim();
+        const _tm = (document.getElementById('classStartTime')?.value || '').trim();
+        if (!_nm || !_id || !_tm) return '请先填写姓名、学号和上课开始时间';
+        if (_id && !/^20\d{10}$/.test(_id)) return '学号输入有误（须为20开头的12位数字）';
+        const _st = getClassStartDate();
+        if (!_st) return '上课开始时间无效，请重新选择';
+        const _gate = new Date(_st.getTime() + 60 * 60 * 1000);
+        if (Date.now() < _gate.getTime()) {
+            const _hh2 = String(_gate.getHours()).padStart(2, '0');
+            const _mm2 = String(_gate.getMinutes()).padStart(2, '0');
+            return '上课开始后60分钟内不可评分，请于 ' + _hh2 + ':' + _mm2 + ' 后再试';
+        }
+        return '';
+    }
+    function checkStudentId(inp) {
+        const _h = document.getElementById('studentIdHint');
+        if (!_h || !inp) return;
+        const _v = inp.value.trim();
+        if (_v && !/^20\d{10}$/.test(_v)) _h.textContent = '学号输入有误';
+        else _h.textContent = '';
+    }
+    function updateTeacherGate() {
+        const _pw = document.getElementById('opPwd');
+        const _btn = document.querySelector('button[onclick="unlockOpScore()"]');
+        const _msg = document.getElementById('opLockMsg');
+        const _reason = teacherGateBlockReason();
+        if (_pw) _pw.disabled = !!_reason;
+        if (_btn) _btn.disabled = !!_reason;
+        if (_msg && _reason) _msg.innerHTML = '🔒 ' + _reason;
+    }
+
     function unlockOpScore() {
+        const _gr = teacherGateBlockReason();
+        if (_gr) { document.getElementById('opLockMsg').innerHTML = '🔒 ' + _gr; return; }
         let pwd = document.getElementById('opPwd').value;
         document.getElementById('opPwd').value = ''; // 验证后立即清空密码框，防止学生直接复用
         if (pwd === "314159") {
@@ -925,7 +977,7 @@
             forcedFail = false;
             try { localStorage.removeItem('forcedFail'); } catch (e) {}
             const ffBtn0 = document.getElementById('forceFailBtn');
-            if (ffBtn0) ffBtn0.textContent = '⚠️ 强制 0/0/59（未做实验）';
+            if (ffBtn0) ffBtn0.textContent = '⚠️ 强制 0/0/59（教师判定数据抄袭）';
             const ffMsg0 = document.getElementById('forceFailMsg');
             if (ffMsg0) ffMsg0.innerHTML = '已解除强制，恢复自动评分';
             autoGrade();
@@ -949,7 +1001,7 @@
         setOpLocked(); // 强制锁定后同样锁定操作分
     }
 
-    // ========== 一键上报 ==========
+    // ========== 提交成绩 ==========
     async function oneClickDataReport() {
         if (!opScoreLocked) { showReportToast("⚠️ 请先输入教师密码解锁后再执行上报"); return; }
         try { autoGrade(); } catch (e) { /* 评分异常不阻塞上报 */ }
@@ -1226,7 +1278,7 @@
         } catch (e) {}
         document.getElementById('operationScore').value = '0';
         document.getElementById('currentOpScore').innerText = '0';
-        if (_opUnlocked) {
+        if (_opUnlocked && !teacherGateBlockReason()) {
             opScoreLocked = true;
             document.getElementById('opScoreDiv').style.display = 'block';
             document.getElementById('opLockMsg').innerHTML = '✅ 教师已解锁（10分钟内免密码）';
@@ -1335,7 +1387,7 @@
         } catch (e) {}
         document.getElementById('operationScore').value = '0';
         document.getElementById('currentOpScore').innerText = '0';
-        if (_opUnlocked) {
+        if (_opUnlocked && !teacherGateBlockReason()) {
             opScoreLocked = true;
             document.getElementById('opScoreDiv').style.display = 'block';
             document.getElementById('opLockMsg').innerHTML = '✅ 教师已解锁（10分钟内免密码）';
@@ -1384,6 +1436,7 @@
         } catch (e) {}
         const reportBtn = document.getElementById('oneClickReportBtn');
         if (reportBtn) reportBtn.addEventListener('click', oneClickDataReport);
+        updateTeacherGate();
         // 双保险：恢复上次上报数据条（返回本页时可再次复制）
         try {
             const lastRaw = localStorage.getItem('lastReportText');
@@ -1686,59 +1739,5 @@
 
 
 
-
-<script>
-(function(){
-  function __fillUser(){
-    try{
-      var u=JSON.parse(localStorage.getItem('uphys2_current_user')||'null');
-      if(!u) return;
-      var si=document.getElementById('studentId'), sn=document.getElementById('studentName');
-      if(si && si.value !== u.id) si.value = u.id;
-      if(sn && !sn.value && u.name) sn.value = u.name;
-    }catch(e){}
-  }
-  __fillUser();
-  if(document.readyState==='complete'){ __fillUser(); }
-  else{ window.addEventListener('load', function(){ setTimeout(__fillUser, 300); }); }
-  setTimeout(__fillUser, 800);
-})();
-</script>
-<script>
-(function(){
-  var EXP_NO = 'a03';
-  function __toNum(x){ var m=String(x==null?'':x).match(/(\d+(?:\.\d+)?)/); return m?parseFloat(m[1]):null; }
-  function __collectScore(){
-    try{
-      var u = JSON.parse(localStorage.getItem('uphys2_current_user')||'null');
-      if(!u || (u.role && u.role==='teacher')) return;
-      function gv(id){ var el=document.getElementById(id); return el?el.textContent.trim():null; }
-      var rec = {
-        pre:__toNum(gv('detailPreScore')), data:__toNum(gv('detailDataScore')), calc:__toNum(gv('detailCalcScore')),
-        autoPlot:__toNum(gv('detailAutoPlotScore')), manualPlot:__toNum(gv('detailManualPlotScore')),
-        thought:__toNum(gv('detailThoughtScore')), summary:__toNum(gv('detailSummaryScore')),
-        evidence:__toNum(gv('detailEvidenceScore')), op:__toNum(gv('detailOpScore')),
-        total:__toNum(gv('detailTotalScore')), time:Date.now()
-      };
-      if(rec.total==null) return;
-      var any = [rec.pre,rec.data,rec.calc,rec.autoPlot,rec.manualPlot,rec.thought,rec.summary,rec.evidence,rec.op]
-        .some(function(s){ return s!=null && s>0; });
-      if(rec.total===0 && !any) return;
-      var store = JSON.parse(localStorage.getItem('uphys2_records')||'{}');
-      store[u.id] = store[u.id] || {name:''};
-      if(u.name) store[u.id].name = u.name;
-      store[u.id].exps = store[u.id].exps || {};
-      store[u.id].exps[EXP_NO] = rec;
-      localStorage.setItem('uphys2_records', JSON.stringify(store));
-    }catch(e){}
-  }
-  var __orig = window.autoGrade;
-  if(typeof __orig === 'function'){
-    window.autoGrade = function(){ var r = __orig.apply(this, arguments); setTimeout(__collectScore, 150); return r; };
-  }
-  setTimeout(__collectScore, 1500);
-  window.addEventListener('pagehide', __collectScore);
-  window.addEventListener('beforeunload', __collectScore);
-})();
-</script></body>
+</body>
 </html>
