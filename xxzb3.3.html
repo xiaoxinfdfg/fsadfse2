@@ -1088,7 +1088,7 @@ function drawLambdaFChart(){ const res=calculateSlope2(); if(!res) return; calcu
     }
         // 打开上报表单：优先新窗口，被拦截则用链接点击兜底，保证手机端必有反应
         function openReportForm() {
-            const reportUrl = "https://qrbgda8w.jsjform.com/f/uJfvvZ";
+            const reportUrl = "https://qrbgda8w.jsjform.com/f/xRH3oQ";
             let opened = false;
             try { opened = !!window.open(reportUrl, '_blank'); } catch (e) { opened = false; }
             if (!opened) {
@@ -1169,11 +1169,11 @@ function drawLambdaFChart(){ const res=calculateSlope2(); if(!res) return; calcu
                     try { document.body.style.paddingBottom = ""; } catch (e) {}
                     try { localStorage.removeItem("lastReportText"); } catch (e) {}
                     let op = false;
-                    try { op = !!window.open('https://qrbgda8w.jsjform.com/f/uJfvvZ', '_blank'); } catch (e) { op = false; }
+                    try { op = !!window.open('https://qrbgda8w.jsjform.com/f/xRH3oQ', '_blank'); } catch (e) { op = false; }
                     if (!op) {
                         try {
                             const a = document.createElement('a');
-                            a.href = 'https://qrbgda8w.jsjform.com/f/uJfvvZ';
+                            a.href = 'https://qrbgda8w.jsjform.com/f/xRH3oQ';
                             a.target = '_blank';
                             a.rel = 'noopener';
                             document.body.appendChild(a);
@@ -1184,7 +1184,7 @@ function drawLambdaFChart(){ const res=calculateSlope2(); if(!res) return; calcu
                     setTimeout(function () {
                         try {
                             if (!(document.hidden || document.visibilityState === 'hidden')) {
-                                window.location.href = 'https://qrbgda8w.jsjform.com/f/uJfvvZ';
+                                window.location.href = 'https://qrbgda8w.jsjform.com/f/xRH3oQ';
                             }
                         } catch (e) {}
                     }, 800);
@@ -1237,7 +1237,7 @@ function drawLambdaFChart(){ const res=calculateSlope2(); if(!res) return; calcu
                 if (!ok) { try { ok = document.execCommand('copy'); } catch (e) { ok = false; } }
                 showReportToast(ok ? "✅ 已复制！请到上报页面粘贴" : "⚠️ 自动复制失败，请长按文字手动复制");
             });
-            btnOpen.addEventListener('click', function () { window.location.href = "https://qrbgda8w.jsjform.com/f/uJfvvZ"; });
+            btnOpen.addEventListener('click', function () { window.location.href = "https://qrbgda8w.jsjform.com/f/xRH3oQ"; });
             btnClose.addEventListener('click', function () { mask.remove(); });
             mask.addEventListener('click', function (e) { if (e.target === mask) mask.remove(); });
         }
