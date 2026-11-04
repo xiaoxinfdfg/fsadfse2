@@ -687,7 +687,7 @@
             else if (correctAnswers && correctAnswers.some(ans => {
                     const user = userAnswer.toLowerCase().replace(/\s+/g, '');
                     const correct = ans.toLowerCase().replace(/\s+/g, '');
-                    return user === correct || user.includes(correct) || correct.includes(user);
+                    return user.replace(/[。，、；：,.!?！？（）()]/g,'') === correct.replace(/[。，、；：,.!?！？（）()]/g,'');
                 })) status = 'correct';
             else status = 'incorrect';
             statusSpan.classList.remove('correct-icon', 'incorrect-icon', 'empty-icon');
@@ -979,7 +979,7 @@
                 if (val && ans && ans.some(a => {
                         const user = val.replace(/\s+/g,'');
                         const correct = a.toLowerCase().replace(/\s+/g,'');
-                        return user === correct || user.includes(correct) || correct.includes(user);
+                        return user.replace(/[。，、；：,.!?！？（）()]/g,'') === correct.replace(/[。，、；：,.!?！？（）()]/g,'');
                     })) correct++;
             });
             return Math.round((correct / inputs.length) * 10);
