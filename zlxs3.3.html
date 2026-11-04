@@ -265,6 +265,7 @@ background: rgba(200, 230, 201, 0.3);
             <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-01" readonly></div>
             <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名" oninput="updateTeacherGate()"></div>
             <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号" oninput="checkStudentId(this); updateTeacherGate()"><span id="studentIdHint" style="color:#c62828; font-size:0.8rem; margin-left:6px;"></span></div>
+            <span id="basicInfoLockHint" style="display:none; color:#c62828; font-size:0.8rem; margin-left:8px;">🔒 操作分已保存，姓名与学号已锁定（教师验证密码或重置数据后解锁）</span>
             <div>上课开始时间：<select id="classStartTime" class="info-input" onchange="updateTeacherGate()"><option value="">请选择</option><option value="8:00">8:00</option><option value="10:10">10:10</option><option value="14:30">14:30</option><option value="16:40">16:40</option><option value="18:50">18:50</option></select></div>
             <div>指导教师：<input type="text" class="info-input" id="instructor" value="马厂"></div>
             <div>专业班级：<input type="text" class="info-input" id="class" placeholder="专业班级" style="width:400px"></div>
@@ -503,7 +504,7 @@ background: rgba(200, 230, 201, 0.3);
         "content8": ["环形液膜"],
     };
     // 归一化：忽略大小写与空白
-    function normalizeAnswer(s) { return (s || '').toLowerCase().replace(/\s+/g, ''); }
+    function normalizeAnswer(s) { return (s || '').toLowerCase().replace(/\s+/g, '').replace(/[。，、；：,.!?！？（）()]/g, ''); }
     // 匹配判断：完全一致，或“用户答案包含完整标准答案 / 标准答案包含较长的用户答案”（至少2字）
     function matchAnswer(user, candidates) {
         const u = normalizeAnswer(user);
@@ -511,8 +512,6 @@ background: rgba(200, 230, 201, 0.3);
         return candidates.some(a => {
             const cc = normalizeAnswer(a);
             if (u === cc) return true;
-            if (u.length >= 2 && cc.includes(u)) return true;
-            if (cc.length >= 2 && u.includes(cc)) return true;
             return false;
         });
     }
@@ -748,6 +747,7 @@ function calculateError(){ const temp=parseFloat(document.getElementById('temp')
             const _ff = document.getElementById('forceFailBtn'); if (_ff) _ff.disabled = true;
             const _nm0 = document.getElementById('studentName'); if (_nm0) _nm0.disabled = true;
             const _id0 = document.getElementById('studentId'); if (_id0) _id0.disabled = true;
+            const _bh = document.getElementById('basicInfoLockHint'); if (_bh) _bh.style.display = 'inline';
             const _msg = document.getElementById('opLockMsg'); if (_msg) _msg.innerHTML = '✅ 操作分已保存并锁定。请先提交成绩，然后保存长图-转PDF-学习通提交PDF（如果不会操作，请看学习通章节操作视频）';
         }
         function releaseOpLock() {
@@ -758,6 +758,7 @@ function calculateError(){ const temp=parseFloat(document.getElementById('temp')
             const _ff = document.getElementById('forceFailBtn'); if (_ff) _ff.disabled = false;
             const _nm0 = document.getElementById('studentName'); if (_nm0) _nm0.disabled = false;
             const _id0 = document.getElementById('studentId'); if (_id0) _id0.disabled = false;
+            const _bh = document.getElementById('basicInfoLockHint'); if (_bh) _bh.style.display = 'none';
         }
         // ========== 教师评分闸门：必填项校验 + 上课后60分钟保护 ==========
         function getClassStartDate() {
