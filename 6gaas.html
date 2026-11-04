@@ -185,7 +185,7 @@
         }
         .img-card {
             position: relative;
-            width: 140px;
+            width: 420px;
             border-radius: 16px;
             background: white;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
@@ -195,7 +195,7 @@
         }
         .img-card img {
             width: 100%;
-            height: 100px;
+            height: 300px;
             object-fit: cover;
             border-radius: 12px;
             display: block;
@@ -432,10 +432,10 @@
                 white-space: normal;
             }
             .img-card {
-                width: 110px;
+                width: 330px;
             }
             .img-card img {
-                height: 80px;
+                height: 240px;
             }
         }
     </style>
@@ -449,6 +449,7 @@
             <button class="btn" onclick="manualSave()">💾 保存进度</button>
             <button class="btn" onclick="manualLoad()">📂 加载记录</button>
             <button class="btn" onclick="exportData()">📎 导出备份</button>
+            <button class="btn" onclick="importData()">📤 导入备份</button>
             <button class="btn btn-danger" onclick="clearSavedData()">🗑️ 重置所有</button>
         </div>
 
@@ -460,10 +461,11 @@
             </div>
             <input type="hidden" id="expName" value="MESFET器件工艺与仿真 (ATHENA+ATLAS)">
             <div>日期：<input type="text" class="info-input" id="expDate" placeholder="2026-06-27"></div>
-            <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名"></div>
-            <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号"></div>
+            <div>姓名：<input type="text" class="info-input" id="studentName" placeholder="学生姓名" oninput="updateTeacherGate()"></div>
+            <div>学号：<input type="text" class="info-input" id="studentId" placeholder="学号" oninput="checkStudentId(this); updateTeacherGate()"><span id="studentIdHint" style="color:#c62828; font-size:0.8rem; margin-left:6px;"></span><span id="basicInfoLockHint" style="display:none; color:#c62828; font-size:0.8rem; margin-left:8px;">🔒 教师评分已保存，姓名与学号已锁定（教师验证密码或重置数据后解锁）</span></div>
             <div>指导教师：<input type="text" class="info-input" id="instructor" value="马厂"></div>
             <div>专业班级：<input type="text" class="info-input" id="class" placeholder="微电子/集成电路" style="width:260px"></div>
+            <div>上课开始时间：<select id="classStartTime" class="info-input" onchange="updateTeacherGate()"><option value="">请选择</option><option value="8:00">8:00</option><option value="10:10">10:10</option><option value="14:30">14:30</option><option value="16:40">16:40</option><option value="18:50">18:50</option></select></div>
         </div>
 
         <!-- ========== 一、工艺仿真 - 网格定义与衬底 ========== -->
@@ -634,8 +636,7 @@
         <div class="evidence-area">
             <strong>📸 实验证据图片上传（权重30%：仿真结构截图/IV曲线/能带图/S参数等）</strong>
             <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:10px 0;">
-                <input type="file" id="evidenceUpload" accept="image/*" multiple style="flex:1; min-width:200px;">
-                <button class="btn btn-success" onclick="uploadEvidenceImages()">➕ 上传图片</button>
+                <input type="file" id="evidenceUpload" accept="image/*" multiple onchange="uploadEvidenceImages()" style="flex:1; min-width:200px;">
                 <button class="btn btn-warning" onclick="clearAllImages()">🗑️ 清空所有</button>
                 <span id="imageCount" style="font-size:0.85rem; color:#555;">已上传 0 张</span>
             </div>
@@ -684,6 +685,7 @@
         let imageList = [];
         let teacherVerified = false;
         let evidenceScoreManual = 0;
+        let opLocked = false;
 
         function showToast(message, duration = 2200) {
             document.querySelectorAll('.report-toast').forEach(el => el.remove());
@@ -759,19 +761,72 @@
                 inp.addEventListener('input', () => updateAnswerStatus(inp));
                 updateAnswerStatus(inp);
             });
+        }
+        // 学号格式校验提示（对齐模板：20 开头的 12 位学号）
+        function checkStudentId(inp) {
+            const _h = document.getElementById('studentIdHint');
+            if (!_h || !inp) return;
+            const _v = inp.value.trim();
+            if (_v && !/^20\d{10}$/.test(_v)) _h.textContent = '学号输入有误';
+            else _h.textContent = '';
+        }
+        // ========== 教师评分闸门（对齐模板）：必填项校验 + 上课后120分钟保护 ==========
+        function getClassStartDate() {
+            const dStr = (document.getElementById('expDate')?.value || '').trim();
+            const tStr = (document.getElementById('classStartTime')?.value || '').trim();
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dStr) || !/^\d{1,2}:\d{2}$/.test(tStr)) return null;
+            const _hm = tStr.split(':');
+            const _hh = String(parseInt(_hm[0], 10) || 0).padStart(2, '0');
+            const _mm = String(parseInt(_hm[1], 10) || 0).padStart(2, '0');
+            const dt = new Date(dStr + 'T' + _hh + ':' + _mm + ':00');
+            return isNaN(dt.getTime()) ? null : dt;
         }
+        function teacherGateBlockReason() {
+            const _nm = (document.getElementById('studentName')?.value || '').trim();
+            const _id = (document.getElementById('studentId')?.value || '').trim();
+            const _tm = (document.getElementById('classStartTime')?.value || '').trim();
+            if (!_nm || !_id || !_tm) return '请先填写姓名、学号和上课开始时间';
+            if (_id && !/^20\d{10}$/.test(_id)) return '学号输入有误（须为20开头的12位数字）';
+            const _st = getClassStartDate();
+            if (!_st) return '上课开始时间无效，请重新选择';
+            const _gate = new Date(_st.getTime() + 120 * 60 * 1000);
+            if (Date.now() < _gate.getTime()) {
+                const _hh2 = String(_gate.getHours()).padStart(2, '0');
+                const _mm2 = String(_gate.getMinutes()).padStart(2, '0');
+                return '上课开始后120分钟内不可评分，请于 ' + _hh2 + ':' + _mm2 + ' 后再试';
+            }
+            return '';
+        }
+        function updateTeacherGate() {
+            const _pw = document.getElementById('teacherPwd');
+            const _btn = document.querySelector('button[onclick="verifyTeacher()"]');
+            const _msg = document.getElementById('teacherMsg');
+            const _reason = teacherGateBlockReason();
+            if (_pw) _pw.disabled = !!_reason;
+            if (_btn) _btn.disabled = !!_reason;
+            if (_msg && _reason) _msg.innerHTML = '🔒 ' + _reason;
+        }
+
+
 
         // ============================================================
         // 教师验证
         // ============================================================
         function verifyTeacher() {
+            const _gr = teacherGateBlockReason();
+            if (_gr) {
+                document.getElementById('teacherMsg').innerHTML = "🔒 " + _gr;
+                showToast("🔒 " + _gr);
+                return;
+            }
             const pwd = document.getElementById('teacherPwd').value;
-            if (pwd === "52531314") {
+            if (pwd === "314159") {
                 teacherVerified = true;
                 document.getElementById('teacherMsg').innerHTML = "✅ 验证成功，可评分及上报";
                 document.getElementById('teacherPanelLocked').style.display = "block";
                 document.getElementById('reportBtnForTeacher').onclick = oneClickDataReport;
                 showToast("🔓 教师权限已解锁");
+                releaseOpLock();
             } else {
                 teacherVerified = false;
                 document.getElementById('teacherMsg').innerHTML = "❌ 密码错误，无法评分/上报";
@@ -788,7 +843,31 @@
             document.getElementById('currentEvidenceScoreSpan').innerText = evidenceScoreManual;
             showToast(`📸 证据分数已设置为 ${evidenceScoreManual}/30`);
             manualSave();
+            setOpLocked();
+        }
+        // ========== 教师评分锁定（对齐模板：保存证据分后防学生修改） ==========
+        function opLockKey() { return 'opLocked_' + (document.title || "报告").split("|")[0].trim(); }
+        function isOpLocked() { try { return localStorage.getItem(opLockKey()) === '1'; } catch (e) { return false; } }
+        function setOpLocked() {
+            opLocked = true;
+            try { localStorage.setItem(opLockKey(), '1'); } catch (e) {}
+            const _in = document.getElementById('evidenceScore'); if (_in) _in.disabled = true;
+            const _sv = document.querySelector('button[onclick="saveEvidenceScore()"]'); if (_sv) _sv.disabled = true;
+            const _msg = document.getElementById('teacherMsg'); if (_msg) _msg.innerHTML = '🔒 证据分已保存并锁定（不可修改）；如需修改请教师重新验证密码';
+            const _nm = document.getElementById('studentName'); if (_nm) _nm.disabled = true;
+            const _id = document.getElementById('studentId'); if (_id) _id.disabled = true;
+            const _bh = document.getElementById('basicInfoLockHint'); if (_bh) _bh.style.display = 'inline';
         }
+        function releaseOpLock() {
+            opLocked = false;
+            try { localStorage.removeItem(opLockKey()); } catch (e) {}
+            const _in = document.getElementById('evidenceScore'); if (_in) _in.disabled = false;
+            const _sv = document.querySelector('button[onclick="saveEvidenceScore()"]'); if (_sv) _sv.disabled = false;
+            const _nm = document.getElementById('studentName'); if (_nm) _nm.disabled = false;
+            const _id = document.getElementById('studentId'); if (_id) _id.disabled = false;
+            const _bh = document.getElementById('basicInfoLockHint'); if (_bh) _bh.style.display = 'none';
+        }
+
 
         // ============================================================
         // 评分逻辑
@@ -892,35 +971,146 @@
             showToast(`📊 评分完成：${total}/100`);
         }
 
-        // ============================================================
-        // 一键上报
-        // ============================================================
+        // 一键上报 (教师密码保护) —— 交互对齐模板（保留 GXDAiI 表单与填空/证据/综合得分格式）
         async function oneClickDataReport() {
-            if (!teacherVerified) { showToast("⚠️ 请先输入教师密码并验证通过后才能上报数据！"); return; }
-            runAutoGrade();
-            const className = document.getElementById('class').value.trim() || "未填";
-            const stuId = document.getElementById('studentId').value.trim() || "未填";
-            const stuName = document.getElementById('studentName').value.trim() || "未填";
-            const totalScore = document.getElementById('detailTotalScore').innerText;
-            const date = document.getElementById('expDate').value.trim() || new Date().toLocaleDateString('zh-CN');
-            const instructor = document.getElementById('instructor').value.trim() || "马厂";
-            const expName = "MESFET器件工艺与仿真 (ATHENA+ATLAS)";
-            const reportText =
-                `${expName}\n专业班级:${className}\n学号:${stuId}\n姓名:${stuName}\n综合得分:${totalScore}\n实验日期:${date}\n指导教师:${instructor}`;
-            try {
-                await navigator.clipboard.writeText(reportText);
-                showToast("✅ 实验报告数据已复制，可粘贴至表单");
-            } catch (_) {
-                let ta = document.createElement('textarea');
-                ta.value = reportText;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                ta.remove();
-                showToast("✅ 实验报告数据已复制（备用方式）");
+            if (!teacherVerified) {
+                showToast("⚠️ 请先输入教师密码并验证通过后才能上报数据！");
+                return;
             }
-            window.open("https://qrbgda8w.jsjform.com/f/GXDAiI", '_blank');
+            try { runAutoGrade(); } catch (e) { /* 评分异常不阻塞上报 */ }
+            const className = document.getElementById('class')?.value.trim() || "未填专业班级";
+            const stuId = document.getElementById('studentId')?.value.trim() || "未填学号";
+            const stuName = document.getElementById('studentName')?.value.trim() || "未填姓名";
+            const totalScore = document.getElementById('detailTotalScore')?.innerText?.split('/')[0] || "0";
+            const blankScore = document.getElementById('detailBlankScore')?.innerText?.split('/')[0] || "0";
+            const evidenceScore = document.getElementById('detailEvidenceScore')?.innerText?.split('/')[0] || "0";
+            const date = document.getElementById('expDate')?.value.trim() || new Date().toLocaleDateString('zh-CN');
+            const instructor = document.getElementById('instructor')?.value.trim() || "马厂";
+            const expName = document.getElementById('expName')?.value.trim() || (document.title || "实验报告").split("|")[0].trim();
+            const reportLines = [
+                expName,
+                `专业班级:${className}`,
+                `学号:${stuId}`,
+                `姓名:${stuName}`,
+                `填空与参数:${blankScore}`,
+                `证据图片:${evidenceScore}`,
+                `综合得分:${totalScore}`,
+                `实验日期:${date}`,
+                `指导教师:${instructor}`,
+                `ϞҨӃҖӜ™`,
+            ];
+            const reportText = reportLines.join("\n");
+            // ① 先同步复制到剪贴板（textarea+execCommand，页面聚焦时即成功，不依赖异步权限）
+            let copied = copyReportTextSync(reportText);
+            // ② 立即打开上报表单（同步调用，用户激活最充分，浏览器拦截概率最低）
+            openReportForm();
+            // ③ 同步复制失败时，用 Clipboard API 兜底
+            if (!copied) {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(reportText);
+                        copied = true;
+                    }
+                } catch (e) { copied = false; }
+            }
+            if (copied) {
+                // ④ 终极兜底：新页未打开时（本页仍在前台），800ms 后同页跳转，保证必达统计平台
+                setTimeout(function () {
+                    try {
+                        if (!(document.hidden || document.visibilityState === 'hidden')) {
+                            window.location.href = "https://qrbgda8w.jsjform.com/f/GXDAiI";
+                        }
+                    } catch (e) { /* 忽略 */ }
+                }, 800);
+                showToast("✅ 数据已复制！请在上报页面粘贴提交");
+            } else {
+                showReportContentModal(reportText);
+            }
         }
+
+        // ---------- 上报辅助（对齐模板：同步复制 / 常驻数据条 / 内容弹窗 / 打开表单） ----------
+        function copyReportTextSync(text) {
+            try {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.setAttribute('readonly', '');
+                textarea.style.position = 'fixed';
+                textarea.style.top = '-9999px';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                textarea.setSelectionRange(0, textarea.value.length);
+                const ok = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                return !!ok;
+            } catch (e) { return false; }
+        }
+
+
+
+        // 兜底弹窗：剪贴板不可用时展示报告内容，支持长按复制
+        function showReportContentModal(text) {
+            let mask = document.createElement('div');
+            mask.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px;';
+            let box = document.createElement('div');
+            box.style.cssText = 'background:#fff;border-radius:14px;max-width:420px;width:100%;padding:18px;box-sizing:border-box;font-size:14px;color:#222;';
+            let title = document.createElement('div');
+            title.style.cssText = 'font-weight:700;font-size:15px;margin-bottom:10px;';
+            title.textContent = '📋 请长按下方内容复制，再粘贴到上报页面';
+            let ta = document.createElement('textarea');
+            ta.readOnly = true;
+            ta.value = text;
+            ta.style.cssText = 'width:100%;height:200px;box-sizing:border-box;font-size:13px;border:1px solid #ccc;border-radius:8px;padding:8px;background:#fafafa;color:#222;white-space:pre;resize:none;';
+            let btnRow = document.createElement('div');
+            btnRow.style.cssText = 'margin-top:12px;display:flex;gap:8px;';
+            let btnCopy = document.createElement('button');
+            btnCopy.textContent = '复制';
+            btnCopy.style.cssText = 'flex:1;padding:9px;border:none;border-radius:8px;background:#1976d2;color:#fff;font-size:14px;';
+            let btnOpen = document.createElement('button');
+            btnOpen.textContent = '打开上报页面';
+            btnOpen.style.cssText = 'flex:1;padding:9px;border:none;border-radius:8px;background:#2e7d32;color:#fff;font-size:14px;';
+            let btnClose = document.createElement('button');
+            btnClose.textContent = '关闭';
+            btnClose.style.cssText = 'padding:9px 14px;border:none;border-radius:8px;background:#eee;color:#555;font-size:14px;';
+            btnRow.appendChild(btnCopy); btnRow.appendChild(btnOpen); btnRow.appendChild(btnClose);
+            box.appendChild(title); box.appendChild(ta); box.appendChild(btnRow);
+            mask.appendChild(box);
+            document.body.appendChild(mask);
+            ta.addEventListener('click', function () { ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length); });
+            btnCopy.addEventListener('click', async function () {
+                ta.focus(); ta.select(); ta.setSelectionRange(0, ta.value.length);
+                let ok = false;
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(text); ok = true; }
+                    else { ok = document.execCommand('copy'); }
+                } catch (e) { ok = false; }
+                if (!ok) { try { ok = document.execCommand('copy'); } catch (e) { ok = false; } }
+                showToast(ok ? "✅ 已复制！请到上报页面粘贴" : "⚠️ 自动复制失败，请长按文字手动复制");
+            });
+            btnOpen.addEventListener('click', function () { window.location.href = "https://qrbgda8w.jsjform.com/f/GXDAiI"; });
+            btnClose.addEventListener('click', function () { mask.remove(); });
+            mask.addEventListener('click', function (e) { if (e.target === mask) mask.remove(); });
+        }
+
+        // 打开上报表单：优先新窗口，被拦截则用链接点击兜底，保证手机端必有反应
+        function openReportForm() {
+            const reportUrl = "https://qrbgda8w.jsjform.com/f/GXDAiI";
+            let opened = false;
+            try { opened = !!window.open(reportUrl, '_blank'); } catch (e) { opened = false; }
+            if (!opened) {
+                try {
+                    const a = document.createElement('a');
+                    a.href = reportUrl;
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } catch (e) { /* 已尽力，兜底弹窗仍可打开 */ }
+            }
+        }
+
 
         // ============================================================
         // 图片上传（修复版）
@@ -1095,7 +1285,7 @@
             data.thoughts.thought2 = document.getElementById('thought2').value;
             data.thoughts.thought3 = document.getElementById('thought3').value;
             try {
-                localStorage.setItem('fullReport', JSON.stringify(data));
+                localStorage.setItem('fullReport_gaas', JSON.stringify(data));
                 document.getElementById('lastSaveTime').innerText = `📁 保存于 ${new Date().toLocaleTimeString()}`;
                 showToast("💾 进度已保存");
             } catch (e) {
@@ -1108,7 +1298,7 @@
         }
 
         function manualLoad() {
-            const raw = localStorage.getItem('fullReport');
+            const raw = localStorage.getItem('fullReport_gaas');
             if (!raw) { showToast("📭 无保存记录"); return; }
             try {
                 const data = JSON.parse(raw);
@@ -1146,7 +1336,7 @@
         }
 
         function exportData() {
-            const d = localStorage.getItem('fullReport');
+            const d = localStorage.getItem('fullReport_gaas');
             if (d) {
                 try {
                     const a = document.createElement('a');
@@ -1158,11 +1348,33 @@
                     showToast("⚠️ 导出失败");
                 }
             } else { showToast("📭 暂无数据可导出"); }
+        }
+        function importData() {
+            let inp = document.createElement('input');
+            inp.type = 'file';
+            inp.accept = '.json';
+            inp.onchange = function(e) {
+                let f = e.target.files[0];
+                if (!f) return;
+                let reader = new FileReader();
+                reader.onload = function(ev) {
+                    localStorage.setItem('fullReport_gaas', ev.target.result);
+                    showToast("✅ 导入成功，即将刷新页面");
+                    setTimeout(() => location.reload(), 1500);
+                };
+                reader.readAsText(f);
+            };
+            inp.click();
         }
+
 
         function clearSavedData() {
             if (confirm("确定要清除所有本地保存的数据吗？此操作不可恢复！")) {
-                localStorage.clear();
+                localStorage.removeItem('fullReport_gaas');
+                localStorage.removeItem('evidenceImages');
+                localStorage.removeItem('lastReportText');
+                try { localStorage.removeItem(opLockKey()); } catch (e) {}
+                opLocked = false;
                 showToast("🗑️ 所有数据已清除，页面即将刷新");
                 setTimeout(() => location.reload(), 800);
             }
@@ -1224,10 +1436,13 @@
         window.onload = function() {
             document.getElementById('expName').value = 'MESFET器件工艺与仿真 (ATHENA+ATLAS)';
             bindFillEvents();
+            const _today = new Date();
+            document.getElementById('expDate').value = _today.getFullYear() + '-' + String(_today.getMonth() + 1).padStart(2, '0') + '-' + String(_today.getDate()).padStart(2, '0');
+            
 
             loadImagesFromStorage();
 
-            const raw = localStorage.getItem('fullReport');
+            const raw = localStorage.getItem('fullReport_gaas');
             if (raw) {
                 try {
                     const data = JSON.parse(raw);
@@ -1261,10 +1476,11 @@
             teacherVerified = false;
             document.getElementById('teacherPanelLocked').style.display = "none";
             document.getElementById('teacherMsg').innerHTML = "";
+            updateTeacherGate();
+            if (isOpLocked()) { setOpLocked(); }
             document.getElementById('evidenceScore').value = "0";
             evidenceScoreManual = 0;
-            document.getElementById('currentEvidenceScoreSpan').innerText = "0";
-            drawCharts();
+            document.getElementById('currentEvidenceScoreSpan').innerText = "0";            drawCharts();
         };
     </script>
 </body>
